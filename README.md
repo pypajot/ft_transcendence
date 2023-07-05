@@ -1,3 +1,6 @@
+#INFOS
+The interesting part of the NestJS code for the database connection is in these 2 files in ./backend/src/ : app.module.ts and orm.config.ts
+
 #PREREQUIS
 - Docker installed
 - TypeOrm and pg npm lib have been installed with the command:
