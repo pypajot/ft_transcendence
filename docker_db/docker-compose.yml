@@ -10,11 +10,34 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: ${PGDATA}
-    volumes:
-       - postgres:/data/postgres_db
+    networks:
+      - transcendence
+  #  volumes:
+  #     - postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    restart: unless-stopped
-volumes:
-    postgres:
-      external: true
+    restart: always
+
+#volumes:
+#  postgres:
+#    name: postgres
+#    driver: local
+#    driver_opts:
+#      type: none
+#      o: bind
+#      device: /mnt/nfs/homes/ppajot/data/postgres_db
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - transcendence
+    depends_on:
+      - postgres
+    restart: always
+
+networks:
+  transcendence:
+    driver: bridge
