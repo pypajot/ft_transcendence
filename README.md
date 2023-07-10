@@ -10,10 +10,18 @@ npm install @nestjs/typeorm typeorm pg
 
 #RUN
 - in the ./docker_db dir, run :
-docker volume create postgres
-docker-compose up -d
+`docker volume create postgres`
+`docker-compose up -d`
 
 - in the ./backend dir, run :
-npm run start:dev
+`npm install`
+`npm run start:dev`
 
-If there are no errors the backend is connected to the database successfully.
+- in the ./frontend dir, run :
+`npm install`
+`npm run start`
+
+Check :
+`localhost:8000/message` : you should see {message: "Hello World!"} from server.
+
+`localhost:3000` : you should see "Hello World!", fetched by client from server.
