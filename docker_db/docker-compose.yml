@@ -1,5 +1,5 @@
 services:
-  postgres:
+  postgresql:
     build:
       context: .
       dockerfile: Dockerfile
@@ -26,17 +26,6 @@ services:
 #      type: none
 #      o: bind
 #      device: /mnt/nfs/homes/ppajot/data/postgres_db
-
-  adminer:
-    image: adminer
-    container_name: adminer
-    ports:
-      - 8080:8080
-    networks:
-      - transcendence
-    depends_on:
-      - postgres
-    restart: always
 
 networks:
   transcendence:
