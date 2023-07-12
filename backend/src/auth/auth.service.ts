@@ -7,6 +7,7 @@ export class AuthService {
 	constructor(private prisma: PrismaService) {}
 
 	async signup(dto: AuthDto) {
+		console.log(dto);
 		const user =  await this.prisma.user.create({
 			data: {
 				username: dto.username,
