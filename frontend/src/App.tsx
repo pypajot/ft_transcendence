@@ -1,8 +1,4 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css';
-import { json } from 'stream/consumers';
 
 
 
@@ -33,9 +29,8 @@ function App() {
 		// 	password: formData.get('password')
 		// };
 		alert(JSON.stringify(formBody));
-		await fetch('http://localhost:3333/auth/signup', {
+		await fetch('/auth/signup', {
 			method: 'POST',
-			mode: 'cors',
 			body: JSON.stringify(formBody)
 				// formData
 			

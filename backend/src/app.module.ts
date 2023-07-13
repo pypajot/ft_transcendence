@@ -7,7 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 
 ConfigModule.forRoot({
-	  envFilePath: '.env',
+	  envFilePath: '../.env',
 	  isGlobal: true,
 });
 
