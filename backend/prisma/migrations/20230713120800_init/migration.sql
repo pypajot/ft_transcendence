@@ -3,21 +3,22 @@ CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "username" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "hash" TEXT NOT NULL,
+    "firstName" TEXT,
+    "lastName" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Tweet" (
+CREATE TABLE "Bookmark" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "content" TEXT NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "link" TEXT NOT NULL,
 
-    CONSTRAINT "Tweet_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Bookmark_pkey" PRIMARY KEY ("id")
 );
-
--- AddForeignKey
-ALTER TABLE "Tweet" ADD CONSTRAINT "Tweet_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
