@@ -1,20 +1,16 @@
+version: '3.8'
 services:
-  postgres:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: "postgres_db"
-    container_name: ${PG_CONTAINER_NAME}
+  postgres_db:
+    image: postgres:13
+    ports:
+      - "5434:5432"
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      PGDATA: ${PGDATA}
-    volumes:
-       - postgres:/data/postgres_db
-    ports:
-      - "5432:5432"
-    restart: unless-stopped
-volumes:
-    postgres:
-      external: true
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      - trenscendence
+networks:
+  trenscendence:
