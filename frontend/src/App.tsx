@@ -1,10 +1,22 @@
+import { useEffect, useState } from 'react';
+import { UserAPI } from './api/UserAPI';
+import { UserDTO } from './api/dto/user.dto';
 import './App.css';
 
-
-
-
-
 function App() {
+
+	const [user, setUser] = useState<UserDTO>();
+
+
+	useEffect(() => {
+		async function FetchUser() {
+			const response = await UserAPI.getUser();
+			console.log(response);
+			setUser(response);
+		}
+
+		FetchUser();
+	}, []);
 
 	async function HandleSubmit(e: any)
 	{
@@ -13,27 +25,15 @@ function App() {
 		const form = e.target;
 		const formData = new FormData(form);
 
-		var formBody = {
-				"username": "test",
-				"password": "test"
+		const formBody = {
+				"username": formData.get('username'),
+				"password": formData.get('password')
 		}
-		// for (var property in formData)
-		// {
-		// 	console.log(property);
-			// var encodedKey = encodeURIComponent(property[0]);
-			// var encodedValue = encodeURIComponent(property[1]);
-			// formBody.push(encodedKey + "=" + encodedValue);
-		// }
-		// const data = {
-		// 	username: formData.get('username'),
-		// 	password: formData.get('password')
-		// };
 		alert(JSON.stringify(formBody));
 		await fetch('/auth/signup', {
 			method: 'POST',
-			body: JSON.stringify(formBody)
-				// formData
-			
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(formBody)			
 		})
 	}
 
@@ -60,6 +60,12 @@ function App() {
 						</button>
 					</div>
 				</form>
+			</div>
+			<div>
+				<h1>Users</h1>
+				<ul>{user?.id}</ul>
+				{/* <ul>{user?.username}</ul> */}
+				<ul>{user?.password}</ul>
 			</div>
 		</>
 	);
