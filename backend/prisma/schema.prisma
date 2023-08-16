@@ -10,8 +10,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Users {
 	id			Int		@default(autoincrement()) @id
-	username	String
+	username	String	@unique
 	hash		String
 }
