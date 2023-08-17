@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './Login.css';
 
-const Signup = () => {
+const Login = () => {
 
 	// const [user, setUser] = useState<UserDTO>();
 
@@ -27,18 +27,20 @@ const Signup = () => {
 				"username": formData.get('username'),
 				"password": formData.get('password')
 		}
-		alert(JSON.stringify(formBody));
-		await fetch('/auth/signup', {
+		// alert(JSON.stringify(formBody));
+		await fetch('/auth/login', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(formBody),
 		})
+		.then(response => response.json())
+		.then(response => alert(JSON.stringify(response)));
 	}
 
 	return (
 		<>
 			<div>
-				<h1>Signup Form</h1>
+				<h1>Login Form</h1>
 			</div>
 			<div>
 				<form onSubmit={HandleSubmit}>
@@ -64,4 +66,4 @@ const Signup = () => {
 };
 
 
-export default Signup;
+export default Login;
