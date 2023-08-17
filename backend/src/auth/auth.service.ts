@@ -4,6 +4,7 @@ import { AuthDto } from "./dto";
 import * as argon2 from 'argon2';
 import { Prisma } from "@prisma/client";
 import {JwtService} from '@nestjs/jwt'
+import { access } from "fs";
 
 @Injectable()
 export class AuthService {
@@ -37,29 +38,41 @@ export class AuthService {
 		
 	}
 
-	async validateUser(dto: AuthDto) {
+	async login(dto: AuthDto) {
+		const user = await this.validateUser(dto.username, dto.password);
+		return this.signToken(user.id, user.username);
+	};
+
+
+	async validateUser(username: string, password: string)
+	{
 		const user = await this.prisma.users.findUnique({
 			where: {
-				username: dto.username,
+				username: username,
 			}
 		})
 
 		if (!user)
 			throw (new ForbiddenException('Invalid username'));
 
-		const pwMatch = await argon2.verify(user.hash, dto.password);
+		const pwMatch = await argon2.verify(user.hash, password);
 
 		if (!pwMatch)
 			throw (new ForbiddenException('Invalid password'));
-		
+
 		return user;
-	};
+	}
 
-
-	async login(user: any) {
-		const payload = { sub: user.id, username: user.username };
-		return {
-			access_token: await this.jwt.signAsync(payload)
+	async signToken(id: number, username: string) : Promise<any> {
+		const payload = {
+			sub: id,
+			username: username
 		};
+		const token = await this.jwt.signAsync(
+			payload, {
+				expiresIn: '60s',
+				secret: process.env.JWT_SECRET,
+			});
+		return { access_token : token }
 	}
 }
