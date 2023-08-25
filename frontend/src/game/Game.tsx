@@ -1,12 +1,16 @@
 import React, { KeyboardEvent, useEffect, useState } from 'react';
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 import {GameState} from '../../../backend/src/game/game.service.ts';
 import './Game.css';
 //import { EventListener } from 'react';
 
 const socket = io('http://localhost:8000');
 
-const Game = () => {
+interface GameProps {
+  socket: Socket;
+}
+
+const Game : React.FC<GameProps> = ({ socket }) => {
   const [gameState, setGameState] = useState<GameState | null>(null);
 
   useEffect(() => {
@@ -25,7 +29,7 @@ const Game = () => {
 
   // Other game logic and rendering based on the received gameState
 
-  const handleKeyPress = (event: React.KeyboardEvent) => {
+  const handleKeyPress = (event: any) => {
     // Handle user input (e.g., arrow keys) for moving paddles
     // Emit paddle movements to the server via WebSocket
     const direction = event.key === 'ArrowUp' ? 'up' : event.key === 'ArrowDown' ? 'down' : 'stop';
@@ -34,6 +38,7 @@ const Game = () => {
 
   useEffect(() => {
     // Add event listener for user input (arrow keys)
+
     window.addEventListener('keydown', handleKeyPress);
     window.addEventListener('keyup', handleKeyPress);
 
