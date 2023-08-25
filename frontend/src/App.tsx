@@ -2,13 +2,14 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import io from 'socket.io-client';
 import Game from './game/Game';
+import './App.css';
 
 const App: React.FC = () => {
   const socket = io("http://localhost:8000");
 
   return (
     <Router>
-      <div>
+      <div className="game">
         <h1>Pong Game</h1>
         <Routes>
           <Route path="/game" element={<Game socket={socket} />} />

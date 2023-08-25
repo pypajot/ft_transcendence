@@ -2,50 +2,49 @@
 .container {
     position: relative;
     width: 100%; /* 100% of the container's width */
-    height: 0;
     padding-top: 75%; /* 75% of the container's width to set the aspect ratio (adjust as needed) */
-    border: 2px solid black;
+    border: 3px solid whitesmoke;
     overflow: hidden;
   }
   
   .ball {
     position: absolute;
-    width: 2%; /* Adjust ball size as needed */
+    width: 2%;
     height: 2%;
-    background-color: black;
+    background-color: whitesmoke;
     border-radius: 50%;
   }
   
   .paddle {
     position: absolute;
-    width: 0.5%; /* Adjust paddle width as needed */
-    height: 10%; /* Adjust paddle height as needed */
+    width: 1%;
+    height: 12%;
   }
   
   .paddle1 {
     left: 1%; /* Adjust paddle position as needed */
-    background-color: blue;
+    background-color: whitesmoke;
   }
   
   .paddle2 {
     right: 1%; /* Adjust paddle position as needed */
-    background-color: red;
+    background-color: whitesmoke;
   }
   
   .score {
+    /* Adjust score position to be above the game frame */
     position: absolute;
-    font-size: 1%; /* Adjust font size as needed */
+    color: whitesmoke;
+    font-size: 100%; /* Adjust font size as needed */
   }
   
   .score1 {
     top: 1%; /* Adjust score position as needed */
     left: 1%;
-    color: blue;
   }
   
   .score2 {
     top: 1%; /* Adjust score position as needed */
     right: 1%;
-    color: red;
   }
   

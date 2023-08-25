@@ -9,16 +9,23 @@ npm install @nestjs/typeorm typeorm pg
 - Add an .env file in the ./docker_db/ directory with the necessary variables defined
 
 #RUN
-- in the ./docker_db dir, run :
-`docker volume create postgres`
-`docker-compose up -d`
 
 - in the ./backend dir, run :
+
+If you are on a new machine, beforehand run :
+`docker volume create postgres`
 `npm install`
+
+then always:
+`docker-compose up -d`
 `npm run start:dev`
 
 - in the ./frontend dir, run :
+
+If you are on a new machine, beforehand run :
 `npm install`
+
+then always:
 `npm run start`
 
 Check :

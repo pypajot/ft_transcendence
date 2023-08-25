@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { WebSocketGateway, WebSocketServer, SubscribeMessage } from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
 
 @Injectable()
 export class GameService {
@@ -39,9 +41,13 @@ export class GameService {
     this.player2Score = 0; // Initialize Player 2's score to 0
   }
 
-  // Add methods for updating the game state based on user input and physics of the game.
-  // For example, methods to move the paddles, update the ball's position, check for collisions, and update scores.
+  @WebSocketServer()
+  server: Server;
 
+  // Add a method to emit the updated game state to all connected clients
+  emitGameStateToClients(gameState: GameState): void {
+    this.server.emit('gameState', gameState);
+  }
   // Add a method to get the current game state, which will be sent to the clients via WebSocket.
   getGameState(): GameState {
     return {
@@ -56,17 +62,43 @@ export class GameService {
     };
   }
 
-  // New method to update the game state based on physics and user input
+  // Methods to move the paddles up and down, and to stop them.
+  movePaddleUp(clientId: string): void {
+    if (clientId === 'player1') {
+      if (this.paddle1Y >= 5 && this.paddle1Y <= this.gameHeight - this.paddleHeight - 5) /* prevents paddle from going off screen */
+        this.paddle1Y -= 5;
+    }
+    else if (clientId === 'player2') {
+      if (this.paddle2Y >= 5 && this.paddle2Y <= this.gameHeight - this.paddleHeight - 5)
+        this.paddle2Y -= 5;
+    }
+  }
+  movePaddleDown(clientId: string): void {
+    if (clientId === 'player1') {
+      if (this.paddle1Y >= 5 && this.paddle1Y <= this.gameHeight - this.paddleHeight - 5)
+        this.paddle1Y += 5;
+    } 
+    else if (clientId === 'player2') {
+      if (this.paddle2Y >= 5 && this.paddle2Y <= this.gameHeight - this.paddleHeight - 5)
+        this.paddle2Y += 5;
+    }
+  }
+  stopPaddle(clientId: string): void {
+    if (clientId === 'player1') {
+      this.paddle1Y = this.paddle1Y;
+    } else if (clientId === 'player2') {
+      this.paddle2Y = this.paddle2Y;
+    }
+  }
+  // Method to update the game state based on physics and user input
   updateGameState(): void {
     // Move the ball based on its current speed and direction
     this.ballX += this.ballSpeedX * this.ballSpeedXDirection;
     this.ballY += this.ballSpeedY * this.ballSpeedYDirection;
-  
     // Check for collisions with the game boundaries (top and bottom walls)
     if (this.ballY - this.ballSize / 2 <= 0 || this.ballY + this.ballSize / 2 >= this.gameHeight) {
       this.ballSpeedYDirection *= -1; // Reverse the Y-direction when the ball hits the top or bottom wall
     }
-  
     // Check for collisions with the paddles
     if (
       (this.ballX - this.ballSize / 2 <= this.paddleWidth && this.ballY >= this.paddle1Y && this.ballY <= this.paddle1Y + this.paddleHeight) ||
@@ -85,6 +117,7 @@ export class GameService {
       this.player1Score++;
       this.resetBall(); // Reset the ball to the center after scoring
     }
+    this.emitGameStateToClients(this.getGameState());
   }
   
   // Method to reset the ball to the center after scoring or at the start of the game
