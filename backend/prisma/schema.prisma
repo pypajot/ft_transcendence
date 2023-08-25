@@ -10,8 +10,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
+model User {
 	id			Int		@default(autoincrement()) @id
+
 	username	String	@unique
 	hash		String
+	createdAt	DateTime @default(now())
+	updatedAt	DateTime @updatedAt
+
+	tokens		UserToken[]
+
+	@@map("users")
+}	
+
+model UserToken {
+	id			String @id @default(uuid())
+
+	user		User @relation(fields: [UserId], references: [id], onDelete: Cascade)
+	UserId		Int
+
+	refreshToken	String
+	family			String @unique
+	createdAt		DateTime @default(now())
+
+	@@map("usertokens")
 }
