@@ -17,7 +17,7 @@ export class AuthService {
 		console.log(dto);
 		const hash = await argon2.hash(dto.password);
 		try {
-			const user =  await this.prisma.users.create({
+			const user =  await this.prisma.user.create({
 				data: {
 					username: dto.username,
 					hash: hash,
@@ -38,21 +38,25 @@ export class AuthService {
 		
 	}
 
-	async login(dto: AuthDto, res: any) {
-		const user = await this.validateUser(dto.username, dto.password);
+	async login(dto: AuthDto, res: any) : Promise<any> {
+		const user = await this.prisma.user.findUnique({
+			where: {
+				username: dto.username,
+			}
+		})
 		res.cookie('refresh_token', await this.signRefreshToken(user.id), {
 			httpOnly: true,
 			sameSite: 'lax',
 			secure: false,
 			path: '/auth/refresh',
 		});
-		return this.signAccessToken(user.id, user.username);
+		return await this.signAccessToken(user.id, user.username);
 	};
 
 
 	async validateUser(username: string, password: string)
 	{
-		const user = await this.prisma.users.findUnique({
+		const user = await this.prisma.user.findUnique({
 			where: {
 				username: username,
 			}
@@ -63,6 +67,7 @@ export class AuthService {
 		const pwMatch = await argon2.verify(user.hash, password);
 		if (!pwMatch)
 			return null;
+		
 		return user;
 	}
 
@@ -73,10 +78,11 @@ export class AuthService {
 		};
 		const token = await this.jwt.signAsync(
 			payload, {
-				expiresIn: '600s',
+				expiresIn: '60s',
 				secret: process.env.JWT_SECRET,
-			});
-		return { access_token : token }
+			}
+		);
+		return token
 	}
 
 	async signRefreshToken(id: number, token_family? : string) : Promise<string> {
@@ -91,49 +97,55 @@ export class AuthService {
 				expiresIn: '7d',
 				secret: process.env.REFRESH_SECRET,
 			});
-		const hash = argon2.hash(token);
-		await this.prisma.usertokens.create({
-			userId: id,
-			family: token_family,
-			refreshToken: hash,
+		const hash = await argon2.hash(token);
+		await this.prisma.user.update({
+			where: {
+				id: id
+			},
+			data: {
+				tokens: {
+					 create: {
+						family: token_family,
+						refreshToken: hash,
+					}
+				}
+			}
+
 		})
 
 
 		return token;
 	}
 
-	async refresh(refresh_token: string) {
-		const payload = await this.jwt.verifyAsync(refresh_token, {
-			secret: process.env.REFRESH_SECRET,
-		});
+	async refresh(refresh_token: any) {
+		console.log(refresh_token)
+		// const payload = await this.jwt.verifyAsync(refresh_token, {
+		// 	secret: process.env.REFRESH_SECRET,
+		// });
 
-		const token = await this.prisma.usertokens.findUnique({
-			where: {
-				userId_family: {
-					userId: payload.sub,
-					family: payload.token_family,
-				}
-			}
-		});
+		// const token = await this.prisma.userToken.findUnique({
+		// 	where: {
+		// 		UserId: payload.sub,
+		// 		family: payload.token_family,
+		// 	}
+		// });
 
-		if (!token)
-			throw new ForbiddenException('Invalid refresh token');
+		// if (!token)
+		// 	throw new ForbiddenException('Invalid refresh token');
 
-		const tokenMatch = await argon2.verify(token.refreshToken, refresh_token);
+		// const tokenMatch = await argon2.verify(token.refreshToken, refresh_token);
 
-		if (!tokenMatch)
-		{
-			await this.prisma.usertokens.delete({
-				where: {
-					userId_family: {
-						userId: payload.sub,
-						family: payload.token_family,
-					}
-				}
-			});
-			throw new ForbiddenException('Invalid refresh token');
-		}
+		// if (!tokenMatch)
+		// {
+		// 	await this.prisma.userToken.delete({
+		// 		where: {			
+		// 			UserId: payload.sub,
+		// 			family: payload.token_family,
+		// 		}
+		// 	});
+		// 	throw new ForbiddenException('Invalid refresh token');
+		// }
 
-		return this.signAccessToken(payload.sub, payload.token_family);
+		// return this.signAccessToken(payload.sub, payload.token_family);
 	}
 }
