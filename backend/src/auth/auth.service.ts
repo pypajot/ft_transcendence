@@ -6,6 +6,11 @@ import { Prisma } from "@prisma/client";
 import {JwtService} from '@nestjs/jwt'
 import { v4 as uuidv4 } from "uuid";
 
+type RefreshPayloadType = {
+	sub: number;
+	token_family: string;
+};
+
 @Injectable()
 export class AuthService {
 	constructor(
@@ -48,7 +53,7 @@ export class AuthService {
 			httpOnly: true,
 			sameSite: 'lax',
 			secure: false,
-			path: '/auth/refresh',
+			path: '/',
 		});
 		return await this.signAccessToken(user.id, user.username);
 	};
@@ -85,18 +90,7 @@ export class AuthService {
 		return token
 	}
 
-	async signRefreshToken(id: number, token_family? : string) : Promise<string> {
-		if (!token_family)
-			token_family = uuidv4();
-		const payload = {
-			sub: id,
-			token_family: token_family,
-		};
-		const token = await this.jwt.signAsync(
-			payload, {
-				expiresIn: '7d',
-				secret: process.env.REFRESH_SECRET,
-			});
+	async addTokenToDb(id: number, token: any, token_family? : string) {
 		const hash = await argon2.hash(token);
 		await this.prisma.user.update({
 			where: {
@@ -112,40 +106,100 @@ export class AuthService {
 			}
 
 		})
+	}
 
+	async removeTokenFromDb (id: number, token_family: string) {
+		await this.prisma.userToken.delete({
+			where: {
+				family: token_family,
+			},
+		})
+	}
 
+	async signRefreshToken(id: number, token_family? : string) : Promise<string> {
+		if (!token_family)
+			token_family = uuidv4();
+		const payload = {
+			sub: id,
+			token_family: token_family,
+		};
+		const token = await this.jwt.signAsync(
+			payload, {
+				expiresIn: '600s',
+				secret: process.env.REFRESH_SECRET,
+			}
+		);
+		this.addTokenToDb(id, token_family, token);
 		return token;
 	}
 
+	async verifyFamilyInDb(payload: any): Promise<any | null> {
+		const token = await this.prisma.userToken.findUnique({
+			where: {
+				UserId: payload.sub,
+				family: payload.token_family,
+			}
+		});
+		if (!token)
+			return null
+		return token;
+	}
+
+	async isReuse(token: any, refresh_token: string): Promise<boolean> {
+		const tokenMatch = await argon2.verify(token.refreshToken, refresh_token);
+		return tokenMatch;
+	}
+
+	async deleteIfReuse(payload: any) {
+		await this.prisma.userToken.delete({
+			where: {			
+				UserId: payload.sub,
+				family: payload.token_family,
+			}
+		});
+	}
+
+
 	async refresh(refresh_token: any) {
-		console.log(refresh_token)
-		// const payload = await this.jwt.verifyAsync(refresh_token, {
-		// 	secret: process.env.REFRESH_SECRET,
-		// });
+		const payload = this.jwt.decode(refresh_token) as RefreshPayloadType;
+		await this.prisma.userToken.delete({
+			where: {
+				UserId: payload.sub,
+				family: payload.token_family,
+			}
+		})
+		const newtoken = this.signRefreshToken(payload.sub, payload.token_family);
+// setcookie
+//rmcookie
+		return this.signAccessToken(payload.sub, payload.token_family);
+	}
+	// add username to refresh payload to sign access token
 
-		// const token = await this.prisma.userToken.findUnique({
-		// 	where: {
-		// 		UserId: payload.sub,
-		// 		family: payload.token_family,
-		// 	}
-		// });
+	async logout(res: any, refresh_token: any) {
+		const payload = await this.jwt.verifyAsync(refresh_token, {
+			secret: process.env.REFRESH_SECRET,
+		});
 
-		// if (!token)
-		// 	throw new ForbiddenException('Invalid refresh token');
-
-		// const tokenMatch = await argon2.verify(token.refreshToken, refresh_token);
-
-		// if (!tokenMatch)
-		// {
-		// 	await this.prisma.userToken.delete({
-		// 		where: {			
-		// 			UserId: payload.sub,
-		// 			family: payload.token_family,
-		// 		}
-		// 	});
-		// 	throw new ForbiddenException('Invalid refresh token');
-		// }
-
-		// return this.signAccessToken(payload.sub, payload.token_family);
+		const token = await this.prisma.userToken.findUnique({
+			where: {
+				UserId: payload.sub,
+				family: payload.token_family,
+			}
+		});
+		if (!token)
+			throw new ForbiddenException('Invalid refresh token');
+		await this.prisma.userToken.delete({
+			where: {			
+				UserId: payload.sub,
+				family: payload.token_family,
+			}
+		})
+		res.clearCookie('refresh_token', {
+			httpOnly: true,
+			sameSite: 'lax',
+			secure: false,
+			path: '/',
+		});
+		return ("Logout successful");
 	}
 }
