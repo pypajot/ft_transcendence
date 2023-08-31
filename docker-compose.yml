@@ -14,6 +14,16 @@ services:
     ports:
       - "5432:5432"
     restart: always
+  redis:
+    image: redis
+    command: /bin/sh -c "redis-server --requirepass $$REDIS_PASS"
+    env_file:
+      -.env
+    ports:
+      - 8081:8081
+    volumes:
+      - ./redis/data:/data
+    
 
 #volumes:
 #  postgres:

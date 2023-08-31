@@ -9,6 +9,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatService = void 0;
 const common_1 = require("@nestjs/common");
 let ChatService = exports.ChatService = class ChatService {
+    findUserById(client_id, cli_arr) {
+        return cli_arr.find(cli_arr => cli_arr.socket_id === client_id);
+    }
+    receiveMessage(client_id, message, cli_arr, msg_id) {
+        let message_obj = {
+            message: message,
+            id: msg_id
+        };
+        let user = this.findUserById(client_id, cli_arr);
+        if (user) {
+            user.messages.push(message);
+        }
+    }
+    new_cli(id, name, client_id, cli_arr) {
+        let cli = { id: id, name: name, socket_id: client_id, messages: [] };
+        cli_arr.push(cli);
+    }
     sendMessage(io, message) {
         io.emit('message', message);
     }

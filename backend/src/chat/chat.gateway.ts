@@ -1,4 +1,4 @@
-import { OnModuleInit } from "@nestjs/common";
+import { Logger, OnModuleInit } from "@nestjs/common";
 import {
 	MessageBody,
 	OnGatewayConnection,
@@ -11,33 +11,45 @@ import { Server } from 'socket.io';
 import { ServerToClientEvents } from "src/types/events";
 import { ChatService } from "./chat.service";
 import { Message } from "src/types/message.entity";
+import { Client_elem } from "src/types/client.entity";
 
 @WebSocketGateway({cors: '*', namespace: 'chat'})
 class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit 
 {
+	public id = 0;
+	public id_msg = 0;
+	public cli_arr:  Client_elem[] = [];
+	private readonly logger = new Logger(ChatGateway.name);
 	constructor(private readonly chatService: ChatService){}
 		@WebSocketServer() io: Server<any, ServerToClientEvents>;
 
 		afterInit()
 		{
-			console.log("Websocket Initialized\n");
+			this.logger.log("Websocket Initialized\n");
 		}
 		handleConnection(client: any, ...args: any[]) {
-			console.log(`Client ${client.id} arrived`);
+			//Save client.id and link it to the username
+			this.chatService.new_cli(this.id, args[0], client.id, this.cli_arr);
+			this.id = this.id + 1;
+			this.logger.log(`Client ${client.id} arrived`);
 		}
 		handleDisconnect(client: any){
-			console.log(`Client ${client.id} left`);
+			this.cli_arr = this.cli_arr.filter(cli_arr => cli_arr.socket_id !== client.id);
+			//Remove the client.id and the username
+			this.logger.log(`Client ${client.id} left`);
 		}
 
 		@SubscribeMessage('message')
-		handleEvent(@MessageBody() data: string): void {
-			console.log(data);
-        	let message_obj: Message = {
-        		message : data,
-        		id : "id"
-			}
-			this.chatService.sendMessage(this.io, message_obj);
+		handleEvent(client: any, data: string): void {
+			this.logger.log(`Message : ${data} from : ${client.id}`);
+			this.chatService.receiveMessage(client.id, data, this.cli_arr, this.id_msg)
+			this.id_msg = this.id_msg + 1;
+
+			console.log("\n");
+			this.cli_arr.map((elem) => {console.log(`client : ${elem.id} \n message: ${elem.messages[0]}\n`)})
+	//		this.chatService.sendMessage(this.io, message_obj);
 		}
+
 }
 
 export default ChatGateway;

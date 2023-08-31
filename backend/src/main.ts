@@ -5,6 +5,8 @@ import { Transport } from '@nestjs/microservices'
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
-  await app.listen(3001);
+  await app.listen(3001, () => {
+    console.log("Listening on port 3001..");
+  });
 }
 bootstrap();
