@@ -15,17 +15,22 @@ export class SocketGateway {
   handleMovePaddle(client: Socket, data: { direction: string }): void {
     const { direction } = data;
     if (direction === 'up') {
-      this.gameService.movePaddleUp(client.id);
+      this.gameService.movePaddleUp('player1'); //replace later with client.id
     } else if (direction === 'down') {
-      this.gameService.movePaddleDown(client.id);
+      this.gameService.movePaddleDown('player1'); //replace later with client.id
     } else if (direction === 'stop') {
-      this.gameService.stopPaddle(client.id);
+      this.gameService.stopPaddle('player1'); //replace later with client.id
     }
   }
 
   @SubscribeMessage('getGameState') // Custom event name to request game state from frontend
   handleGetGameState(client: any): void {
     const gameState: GameState = this.gameService.getGameState();
-    client.emit('gameState', gameState); // Emit the game state to the specific client that requested it
+    // create a loop with a delay of 50ms
+    setInterval(() => {
+      this.gameService.updateGameState(); // Update the game state
+      const gameState: GameState = this.gameService.getGameState(); // Get the updated game state
+      client.emit('gameState', gameState); // Send the game state to the client
+    }, 50);
   }
 }

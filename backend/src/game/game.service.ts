@@ -35,8 +35,8 @@ export class GameService {
     this.paddle2Y = 250; // Set initial Y position for paddle 2 (Player 2)
     this.ballX = 400; // Set initial X position for the ball
     this.ballY = 300; // Set initial Y position for the ball
-    this.ballSpeedX = 5; // Set the initial speed of the ball along the X-axis
-    this.ballSpeedY = 5; // Set the initial speed of the ball along the Y-axis
+    this.ballSpeedX = 3; // Set the initial speed of the ball along the X-axis
+    this.ballSpeedY = 3; // Set the initial speed of the ball along the Y-axis
     this.player1Score = 0; // Initialize Player 1's score to 0
     this.player2Score = 0; // Initialize Player 2's score to 0
   }
@@ -48,6 +48,7 @@ export class GameService {
   emitGameStateToClients(gameState: GameState): void {
     this.server.emit('gameState', gameState);
   }
+
   // Add a method to get the current game state, which will be sent to the clients via WebSocket.
   getGameState(): GameState {
     return {
@@ -65,22 +66,22 @@ export class GameService {
   // Methods to move the paddles up and down, and to stop them.
   movePaddleUp(clientId: string): void {
     if (clientId === 'player1') {
-      if (this.paddle1Y >= 5 && this.paddle1Y <= this.gameHeight - this.paddleHeight - 5) /* prevents paddle from going off screen */
-        this.paddle1Y -= 5;
+      if (this.paddle1Y >= 25) /* prevents paddle from going off screen */
+        this.paddle1Y -= 10;
     }
     else if (clientId === 'player2') {
-      if (this.paddle2Y >= 5 && this.paddle2Y <= this.gameHeight - this.paddleHeight - 5)
-        this.paddle2Y -= 5;
+      if (this.paddle2Y >= 25)
+        this.paddle2Y -= 10;
     }
   }
   movePaddleDown(clientId: string): void {
     if (clientId === 'player1') {
-      if (this.paddle1Y >= 5 && this.paddle1Y <= this.gameHeight - this.paddleHeight - 5)
-        this.paddle1Y += 5;
+      if (this.paddle1Y <= this.gameHeight - this.paddleHeight - 10)
+        this.paddle1Y += 10;
     } 
     else if (clientId === 'player2') {
-      if (this.paddle2Y >= 5 && this.paddle2Y <= this.gameHeight - this.paddleHeight - 5)
-        this.paddle2Y += 5;
+      if (this.paddle2Y <= this.gameHeight - this.paddleHeight - 10)
+        this.paddle2Y += 10;
     }
   }
   stopPaddle(clientId: string): void {
@@ -113,13 +114,13 @@ export class GameService {
     if (this.ballX - this.ballSize / 2 <= 0) {
       this.player2Score++;
       this.resetBall(); // Reset the ball to the center after scoring
-    } else if (this.ballX + this.ballSize / 2 >= this.gameWidth) {
+    }
+    else if (this.ballX + this.ballSize / 2 >= this.gameWidth) {
       this.player1Score++;
       this.resetBall(); // Reset the ball to the center after scoring
     }
-    this.emitGameStateToClients(this.getGameState());
   }
-  
+
   // Method to reset the ball to the center after scoring or at the start of the game
   private resetBall(): void {
     this.ballX = this.gameWidth / 2;
