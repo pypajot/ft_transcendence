@@ -1,6 +1,6 @@
 import React, { KeyboardEvent, useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
-import {GameState} from '../../../backend/src/game/game.service.ts';
+import {GameState} from '../../../../backend/src/game/game.service.ts';
 import './Game.css';
 //import { EventListener } from 'react';
 

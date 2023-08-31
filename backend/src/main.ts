@@ -8,9 +8,6 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
   }));
-  // app.use('/', (_, res) => {
-  //   res.send('Hello, this is the root of the API!');
-  // });
   await app.listen(8000);
 }
 bootstrap();
