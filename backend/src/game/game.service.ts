@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { WebSocketGateway, WebSocketServer, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { GOAL_LIMIT } from './const.game';
 
 @Injectable()
 export class GameService {
@@ -25,6 +26,9 @@ export class GameService {
   private readonly gameWidth: number = 800;
   private readonly gameHeight: number = 600;
 
+  // goal limit
+  private readonly goalLimit: number = GOAL_LIMIT;
+
   constructor() {
     this.initGame();
   }
@@ -39,6 +43,8 @@ export class GameService {
     this.ballSpeedY = 3; // Set the initial speed of the ball along the Y-axis
     this.player1Score = 0; // Initialize Player 1's score to 0
     this.player2Score = 0; // Initialize Player 2's score to 0
+    // print on the terminal that the game has started
+    console.log('Game has started');
   }
 
   @WebSocketServer()
@@ -118,6 +124,10 @@ export class GameService {
     else if (this.ballX + this.ballSize / 2 >= this.gameWidth) {
       this.player1Score++;
       this.resetBall(); // Reset the ball to the center after scoring
+    }
+    // Check for end of game
+    if (this.player1Score >= this.goalLimit || this.player2Score >= this.goalLimit) {
+      this.initGame(); // Reset the game state
     }
   }
 
