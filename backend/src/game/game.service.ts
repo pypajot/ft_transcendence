@@ -1,10 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { WebSocketGateway, WebSocketServer, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GOAL_LIMIT } from './const.game';
+import { GOAL_LIMIT, BALL_SPEED } from './const.game';
+
+
+export enum GameMode {
+  Classic = 'Classic',
+  Multiball = 'Multiball',
+  Hardcore = 'Hardcore',
+}
+
+export interface GameConfiguration {
+  mode: GameMode;
+  numberOfBalls: number;
+  ballSpeed: number;
+  paddleSize: number;
+  goalsToWin: number;
+}
 
 @Injectable()
 export class GameService {
+  // include the game configuration in the game service
+  private gameConfiguration: GameConfiguration = {
+    
+  };
+  // Properties for the game state
   private paddle1Y: number; // Position of paddle 1 (Player 1)
   private paddle2Y: number; // Position of paddle 2 (Player 2)
   private ballX: number; // Position of the ball along the X-axis
@@ -39,12 +59,10 @@ export class GameService {
     this.paddle2Y = 250; // Set initial Y position for paddle 2 (Player 2)
     this.ballX = 400; // Set initial X position for the ball
     this.ballY = 300; // Set initial Y position for the ball
-    this.ballSpeedX = 3; // Set the initial speed of the ball along the X-axis
-    this.ballSpeedY = 3; // Set the initial speed of the ball along the Y-axis
+    this.ballSpeedX = BALL_SPEED; // Set the initial speed of the ball along the X-axis
+    this.ballSpeedY = BALL_SPEED; // Set the initial speed of the ball along the Y-axis
     this.player1Score = 0; // Initialize Player 1's score to 0
     this.player2Score = 0; // Initialize Player 2's score to 0
-    // print on the terminal that the game has started
-    console.log('Game has started');
   }
 
   @WebSocketServer()
@@ -135,8 +153,8 @@ export class GameService {
   private resetBall(): void {
     this.ballX = this.gameWidth / 2;
     this.ballY = this.gameHeight / 2;
-    this.ballSpeedX = 5; // Set the initial speed of the ball along the X-axis
-    this.ballSpeedY = 5; // Set the initial speed of the ball along the Y-axis
+    this.ballSpeedX = BALL_SPEED; // Set the initial speed of the ball along the X-axis
+    this.ballSpeedY = BALL_SPEED; // Set the initial speed of the ball along the Y-axis
     this.ballSpeedXDirection = Math.random() > 0.5 ? 1 : -1; // Randomize the initial X-direction
     this.ballSpeedYDirection = Math.random() > 0.5 ? 1 : -1; // Randomize the initial Y-direction
   }

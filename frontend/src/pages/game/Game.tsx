@@ -50,6 +50,16 @@ const Game : React.FC<GameProps> = ({ socket }) => {
   }, []);
 
   return (
+    <div className="game">
+    <div className="scores-container">
+          {/* Render scores */}
+          {gameState && (
+            <>
+              <div className="score">Player 1: {gameState.player1Score}</div>
+              <div className="score">Player 2: {gameState.player2Score}</div>
+            </>
+          )}
+        </div>
     <div className="container">
       {/* Render the ball */}
       {gameState && (
@@ -75,15 +85,8 @@ const Game : React.FC<GameProps> = ({ socket }) => {
           />
         </>
       )}
-
-      {/* Render scores */}
-      {gameState && (
-        <>
-          <div className="score score1">Player 1: {gameState.player1Score}</div>
-          <div className="score score2">Player 2: {gameState.player2Score}</div>
-        </>
-      )}
     </div>
+  </div>
   );
 };
 

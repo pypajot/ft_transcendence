@@ -11,5 +11,5 @@
   justify-content: center;
   align-items: center;
   margin : auto;
-  width: 150%; /*temporary : increases the size of the game board*/
+  width: 120%; /*temporary : increases the size of the game board*/
 }

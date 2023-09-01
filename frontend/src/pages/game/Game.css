@@ -1,4 +1,17 @@
 /* Game.css */
+
+.scores-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.score {
+  font-size: 20px; /* Adjust the font size as needed */
+  color: #fff; /* Text color */
+}
+
 .container {
     position: relative;
     width: 100%; /* 100% of the container's width */
@@ -29,22 +42,5 @@
   .paddle2 {
     right: 1%; /* Adjust paddle position as needed */
     background-color: whitesmoke;
-  }
-  
-  .score {
-    /* Adjust score position to be above the game frame */
-    position: absolute;
-    color: whitesmoke;
-    font-size: 100%; /* Adjust font size as needed */
-  }
-  
-  .score1 {
-    top: 1%; /* Adjust score position as needed */
-    left: 1%;
-  }
-  
-  .score2 {
-    top: 1%; /* Adjust score position as needed */
-    right: 1%;
   }
   
