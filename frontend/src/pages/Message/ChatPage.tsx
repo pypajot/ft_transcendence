@@ -3,6 +3,14 @@ import { Message } from "../../../public/Types/message.entity"
 import io, {Socket} from 'socket.io-client'
 import MessageInput from './MessageInput'
 import Messages from './Messages'
+import LittleMessage from './LittleMessage'
+
+//Access Username by global cookies or something ?
+const newSocket = io("http://localhost:3001/chat", {
+    query: {
+        username: "nice",
+      },
+});
 
 const ChatComponent = () => {
     const [socket, setSocket] = useState<Socket>()
@@ -13,9 +21,8 @@ const ChatComponent = () => {
         socket?.emit("message", value)
     }
     useEffect(() => {
-        const newSocket = io("http://localhost:3001/chat")
         setSocket(newSocket)
-    }, [setSocket])
+    }, [])
 
     const messageListener = (message: Message) => {
         setMessages([...messages, message]);
@@ -31,6 +38,7 @@ const ChatComponent = () => {
         {" "}
         <MessageInput send={send}/>
         <Messages message={messages}/>
+        <LittleMessage/>
         </>
     )
 }

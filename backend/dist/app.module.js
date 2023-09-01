@@ -12,15 +12,18 @@ const config_1 = require("@nestjs/config");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const chat_module_1 = require("./chat/chat.module");
+const user_module_1 = require("./user/user.module");
+const prisma_module_1 = require("./prisma/prisma.module");
+const prisma_service_1 = require("./prisma/prisma.service");
 let AppModule = exports.AppModule = class AppModule {
 };
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [config_1.ConfigModule.forRoot({
                 isGlobal: true,
-            }), chat_module_1.ChatModule],
+            }), chat_module_1.ChatModule, user_module_1.UserModule, prisma_module_1.PrismaModule],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        providers: [app_service_1.AppService, prisma_service_1.PrismaService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

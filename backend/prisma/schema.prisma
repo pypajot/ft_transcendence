@@ -3,9 +3,21 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
+
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+	username	String
+	id			Int		@default(autoincrement()) @id
+	password	String
+	@@unique([username])
+}
+
+//@@map("") to rename the model
+

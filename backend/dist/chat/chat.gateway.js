@@ -26,9 +26,9 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
         this.logger.log("Websocket Initialized\n");
     }
     handleConnection(client, ...args) {
-        this.chatService.new_cli(this.id, args[0], client.id, this.cli_arr);
+        this.chatService.new_cli(this.id, client.handshake.query.username, client.id, this.cli_arr);
         this.id = this.id + 1;
-        this.logger.log(`Client ${client.id} arrived`);
+        this.logger.log(`Client ${client.id} ${client.handshake.query.username} arrived`);
     }
     handleDisconnect(client) {
         this.cli_arr = this.cli_arr.filter(cli_arr => cli_arr.socket_id !== client.id);
