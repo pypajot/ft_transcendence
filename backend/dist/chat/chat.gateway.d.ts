@@ -14,6 +14,6 @@ declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, O
     afterInit(): void;
     handleConnection(client: any, ...args: any[]): void;
     handleDisconnect(client: any): void;
-    handleEvent(client: any, data: string): void;
+    handleEvent(client: any, data: string[]): void;
 }
 export default ChatGateway;

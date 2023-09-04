@@ -2,5 +2,23 @@
   "dependencies": {
     "@nestjs/microservices": "^10.2.3",
     "redis": "^4.6.8"
-  }
+  },
+  "name": "ft_transcendence",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pypajot/ft_transcendence.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pypajot/ft_transcendence/issues"
+  },
+  "homepage": "https://github.com/pypajot/ft_transcendence#readme",
+  "description": ""
 }

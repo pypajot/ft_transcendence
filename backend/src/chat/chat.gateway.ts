@@ -39,16 +39,16 @@ class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGateway
 			this.logger.log(`Client ${client.id} left`);
 		}
 		@SubscribeMessage('message')
-		handleEvent(client: any, data: string): void {
-			this.logger.log(`Message : ${data} from : ${client.id}`);
+		handleEvent(client: any, data: string[]): void {
+			this.logger.log(`Message : ${data[0]} from : ${client.id} to: ${data[1]}`);
 			this.chatService.receiveMessage(client.id, data, this.cli_arr, this.id_msg)
 			this.id_msg = this.id_msg + 1;
 
 			console.log("\n");
-			this.cli_arr.map((elem) => {console.log(`client : ${elem.id} \n message: ${elem.messages[0]}\n`)})
+			this.cli_arr.map((elem) => {console.log(`client : ${elem.name} \n message: ${elem.messages[0]}\n`)})
+			this.chatService.sendTo(this.io, data[0], data[1], this.cli_arr);
 	//		this.chatService.sendMessage(this.io, message_obj);
 		}
-
 }
 
 export default ChatGateway;

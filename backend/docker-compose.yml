@@ -9,8 +9,9 @@ services:
       PGDATA: ${PGDATA}
     networks:
       - transcendence
-  #  volumes:
-  #     - postgres:/var/lib/postgresql/data
+    volumes:
+      - type: volume
+        target: /mnt/nfs/homes/odessein/Project/ft_transcendence/backend/docker-compose.yml
     ports:
       - "5432:5432"
     restart: always

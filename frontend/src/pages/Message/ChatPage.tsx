@@ -4,27 +4,33 @@ import io, {Socket} from 'socket.io-client'
 import MessageInput from './MessageInput'
 import Messages from './Messages'
 import LittleMessage from './LittleMessage'
+import MessageTarget from './MessageTarget'
 
 //Access Username by global cookies or something ?
-const newSocket = io("http://localhost:3001/chat", {
-    query: {
-        username: "nice",
-      },
-});
 
 const ChatComponent = () => {
     const [socket, setSocket] = useState<Socket>()
-    const [messages, setMessages] = useState<Message[]>([])
+    const [messages, setMessages] = useState<String[]>([])
+    const [target, setTarget] = useState<String>("");
 
+
+    useEffect(() => {
+        const newSocket = io("http://localhost:3001/chat", {
+            query: {
+                username: localStorage.getItem("username"),
+            },
+        });
+        setSocket(newSocket);
+        return () => {
+            newSocket.disconnect();
+        }
+    }, [])
     const send = (value: string) =>
     {
-        socket?.emit("message", value)
+        let message_content : String[] = [value, target];
+        socket?.emit("message", message_content);
     }
-    useEffect(() => {
-        setSocket(newSocket)
-    }, [])
-
-    const messageListener = (message: Message) => {
+    const messageListener = (message: string) => {
         setMessages([...messages, message]);
     }
     useEffect(() => {
@@ -38,6 +44,7 @@ const ChatComponent = () => {
         {" "}
         <MessageInput send={send}/>
         <Messages message={messages}/>
+        <MessageTarget target={setTarget}/>
         <LittleMessage/>
         </>
     )

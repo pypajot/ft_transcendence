@@ -35,11 +35,12 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
         this.logger.log(`Client ${client.id} left`);
     }
     handleEvent(client, data) {
-        this.logger.log(`Message : ${data} from : ${client.id}`);
+        this.logger.log(`Message : ${data[0]} from : ${client.id} to: ${data[1]}`);
         this.chatService.receiveMessage(client.id, data, this.cli_arr, this.id_msg);
         this.id_msg = this.id_msg + 1;
         console.log("\n");
-        this.cli_arr.map((elem) => { console.log(`client : ${elem.id} \n message: ${elem.messages[0]}\n`); });
+        this.cli_arr.map((elem) => { console.log(`client : ${elem.name} \n message: ${elem.messages[0]}\n`); });
+        this.chatService.sendTo(this.io, data[0], data[1], this.cli_arr);
     }
 };
 __decorate([
@@ -49,7 +50,7 @@ __decorate([
 __decorate([
     (0, websockets_1.SubscribeMessage)('message'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [Object, Array]),
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleEvent", null);
 ChatGateway = ChatGateway_1 = __decorate([
