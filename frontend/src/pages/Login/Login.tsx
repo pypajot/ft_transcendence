@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import './Login.css';
 import { AuthContext, useAuth } from '../../context/AuthContext';
 
-const Login = () => {
+function Login() {
 
 	// const [user, setUser] = useState<UserDTO>();
 
@@ -23,7 +23,6 @@ const Login = () => {
 
 		const form = e.target;
 		const formData = new FormData(form);
-		const { accessToken, setAccessToken } = useAuth();
 		const formBody = {
 				"username": formData.get('username'),
 				"password": formData.get('password')
@@ -36,7 +35,8 @@ const Login = () => {
 			credentials: 'include',
 		})
 		.then(response => response.json())
-		.then(response => setAccessToken(response.accessToken));
+		.then(response => sessionStorage.setItem('access_token', response.access_token));
+		
 	}
 
 	return (

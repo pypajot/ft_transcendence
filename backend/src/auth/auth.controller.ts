@@ -28,16 +28,19 @@ export class AuthController {
 		});
 	}
 
-	@Post('refresh')
+	@Get('refresh')
 	@UseGuards(RefreshAuthGuard)
-	refresh(@Res() res: any, @Req() req: any) {
-		return this.authservice.refresh(res, req.signedCookies.refresh_token);
+	async refresh(@Res() res: any, @Req() req: any) {
+		const token = await this.authservice.refresh(res, req.cookies.refresh_token);
+		res.send({
+			access_token: token
+		});
 	}
 	
 	@Post('logout')
 	@UseGuards(JwtAuthGuard)
 	logout(@Res() res: any, @Req() req: any) {
-		const result = this.authservice.logout(res, req.signedCookies.refresh_token);
+		const result = this.authservice.logout(res, req.cookies.refresh_token);
 		res.send({ result });
 	}
 }

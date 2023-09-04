@@ -5,7 +5,7 @@ import { Request } from "express"
 import { AuthService } from "../auth.service";
 
 @Injectable()
-export class RefreshStrategy extends PassportStrategy(Strategy) {
+export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
 	constructor(private authService: AuthService) {
 		super({
 			jwtFromRequest: ExtractJwt.fromExtractors([
@@ -17,20 +17,21 @@ export class RefreshStrategy extends PassportStrategy(Strategy) {
 	}
 
 	private static ExtractJwtFromCookie(req: Request): string | null {
-		if (!req.signedCookies || !req.signedCookies.refresh_token )
+		if (!req.cookies || !req.cookies.refresh_token )
 			return null;
-		return req.signedCookies.access_token;
+		return req.cookies.refresh_token;
 	}
 
 	async validate(req: Request, payload: any) {
 		const dbToken = await this.authService.verifyFamilyInDb(payload);
 		if (!dbToken)
 			throw new UnauthorizedException();
-		if (this.authService.isReuse(dbToken, req.signedCookies.refresh_token))
+		if (this.authService.isReuse(dbToken, req.cookies.refresh_token))
 		{
 			this.authService.deleteIfReuse(payload);
 			throw new UnauthorizedException();
 		}
+		console.log('test');
 		return { userId: payload.sub, username: payload.token_family };
 	}
 }

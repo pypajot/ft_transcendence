@@ -10,11 +10,15 @@ const Profile = () => {
 
 	useEffect(() => {
 		async function FetchUser() {
-			const response = await refreshFetch("/user/me")
-			const data = await response.data.json();
-			setUser(JSON.stringify(data));
+			// await refreshFetch("/user/me", {retry: false})
+			// .then(response => setUser(JSON.stringify(response.data)))
+			fetch("/user/me", {
+				headers: { 'Content-Type': 'application/json' },
+			})
+			.then(response => response.json)
+			.then(response => setUser(JSON.stringify(response)));
 		}
-
+		console.log("test");
 		FetchUser();
 	}, []);
 

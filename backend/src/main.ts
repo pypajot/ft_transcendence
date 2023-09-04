@@ -5,11 +5,11 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
-  app.use(cookieParser([
-		process.env.JWT_SECRET,
+  app.use(cookieParser(
+		// process.env.JWT_SECRET,
 		process.env.REFRESH_SECRET
-  ]))
+  ))
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(3333);
 }
 bootstrap();

@@ -20,7 +20,6 @@ export class AuthService {
 	) {}
 
 	async signup(dto: AuthDto) {
-		console.log(dto);
 		const hash = await argon2.hash(dto.password);
 		try {
 			const user =  await this.prisma.user.create({
@@ -55,7 +54,7 @@ export class AuthService {
 			sameSite: 'lax',
 			secure: false,
 			path: '/',
-			maxAge: 600,
+			maxAge: 600 * 1000,
 		});
 		return await this.signAccessToken(user.id, user.username);
 	};
@@ -92,7 +91,7 @@ export class AuthService {
 		return token
 	}
 
-	async addTokenToDb(id: number, token: any, token_family? : string) {
+	async addTokenToDb(token: any, id: number, token_family : string) {
 		const hash = await argon2.hash(token);
 		await this.prisma.userToken.create({
 			data: {
@@ -125,7 +124,7 @@ export class AuthService {
 				secret: process.env.REFRESH_SECRET,
 			}
 		);
-		this.addTokenToDb(id, token_family, token);
+		this.addTokenToDb(token, id, token_family);
 		return token;
 	}
 
@@ -143,7 +142,7 @@ export class AuthService {
 
 	async isReuse(token: any, refresh_token: string): Promise<boolean> {
 		const tokenMatch = await argon2.verify(token.refreshToken, refresh_token);
-		return tokenMatch;
+		return !tokenMatch;
 	}
 
 	async deleteIfReuse(payload: any) {
@@ -170,7 +169,7 @@ export class AuthService {
 			sameSite: 'lax',
 			secure: false,
 			path: '/',
-			maxAge: 600,
+			maxAge: 600 * 1000,
 		});
 // setcookie
 //rmcookie
@@ -202,6 +201,7 @@ export class AuthService {
 			sameSite: 'lax',
 			secure: false,
 			path: '/',
+			maxAge: 600 * 1000,
 		});
 		return ("Logout successful");
 	}
