@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 
 type RefreshPayloadType = {
 	sub: number;
+	username: string;
 	token_family: string;
 };
 
@@ -49,11 +50,12 @@ export class AuthService {
 				username: dto.username,
 			}
 		})
-		res.cookie('refresh_token', await this.signRefreshToken(user.id), {
+		res.cookie('refresh_token', await this.signRefreshToken(user.id, user.username), {
 			httpOnly: true,
 			sameSite: 'lax',
 			secure: false,
 			path: '/',
+			maxAge: 600,
 		});
 		return await this.signAccessToken(user.id, user.username);
 	};
@@ -92,19 +94,12 @@ export class AuthService {
 
 	async addTokenToDb(id: number, token: any, token_family? : string) {
 		const hash = await argon2.hash(token);
-		await this.prisma.user.update({
-			where: {
-				id: id
-			},
+		await this.prisma.userToken.create({
 			data: {
-				tokens: {
-					 create: {
-						family: token_family,
-						refreshToken: hash,
-					}
-				}
+				family: token_family,
+				refreshToken: hash,
+				UserId: id,		
 			}
-
 		})
 	}
 
@@ -116,11 +111,12 @@ export class AuthService {
 		})
 	}
 
-	async signRefreshToken(id: number, token_family? : string) : Promise<string> {
+	async signRefreshToken(id: number, username: string, token_family? : string) : Promise<string> {
 		if (!token_family)
 			token_family = uuidv4();
 		const payload = {
 			sub: id,
+			username: username,
 			token_family: token_family,
 		};
 		const token = await this.jwt.signAsync(
@@ -160,7 +156,7 @@ export class AuthService {
 	}
 
 
-	async refresh(refresh_token: any) {
+	async refresh(res: any, refresh_token: any) {
 		const payload = this.jwt.decode(refresh_token) as RefreshPayloadType;
 		await this.prisma.userToken.delete({
 			where: {
@@ -168,10 +164,17 @@ export class AuthService {
 				family: payload.token_family,
 			}
 		})
-		const newtoken = this.signRefreshToken(payload.sub, payload.token_family);
+		const newtoken = await this.signRefreshToken(payload.sub, payload.username, payload.token_family);
+		res.cookie('refresh_token', newtoken, {
+			httpOnly: true,
+			sameSite: 'lax',
+			secure: false,
+			path: '/',
+			maxAge: 600,
+		});
 // setcookie
 //rmcookie
-		return this.signAccessToken(payload.sub, payload.token_family);
+		return this.signAccessToken(payload.sub, payload.username);
 	}
 	// add username to refresh payload to sign access token
 

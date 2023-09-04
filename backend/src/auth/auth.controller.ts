@@ -3,6 +3,7 @@ import { AuthService } from "./auth.service";
 import { AuthDto } from "./dto";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { RefreshAuthGuard } from "./guards/refresh-auth.guard";
+import { JwtAuthGuard } from "./guards";
 
 @Controller('auth')
 export class AuthController {
@@ -29,16 +30,14 @@ export class AuthController {
 
 	@Post('refresh')
 	@UseGuards(RefreshAuthGuard)
-	refresh(@Req() req: any) {
-		return this.authservice.refresh(req.signedCookies.refresh_token);
+	refresh(@Res() res: any, @Req() req: any) {
+		return this.authservice.refresh(res, req.signedCookies.refresh_token);
 	}
 	
 	@Post('logout')
-	@UseGuards(RefreshAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	logout(@Res() res: any, @Req() req: any) {
-		res.send({
-
-		})
-		return this.authservice.logout(res, req.signedCookies.refresh_token);
+		const result = this.authservice.logout(res, req.signedCookies.refresh_token);
+		res.send({ result });
 	}
 }

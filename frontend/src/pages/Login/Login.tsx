@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import './Login.css';
+import { AuthContext, useAuth } from '../../context/AuthContext';
 
 const Login = () => {
 
@@ -22,7 +23,7 @@ const Login = () => {
 
 		const form = e.target;
 		const formData = new FormData(form);
-
+		const { accessToken, setAccessToken } = useAuth();
 		const formBody = {
 				"username": formData.get('username'),
 				"password": formData.get('password')
@@ -32,9 +33,10 @@ const Login = () => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(formBody),
+			credentials: 'include',
 		})
 		.then(response => response.json())
-		.then(response => alert(JSON.stringify(response)));
+		.then(response => setAccessToken(response.accessToken));
 	}
 
 	return (
