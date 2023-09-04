@@ -1,6 +1,38 @@
 import { Player } from './Player';
 import { GameConfiguration, GameMode } from './game.service';
 
+switch (gameConfiguration.mode) {
+const classicGameConfig: GameConfiguration = {
+	mode: GameMode.Classic,
+	ballSpeed: 3,
+	ballSpeedIncreaseFactor: 1.05,
+	paddleWidth: 10,
+	paddleHeight: 100,
+	paddleMoveSpeed: 10,
+	goalLimit: 10,
+};
+
+const partyGameConfig: GameConfiguration = {
+	mode: GameMode.Party,
+	ballSpeed: 3,
+	ballSpeedIncreaseFactor: 1.05,
+	paddleWidth: 10,
+	paddleHeight: 100,
+	paddleMoveSpeed: 20,
+	goalLimit: 10,
+};
+
+const hardcoreGameConfig: GameConfiguration = {
+	mode: GameMode.Hardcore,
+	ballSpeed: 5,
+	ballSpeedIncreaseFactor: 1.2,
+	paddleWidth: 5,
+	paddleHeight: 50,
+	paddleMoveSpeed: 20,
+	goalLimit: 1,
+};
+}
+
 export class MatchmakingService {
 	private queues: Map<GameMode, Player[]> = new Map();
 

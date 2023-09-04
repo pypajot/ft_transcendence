@@ -1,10 +1,8 @@
-import React, { KeyboardEvent, useEffect, useState } from 'react';
-import io, { Socket } from 'socket.io-client';
+import React, { useEffect, useState } from 'react';
+import { Socket } from 'socket.io-client';
 import {GameState} from '../../../../backend/src/game/game.service.ts';
 import './Game.css';
 //import { EventListener } from 'react';
-
-const socket = io('http://localhost:8000');
 
 interface GameProps {
   socket: Socket;

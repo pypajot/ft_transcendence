@@ -1,6 +1,7 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { GameService, GameState } from './game.service';
+import { GameConfiguration } from './game.service';
 
 @WebSocketGateway({ cors: true })
 export class SocketGateway {
@@ -28,7 +29,7 @@ export class SocketGateway {
     const gameState: GameState = this.gameService.getGameState();
     // create a loop with a delay of 50ms
     setInterval(() => {
-      this.gameService.updateGameState(); // Update the game state
+      this.gameService.updateGameState(gameConfiguration); // Update the game state
       const gameState: GameState = this.gameService.getGameState(); // Get the updated game state
       client.emit('gameState', gameState); // Send the game state to the client
     }, 50);

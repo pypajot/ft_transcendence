@@ -6,24 +6,22 @@ import { GOAL_LIMIT, BALL_SPEED } from './const.game';
 
 export enum GameMode {
   Classic = 'Classic',
-  Multiball = 'Multiball',
+  Party = 'Party',
   Hardcore = 'Hardcore',
 }
 
 export interface GameConfiguration {
   mode: GameMode;
-  numberOfBalls: number;
+  goalLimit: number;
   ballSpeed: number;
-  paddleSize: number;
-  goalsToWin: number;
+  ballSpeedIncreaseFactor: number;
+  paddleWidth: number;
+  paddleHeight: number;
+  paddleMoveSpeed: number;
 }
 
 @Injectable()
 export class GameService {
-  // include the game configuration in the game service
-  private gameConfiguration: GameConfiguration = {
-    
-  };
   // Properties for the game state
   private paddle1Y: number; // Position of paddle 1 (Player 1)
   private paddle2Y: number; // Position of paddle 2 (Player 2)
@@ -31,38 +29,46 @@ export class GameService {
   private ballY: number; // Position of the ball along the Y-axis
   private ballSpeedX: number; // Ball movement speed along the X-axis
   private ballSpeedY: number; // Ball movement speed along the Y-axis
-  private player1Score: number; // Score of Player 1
-  private player2Score: number; // Score of Player 2
+  private player1Score: number;
+  private player2Score: number;
 
   // Properties for the game physics
-  private ballSpeedIncreaseFactor: number = 1.05; // Factor to increase ball speed after each hit
+  private readonly ballSize: number = 10;
   private ballSpeedXDirection: number = 1; // Ball movement direction along the X-axis (1 or -1)
   private ballSpeedYDirection: number = 1; // Ball movement direction along the Y-axis (1 or -1)
-  private readonly ballSize: number = 10; // Size of the ball
-  private readonly paddleWidth: number = 10; // Width of the paddles
-  private readonly paddleHeight: number = 100; // Height of the paddles
+  private ballSpeedIncreaseFactor: number;
+  private paddleWidth: number;
+  private paddleHeight: number;
+  private paddleMoveSpeed: number;
 
   // Properties for the game boundaries
   private readonly gameWidth: number = 800;
   private readonly gameHeight: number = 600;
 
-  // goal limit
-  private readonly goalLimit: number = GOAL_LIMIT;
+  // Properties for the game rules
+  private goalLimit: number;
 
-  constructor() {
-    this.initGame();
+
+  constructor(gameConfiguration: GameConfiguration) {
+    this.initGame(gameConfiguration);
   }
 
-  private initGame(): void {
-    // Initialize the game state, e.g., set initial paddle positions, ball position, and scores.
+  private initGame(gameConfiguration: GameConfiguration): void {
+    // Initialize the game state depending on the game mode
+
     this.paddle1Y = 250; // Set initial Y position for paddle 1 (Player 1)
     this.paddle2Y = 250; // Set initial Y position for paddle 2 (Player 2)
     this.ballX = 400; // Set initial X position for the ball
     this.ballY = 300; // Set initial Y position for the ball
-    this.ballSpeedX = BALL_SPEED; // Set the initial speed of the ball along the X-axis
-    this.ballSpeedY = BALL_SPEED; // Set the initial speed of the ball along the Y-axis
+    this.ballSpeedX = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the X-axis
+    this.ballSpeedY = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the Y-axis
+    this.ballSpeedIncreaseFactor = gameConfiguration.ballSpeedIncreaseFactor;
     this.player1Score = 0; // Initialize Player 1's score to 0
     this.player2Score = 0; // Initialize Player 2's score to 0
+    this.paddleWidth = gameConfiguration.paddleWidth;
+    this.paddleHeight = gameConfiguration.paddleHeight;
+    this.paddleMoveSpeed = gameConfiguration.paddleMoveSpeed;
+    this.goalLimit = gameConfiguration.goalLimit;
   }
 
   @WebSocketServer()
@@ -101,11 +107,11 @@ export class GameService {
   movePaddleDown(clientId: string): void {
     if (clientId === 'player1') {
       if (this.paddle1Y <= this.gameHeight - this.paddleHeight - 10)
-        this.paddle1Y += 10;
+        this.paddle1Y += this.paddleMoveSpeed;
     } 
     else if (clientId === 'player2') {
       if (this.paddle2Y <= this.gameHeight - this.paddleHeight - 10)
-        this.paddle2Y += 10;
+        this.paddle2Y += this.paddleMoveSpeed;
     }
   }
   stopPaddle(clientId: string): void {
@@ -116,7 +122,7 @@ export class GameService {
     }
   }
   // Method to update the game state based on physics and user input
-  updateGameState(): void {
+  updateGameState(gameConfiguration: GameConfiguration): void {
     // Move the ball based on its current speed and direction
     this.ballX += this.ballSpeedX * this.ballSpeedXDirection;
     this.ballY += this.ballSpeedY * this.ballSpeedYDirection;
@@ -137,24 +143,25 @@ export class GameService {
     // Check for scoring when the ball crosses the left or right boundary
     if (this.ballX - this.ballSize / 2 <= 0) {
       this.player2Score++;
-      this.resetBall(); // Reset the ball to the center after scoring
+      this.resetBall(gameConfiguration); // Reset the ball to the center after scoring
     }
     else if (this.ballX + this.ballSize / 2 >= this.gameWidth) {
       this.player1Score++;
-      this.resetBall(); // Reset the ball to the center after scoring
+      this.resetBall(gameConfiguration); // Reset the ball to the center after scoring
     }
     // Check for end of game
     if (this.player1Score >= this.goalLimit || this.player2Score >= this.goalLimit) {
-      this.initGame(); // Reset the game state
+      // here we will handle the end of the game and reset the game state
+      //this.initGame(gameConfiguration); // Reset the game state
     }
   }
 
   // Method to reset the ball to the center after scoring or at the start of the game
-  private resetBall(): void {
+  private resetBall(gameConfiguration: GameConfiguration): void {
     this.ballX = this.gameWidth / 2;
     this.ballY = this.gameHeight / 2;
-    this.ballSpeedX = BALL_SPEED; // Set the initial speed of the ball along the X-axis
-    this.ballSpeedY = BALL_SPEED; // Set the initial speed of the ball along the Y-axis
+    this.ballSpeedX = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the X-axis
+    this.ballSpeedY = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the Y-axis
     this.ballSpeedXDirection = Math.random() > 0.5 ? 1 : -1; // Randomize the initial X-direction
     this.ballSpeedYDirection = Math.random() > 0.5 ? 1 : -1; // Randomize the initial Y-direction
   }
