@@ -26,9 +26,12 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
 		const dbToken = await this.authService.verifyFamilyInDb(payload);
 		if (!dbToken)
 			throw new UnauthorizedException();
-		if (this.authService.isReuse(dbToken, req.cookies.refresh_token))
+		console.log('test3');
+		const inDb = await this.authService.isReuse(dbToken, req.cookies.refresh_token);
+		if (!inDb)
 		{
 			this.authService.deleteIfReuse(payload);
+			console.log('test2');
 			throw new UnauthorizedException();
 		}
 		console.log('test');

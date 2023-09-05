@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import './Login.css';
 import { AuthContext, useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 function Login() {
 
@@ -63,6 +64,14 @@ function Login() {
 					</div>
 				</form>
 			</div>
+			<div>
+				Don't have an account ?
+			</div>
+			<Link to='/signup'>
+				<button>
+					Register here
+				</button>
+			</Link>
 		</>
 	);
 };

@@ -142,7 +142,7 @@ export class AuthService {
 
 	async isReuse(token: any, refresh_token: string): Promise<boolean> {
 		const tokenMatch = await argon2.verify(token.refreshToken, refresh_token);
-		return !tokenMatch;
+		return tokenMatch;
 	}
 
 	async deleteIfReuse(payload: any) {
