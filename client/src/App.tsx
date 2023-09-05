@@ -1,10 +1,10 @@
-import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home/Home';
 import ChatComponent from './pages/Message/ChatPage';
 import Test from './pages/Test/Test';
 import Signin from './pages/Auth/Signin';
 import Signup from './pages/Auth/Signup';
+import { ThemeProvider } from '@emotion/react';
 
 // Model for pages, put code in a subfolder of pages, and import it here
 
@@ -24,9 +24,10 @@ function AppRoutes() {
 
 function App() {
   return (
-	<BrowserRouter>
-		<AppRoutes />
-	</BrowserRouter>
+		<BrowserRouter>
+			<AppRoutes />
+		</BrowserRouter>
+
   );
 }
 

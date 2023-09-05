@@ -5,6 +5,7 @@ import MessageInput from './MessageInput'
 import Messages from './Messages'
 import LittleMessage from './LittleMessage'
 import MessageTarget from './MessageTarget'
+import { Button } from '@twilio-paste/core'
 
 //Access Username by global cookies or something ?
 
