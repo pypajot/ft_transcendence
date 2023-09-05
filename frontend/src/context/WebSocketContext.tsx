@@ -1,26 +1,36 @@
-//here we will create a context for the websocket
-
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import React, { createContext, useEffect, useState, useMemo } from 'react';
 import { io, Socket } from 'socket.io-client';
+
+// define the children prop manually since it's not available after React 18
+interface Props {
+	children: React.ReactNode;
+}
 
 export const WebSocketContext = createContext<Socket | undefined>(undefined);
 
-const WebSocketProvider: React.FC = ({ children }) => {
-	  const [socket, setSocket] = useState<Socket>({} as Socket);
+const WebSocketProvider: React.FC<Props> = ({ children }) => {
+	// Create state to hold the WebSocket instance
+	const [socket, setSocket] = useState<Socket>({} as Socket);
 
-	  useEffect(() => {
-		      const SocketClient = io('http://localhost:8000');
-		      setSocket(SocketClient);
+	// Establish a WebSocket connection when the component mounts
+	useEffect(() => {
+		// Create a WebSocket client instance and connect to the server
+		const SocketClient = io('http://localhost:8000');
+		
+		setSocket(SocketClient); // Set the instance in the component's state
+		
+		return () => {SocketClient.close()}; //close the connection when the component unmounts
+	}, []);
 
-		      return () => SocketClient.close();
-		    }, []);
-
+	// Memorize the WebSocket instance, preventing unnecessary re-renders
 	const value = useMemo(() => socket, [socket]);
-	  return (
-		      <WebSocketContext.Provider value={{ value }}>
-		        {children}
-		      </WebSocketContext.Provider>
-		    );
+
+	
+	return (
+		<WebSocketContext.Provider value={value}>
+			{children}
+		</WebSocketContext.Provider>
+	);
 };
 
 export default WebSocketProvider;

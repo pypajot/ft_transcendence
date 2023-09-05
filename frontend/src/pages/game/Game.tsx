@@ -1,27 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
+import { WebSocketContext } from '../../context/WebSocketContext.tsx';
 import {GameState} from '../../../../backend/src/game/game.service.ts';
 import './Game.css';
-//import { EventListener } from 'react';
+import { useContext } from 'react';
 
-interface GameProps {
-  socket: Socket;
-}
-
-const Game : React.FC<GameProps> = ({ socket }) => {
+const Game : React.FC = () => {
+  const socket = useContext(WebSocketContext); // Access the WebSocket context
   const [gameState, setGameState] = useState<GameState | null>(null);
 
   useEffect(() => {
     // Send custom event to request game state from the server
-    socket.emit('getGameState');
+    socket?.emit('getGameState');
 
     // Set up WebSocket event listener to receive the game state from the server
-    socket.on('gameState', (data) => {
+    socket?.on('gameState', (data) => {
       setGameState(data);
     });
 
     return () => {
-      socket.off('gameState');
+      socket?.off('gameState');
     };
   }, []);
 
@@ -31,7 +28,7 @@ const Game : React.FC<GameProps> = ({ socket }) => {
     // Handle user input (e.g., arrow keys) for moving paddles
     // Emit paddle movements to the server via WebSocket
     const direction = event.key === 'ArrowUp' ? 'up' : event.key === 'ArrowDown' ? 'down' : 'stop';
-    socket.emit('movePaddle', { direction });
+    socket?.emit('movePaddle', { direction });
   };
 
   useEffect(() => {
