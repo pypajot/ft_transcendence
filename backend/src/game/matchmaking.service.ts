@@ -1,7 +1,8 @@
 import { Player } from './Player';
-import { GameConfiguration, GameMode } from './game.service';
+import { GameConfiguration, GameMode, GameService } from './game.service';
+import { WebSocketGateway, WebSocketServer, SubscribeMessage } from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
 
-switch (gameConfiguration.mode) {
 const classicGameConfig: GameConfiguration = {
 	mode: GameMode.Classic,
 	ballSpeed: 3,
@@ -31,43 +32,63 @@ const hardcoreGameConfig: GameConfiguration = {
 	paddleMoveSpeed: 20,
 	goalLimit: 1,
 };
-}
 
 export class MatchmakingService {
-	private queues: Map<GameMode, Player[]> = new Map();
+	// Queues for each game mode
+	private classicQueue: Player[] = [];
+	private partyQueue: Player[] = [];
+	private hardcoreQueue: Player[] = [];
 
-	constructor() {
-		// Initialize queues for each game mode
-		for (const mode of Object.values(GameMode)) {
-		  this.queues.set(mode, []);
-		}
-	  }
+	constructor() {}
+
   	// Add a player to the matchmaking queue
-	enqueue(player: Player, gameConfiguration: GameConfiguration): void {
-    	const queue = this.queues.get(gameConfiguration.mode);
-
-    	if (queue) {
-      	// Store the game configuration with the player
-      	queue.push(player);
-      	this.tryMatchPlayers(gameConfiguration.mode);
-    	}
+	enqueue(player: Player): void {
+		const mode = player.gameMode;
+    	// Add the player to the appropriate queue based on selected mode.
+		if (mode === GameMode.Classic) {
+			this.classicQueue.push(player);
+		  }
+		else if (mode === GameMode.Party) {
+			this.partyQueue.push(player);
+		  }
+		else if (mode === GameMode.Hardcore) {
+			this.hardcoreQueue.push(player);
+		  }
+		// Attempt to match players in the queue
+		this.tryMatchPlayers(mode);
   	}
 
   	// Remove a player from the matchmaking queue
-	dequeue(player: Player, gameConfiguration: GameConfiguration): void {
-		const queue = this.queues.get(gameConfiguration.mode);
-		if (queue) {
-			const index = queue.indexOf(player);
-			if (index !== -1)
-				queue.splice(index, 1);
+	dequeue(player: Player): void {
+		const mode = player.gameMode;
+		// Remove the player from the appropriate queue based on selected mode.
+		if (mode === GameMode.Classic) {
+			this.classicQueue = this.classicQueue.filter((p) => p.socket.id !== player.socket.id);
+		}
+		else if (mode === GameMode.Party) {
+			this.partyQueue = this.partyQueue.filter((p) => p.socket.id !== player.socket.id);
+		}
+		else if (mode === GameMode.Hardcore) {
+			this.hardcoreQueue = this.hardcoreQueue.filter((p) => p.socket.id !== player.socket.id);
 		}
 	}
 
 	// Attempt to match players in the queue
-	private tryMatchPlayers(gameMode: GameMode): void {
-		const queue = this.queues.get(gameMode);
+	private tryMatchPlayers(mode: string): void {
+		
+		// Select the appropriate queue based on the game mode
+		let queue: Player[];
+		if (mode === GameMode.Classic) {
+			queue = this.classicQueue;
+		}
+		else if (mode === GameMode.Party) {
+			queue = this.partyQueue;
+		}
+		else if (mode === GameMode.Hardcore) {
+			queue = this.hardcoreQueue;
+		}
 		if (queue.length >= 2) {
-		// Match the first two players in the queue
+		// Match the first two players and remove them from the queue
 			const player1 = queue.shift()!;
 			const player2 = queue.shift()!;
 		// Initialize a new game session with these players
@@ -78,8 +99,30 @@ export class MatchmakingService {
   // Initialize a new game session with matched players
   private initializeGame(player1: Player, player2: Player): void {
     // Create a new game session and start the game
-    // You'll need to implement this part based on your game logic
-    // For example, you can create a GameSession class that manages the game state
-    // and emits game events to the matched players.
+	if (player1.gameMode === GameMode.Classic) {
+		const gameService = new GameService(classicGameConfig);
+	}
+	else if (player1.gameMode === GameMode.Party) {
+		const gameService = new GameService(partyGameConfig);
+	}
+	else if (player1.gameMode === GameMode.Hardcore) {
+		const gameService = new GameService(hardcoreGameConfig);
+	}
   }
+}
+
+@WebSocketGateway({ cors: true })
+export class MatchmakingGateway {
+  constructor(private readonly matchmakingService: MatchmakingService) {}
+
+  @WebSocketServer()
+  server: Server;
+
+  @SubscribeMessage('selectGameMode') // Listen for the selectGameMode event
+  handleSelectGameMode(client: Socket, mode: string): void {
+	const player = new Player(client, 0, mode);
+    // place the player in the appropriate queue based on selected mode.
+    this.matchmakingService.enqueue(player);
+  }
+
 }

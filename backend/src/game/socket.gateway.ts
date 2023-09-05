@@ -25,7 +25,7 @@ export class SocketGateway {
   }
 
   @SubscribeMessage('getGameState') // Custom event name to request game state from frontend
-  handleGetGameState(client: any): void {
+  handleGetGameState(client: any, gameConfiguration: GameConfiguration): void {
     const gameState: GameState = this.gameService.getGameState();
     // create a loop with a delay of 50ms
     setInterval(() => {
