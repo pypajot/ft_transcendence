@@ -22,7 +22,10 @@ export interface GameConfiguration {
 
 @Injectable()
 export class GameService {
+
   // Properties for the game state
+  private player1: Socket;
+  private player2: Socket;
   private paddle1Y: number; // Position of paddle 1 (Player 1)
   private paddle2Y: number; // Position of paddle 2 (Player 2)
   private ballX: number; // Position of the ball along the X-axis
@@ -33,6 +36,8 @@ export class GameService {
   private player2Score: number;
 
   // Properties for the game physics
+  private readonly gameWidth: number = 800;
+  private readonly gameHeight: number = 600;
   private readonly ballSize: number = 10;
   private ballSpeedXDirection: number = 1; // Ball movement direction along the X-axis (1 or -1)
   private ballSpeedYDirection: number = 1; // Ball movement direction along the Y-axis (1 or -1)
@@ -41,19 +46,15 @@ export class GameService {
   private paddleHeight: number;
   private paddleMoveSpeed: number;
 
-  // Properties for the game boundaries
-  private readonly gameWidth: number = 800;
-  private readonly gameHeight: number = 600;
-
   // Properties for the game rules
   private goalLimit: number;
 
 
-  constructor(gameConfiguration: GameConfiguration) {
-    this.initGame(gameConfiguration);
+  constructor(gameConfiguration: GameConfiguration, Player1: Socket, Player2: Socket) {
+    this.initGame(gameConfiguration, Player1, Player2);
   }
 
-  private initGame(gameConfiguration: GameConfiguration): void {
+  private initGame(gameConfiguration: GameConfiguration, Player1: Socket, Player2: Socket): void {
     // Initialize the game state depending on the game mode
 
     this.paddle1Y = 250; // Set initial Y position for paddle 1 (Player 1)
@@ -63,8 +64,8 @@ export class GameService {
     this.ballSpeedX = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the X-axis
     this.ballSpeedY = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the Y-axis
     this.ballSpeedIncreaseFactor = gameConfiguration.ballSpeedIncreaseFactor;
-    this.player1Score = 0; // Initialize Player 1's score to 0
-    this.player2Score = 0; // Initialize Player 2's score to 0
+    this.player1Score = 0;
+    this.player2Score = 0;
     this.paddleWidth = gameConfiguration.paddleWidth;
     this.paddleHeight = gameConfiguration.paddleHeight;
     this.paddleMoveSpeed = gameConfiguration.paddleMoveSpeed;
@@ -73,11 +74,6 @@ export class GameService {
 
   @WebSocketServer()
   server: Server;
-
-  // Add a method to emit the updated game state to all connected clients
-  emitGameStateToClients(gameState: GameState): void {
-    this.server.emit('gameState', gameState);
-  }
 
   // Add a method to get the current game state, which will be sent to the clients via WebSocket.
   getGameState(): GameState {
@@ -96,7 +92,7 @@ export class GameService {
   // Methods to move the paddles up and down, and to stop them.
   movePaddleUp(clientId: string): void {
     if (clientId === 'player1') {
-      if (this.paddle1Y >= 25) /* prevents paddle from going off screen */
+      if (this.paddle1Y >= 25) // prevents paddle from going off screen
         this.paddle1Y -= 10;
     }
     else if (clientId === 'player2') {
@@ -143,16 +139,18 @@ export class GameService {
     // Check for scoring when the ball crosses the left or right boundary
     if (this.ballX - this.ballSize / 2 <= 0) {
       this.player2Score++;
-      this.resetBall(gameConfiguration); // Reset the ball to the center after scoring
+      this.resetBall(gameConfiguration); // Reset the ball to the center
     }
     else if (this.ballX + this.ballSize / 2 >= this.gameWidth) {
       this.player1Score++;
-      this.resetBall(gameConfiguration); // Reset the ball to the center after scoring
+      this.resetBall(gameConfiguration); // Reset the ball to the center
     }
     // Check for end of game
     if (this.player1Score >= this.goalLimit || this.player2Score >= this.goalLimit) {
-      // here we will handle the end of the game and reset the game state
-      //this.initGame(gameConfiguration); // Reset the game state
+      // here we send a message to the clients to display a game over screen
+      this.server.emit('gameEnd', { player1Score: this.player1Score, player2Score: this.player2Score });
+      // TODO : see if we can use the gameEnd event to display a game over screen
+      // and buttons to play again or change game mode
     }
   }
 
@@ -160,8 +158,8 @@ export class GameService {
   private resetBall(gameConfiguration: GameConfiguration): void {
     this.ballX = this.gameWidth / 2;
     this.ballY = this.gameHeight / 2;
-    this.ballSpeedX = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the X-axis
-    this.ballSpeedY = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the Y-axis
+    this.ballSpeedX = gameConfiguration.ballSpeed; 
+    this.ballSpeedY = gameConfiguration.ballSpeed;
     this.ballSpeedXDirection = Math.random() > 0.5 ? 1 : -1; // Randomize the initial X-direction
     this.ballSpeedYDirection = Math.random() > 0.5 ? 1 : -1; // Randomize the initial Y-direction
   }

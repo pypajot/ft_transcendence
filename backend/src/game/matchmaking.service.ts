@@ -100,13 +100,13 @@ export class MatchmakingService {
   private initializeGame(player1: Player, player2: Player): void {
     // Create a new game session and start the game
 	if (player1.gameMode === GameMode.Classic) {
-		const gameService = new GameService(classicGameConfig);
+		const gameService = new GameService(classicGameConfig, player1.socket, player2.socket);
 	}
 	else if (player1.gameMode === GameMode.Party) {
-		const gameService = new GameService(partyGameConfig);
+		const gameService = new GameService(partyGameConfig, player1.socket, player2.socket);
 	}
 	else if (player1.gameMode === GameMode.Hardcore) {
-		const gameService = new GameService(hardcoreGameConfig);
+		const gameService = new GameService(hardcoreGameConfig, player1.socket, player2.socket);
 	}
   }
 }
@@ -124,5 +124,4 @@ export class MatchmakingGateway {
     // place the player in the appropriate queue based on selected mode.
     this.matchmakingService.enqueue(player);
   }
-
 }

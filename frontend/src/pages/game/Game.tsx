@@ -16,6 +16,13 @@ const Game : React.FC = () => {
     socket?.on('gameState', (data) => {
       setGameState(data);
     });
+    // add event listener for game end
+    socket?.on('gameEnd', (data) => {
+      // display game end message
+      alert(data);
+      // display 2 buttons: play again and go back to choose game mode
+      // if play again is clicked, emit play again event to server
+    });
 
     return () => {
       socket?.off('gameState');
