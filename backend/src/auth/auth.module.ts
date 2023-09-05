@@ -6,6 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { RefreshStrategy } from './strategies';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
 	imports: [
@@ -14,7 +15,8 @@ import { RefreshStrategy } from './strategies';
 			global: true,
 			secret: process.env.JWT_SECRET,
 			signOptions: { expiresIn: '60s' },
-		})
+		}),
+		HttpModule
 	],
 	controllers: [AuthController],
 	providers: [AuthService, LocalStrategy, JwtStrategy, RefreshStrategy],

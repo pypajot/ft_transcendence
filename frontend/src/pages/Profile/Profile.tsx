@@ -3,11 +3,13 @@ import './Profile.css';
 import { refreshFetch } from '../../fetch/refreshFetch';
 import { LogoutButton } from '../../components/LogoutButton';
 import { useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const Profile = () => {
 
 	const [user, setUser] = useState<string | null>();
 	const run = useRef(0);
+
 
 	useEffect(() => {
 		const FetchUser = async () => {
@@ -18,7 +20,6 @@ const Profile = () => {
 			
 		};
 			
-		
 		if (run.current !== 0)
 			FetchUser();
 		run.current++;

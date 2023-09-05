@@ -5,6 +5,7 @@ import * as argon2 from 'argon2';
 import { Prisma } from "@prisma/client";
 import {JwtService} from '@nestjs/jwt'
 import { v4 as uuidv4 } from "uuid";
+import { HttpService } from "@nestjs/axios";
 
 type RefreshPayloadType = {
 	sub: number;
@@ -17,6 +18,7 @@ export class AuthService {
 	constructor(
 		private prisma: PrismaService,
 		private jwt: JwtService,
+		private http: HttpService,
 	) {}
 
 	async signup(dto: AuthDto) {
@@ -41,6 +43,10 @@ export class AuthService {
 			throw err;
 		}
 		
+	}
+
+	async intralogin(code: string) {
+		const url = "https://api.intra.42.fr/oauth/token";
 	}
 
 	async login(dto: AuthDto, res: any) : Promise<any> {
@@ -171,11 +177,8 @@ export class AuthService {
 			path: '/',
 			maxAge: 600 * 1000,
 		});
-// setcookie
-//rmcookie
 		return this.signAccessToken(payload.sub, payload.username);
 	}
-	// add username to refresh payload to sign access token
 
 	async logout(res: any, refresh_token: any) {
 		const payload = await this.jwt.verifyAsync(refresh_token, {

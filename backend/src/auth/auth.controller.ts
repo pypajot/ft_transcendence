@@ -28,6 +28,11 @@ export class AuthController {
 		});
 	}
 
+	@Post('intralogin')
+	async intralogin(@Body() code: string) {
+		this.authservice.intralogin(code);
+	}
+
 	@Get('refresh')
 	@UseGuards(RefreshAuthGuard)
 	async refresh(@Res() res: any, @Req() req: any) {

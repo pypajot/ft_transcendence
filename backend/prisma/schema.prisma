@@ -15,6 +15,7 @@ model User {
 
 	username	String	@unique
 	hash		String
+	intralogin	String?	@unique
 	createdAt	DateTime @default(now())
 	updatedAt	DateTime @updatedAt
 
