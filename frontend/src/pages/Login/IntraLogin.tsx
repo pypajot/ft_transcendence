@@ -12,17 +12,16 @@ function IntraLogin() {
 
 	useEffect(() => {
 		const HandleIntra = async () => {
-			if (searchParams.get("error"))
-			{
+			if (searchParams.get("error") || !searchParams.get("code"))
 				navigate("/landing");
-				return ;
-			}
-			await fetch("/auth/intralogin", {
+			const response = await fetch("/auth/intralogin", {
 				method: "POST",
 				headers: { "Content-type" : "application/json" },
 				body: searchParams.get("code"),
 			})
-			.then(response => navigate("/profile"));
+			if (response.status == 201)
+				navigate("/profile");
+			navigate("/landing");
 		};
 		HandleIntra();
 	}, []);
