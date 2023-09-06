@@ -19,9 +19,10 @@
     "@twilio-paste/theme": "^11.0.1",
     "axios": "^1.5.0",
     "draft-js": "^0.11.7",
+    "htop": "^1.0.1",
     "prop-types": "^15.8.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
     "react-router-dom": "^6.15.0",
     "socket.io-client": "^4.7.2"
   },

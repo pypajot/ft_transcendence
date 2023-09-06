@@ -5,6 +5,7 @@ import Test from './pages/Test/Test';
 import Signin from './pages/Auth/Signin';
 import Signup from './pages/Auth/Signup';
 import { ThemeProvider } from '@emotion/react';
+import SocketContextProvider from './Context/socket-context';
 
 // Model for pages, put code in a subfolder of pages, and import it here
 
@@ -25,7 +26,7 @@ function AppRoutes() {
 function App() {
   return (
 		<BrowserRouter>
-			<AppRoutes />
+				<AppRoutes />
 		</BrowserRouter>
 
   );

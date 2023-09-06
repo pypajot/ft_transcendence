@@ -1,31 +1,17 @@
-import { useState, useEffect } from 'react'
-import { Message } from "../../../public/Types/message.entity"
-import io, {Socket} from 'socket.io-client'
+import { useState, useEffect, useContext } from 'react'
 import MessageInput from './MessageInput'
 import Messages from './Messages'
 import LittleMessage from './LittleMessage'
 import MessageTarget from './MessageTarget'
-import { Button } from '@twilio-paste/core'
+import { useSocketContext } from '../../Context/socket-context'
+import { Socket } from 'socket.io-client'
 
 //Access Username by global cookies or something ?
 
 const ChatComponent = () => {
-    const [socket, setSocket] = useState<Socket>()
     const [messages, setMessages] = useState<String[]>([])
     const [target, setTarget] = useState<String>("");
-
-
-    useEffect(() => {
-        const newSocket = io("http://localhost:3001/chat", {
-            query: {
-                username: localStorage.getItem("username"),
-            },
-        });
-        setSocket(newSocket);
-        return () => {
-            newSocket.disconnect();
-        }
-    }, [])
+    const socket = useSocketContext();
     const send = (value: string) =>
     {
         let message_content : String[] = [value, target];
@@ -42,7 +28,6 @@ const ChatComponent = () => {
     }, [messageListener]);
     return (
         <>
-        {" "}
         <MessageInput send={send}/>
         <Messages message={messages}/>
         <MessageTarget target={setTarget}/>
