@@ -2,6 +2,7 @@ import { Player } from './Player';
 import { GameConfiguration, GameMode, GameService } from './game.service';
 import { WebSocketGateway, WebSocketServer, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { Injectable } from '@nestjs/common';
 
 const classicGameConfig: GameConfiguration = {
 	mode: GameMode.Classic,
@@ -33,6 +34,7 @@ const hardcoreGameConfig: GameConfiguration = {
 	goalLimit: 1,
 };
 
+@Injectable()
 export class MatchmakingService {
 	// Queues for each game mode
 	private classicQueue: Player[] = [];
@@ -40,7 +42,6 @@ export class MatchmakingService {
 	private hardcoreQueue: Player[] = [];
 
 	constructor() {}
-
   	// Add a player to the matchmaking queue
 	enqueue(player: Player): void {
 		const mode = player.gameMode;
@@ -100,28 +101,31 @@ export class MatchmakingService {
   private initializeGame(player1: Player, player2: Player): void {
     // Create a new game session and start the game
 	if (player1.gameMode === GameMode.Classic) {
-		const gameService = new GameService(classicGameConfig, player1.socket, player2.socket);
+		const gameService = new GameService();
+		gameService.initGame(classicGameConfig, player1.socket, player2.socket);
 	}
 	else if (player1.gameMode === GameMode.Party) {
-		const gameService = new GameService(partyGameConfig, player1.socket, player2.socket);
+		const gameService = new GameService();
+		gameService.initGame(partyGameConfig, player1.socket, player2.socket);
 	}
 	else if (player1.gameMode === GameMode.Hardcore) {
-		const gameService = new GameService(hardcoreGameConfig, player1.socket, player2.socket);
+		const gameService = new GameService();
+		gameService.initGame(hardcoreGameConfig, player1.socket, player2.socket);
 	}
   }
 }
 
-@WebSocketGateway({ cors: true })
-export class MatchmakingGateway {
-  constructor(private readonly matchmakingService: MatchmakingService) {}
+// @WebSocketGateway({ cors: true, namespace: 'matchmaking' })
+// export class MatchmakingGateway {
+//   constructor(private readonly matchmakingService: MatchmakingService) {}
 
-  @WebSocketServer()
-  server: Server;
+//   @WebSocketServer()
+//   server: Server;
 
-  @SubscribeMessage('selectGameMode') // Listen for the selectGameMode event
-  handleSelectGameMode(client: Socket, mode: string): void {
-	const player = new Player(client, 0, mode);
-    // place the player in the appropriate queue based on selected mode.
-    this.matchmakingService.enqueue(player);
-  }
-}
+//   @SubscribeMessage('selectGameMode') // Listen for the selectGameMode event
+//   handleSelectGameMode(client: Socket, mode: string): void {
+// 	const player = new Player(client, 0, mode);
+//     // place the player in the appropriate queue based on selected mode.
+//     this.matchmakingService.enqueue(player);
+//   }
+// }

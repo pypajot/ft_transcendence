@@ -1,36 +1,46 @@
-import React, { createContext, useEffect, useState, useMemo } from 'react';
-import { io, Socket } from 'socket.io-client';
+import * as React from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { Socket, io } from "socket.io-client";
 
-// define the children prop manually since it's not available after React 18
-interface Props {
-	children: React.ReactNode;
+
+type WebContext = {
+    io: Socket;
 }
 
-export const WebSocketContext = createContext<Socket | undefined>(undefined);
-
-const WebSocketProvider: React.FC<Props> = ({ children }) => {
-	// Create state to hold the WebSocket instance
-	const [socket, setSocket] = useState<Socket>({} as Socket);
-
-	// Establish a WebSocket connection when the component mounts
-	useEffect(() => {
-		// Create a WebSocket client instance and connect to the server
-		const SocketClient = io('http://localhost:8000');
-		
-		setSocket(SocketClient); // Set the instance in the component's state
-		
-		return () => {SocketClient.close()}; //close the connection when the component unmounts
-	}, []);
-
-	// Memorize the WebSocket instance, preventing unnecessary re-renders
-	const value = useMemo(() => socket, [socket]);
-
-	
-	return (
-		<WebSocketContext.Provider value={value}>
-			{children}
-		</WebSocketContext.Provider>
-	);
+type SocketContextProviderProps = {
+    children: React.ReactNode;
 };
 
-export default WebSocketProvider;
+export const SocketContext = createContext<WebContext | undefined>(undefined);
+
+export default function SocketContextProvider(props: SocketContextProviderProps){
+
+    const [socket, setSocket] = useState<WebContext>({} as WebContext);
+
+    useEffect(() => {
+        const newSocket:WebContext = { io:io("http://localhost:8000", {
+            query: {
+                username: localStorage.getItem("username"),
+            },
+        })};
+            setSocket(newSocket);
+            return () => {
+                newSocket.io.disconnect();
+            }
+    }, []);
+    const value = useMemo(() => socket, [socket]);
+    return (
+        <SocketContext.Provider value={value}>
+            {props.children}
+        </SocketContext.Provider>
+    )
+}
+
+export function useSocketContext() {
+    const context = useContext(SocketContext);
+    if (context == undefined)
+    {
+        throw new Error("You need to use SocketContext with the SocketContextProvider");
+    }
+    return context.io;
+} 

@@ -27,8 +27,3 @@ If you are on a new machine, beforehand run :
 
 then always:
 `npm run start`
-
-Check :
-`localhost:8000/message` : you should see {message: "Hello World!"} from server.
-
-`localhost:3000` : you should see "Hello World!", fetched by client from server.

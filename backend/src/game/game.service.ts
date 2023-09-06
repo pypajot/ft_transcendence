@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { WebSocketGateway, WebSocketServer, SubscribeMessage } from '@nestjs/websockets';
+import { WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GOAL_LIMIT, BALL_SPEED } from './const.game';
-
+import { MatchmakingService } from './matchmaking.service';
 
 export enum GameMode {
   Classic = 'Classic',
@@ -50,13 +49,13 @@ export class GameService {
   private goalLimit: number;
 
 
-  constructor(gameConfiguration: GameConfiguration, Player1: Socket, Player2: Socket) {
-    this.initGame(gameConfiguration, Player1, Player2);
-  }
+  constructor() {}
 
-  private initGame(gameConfiguration: GameConfiguration, Player1: Socket, Player2: Socket): void {
+  initGame(gameConfiguration: GameConfiguration, Player1: Socket, Player2: Socket): void {
     // Initialize the game state depending on the game mode
 
+    this.player1 = Player1;
+    this.player2 = Player2;
     this.paddle1Y = 250; // Set initial Y position for paddle 1 (Player 1)
     this.paddle2Y = 250; // Set initial Y position for paddle 2 (Player 2)
     this.ballX = 400; // Set initial X position for the ball
@@ -78,6 +77,8 @@ export class GameService {
   // Add a method to get the current game state, which will be sent to the clients via WebSocket.
   getGameState(): GameState {
     return {
+      player1: this.player1,
+      player2: this.player2,
       paddle1Y: this.paddle1Y,
       paddle2Y: this.paddle2Y,
       ballX: this.ballX,
@@ -91,29 +92,29 @@ export class GameService {
 
   // Methods to move the paddles up and down, and to stop them.
   movePaddleUp(clientId: string): void {
-    if (clientId === 'player1') {
+    if (clientId === this.player1.id) {
       if (this.paddle1Y >= 25) // prevents paddle from going off screen
         this.paddle1Y -= 10;
     }
-    else if (clientId === 'player2') {
+    else if (clientId === this.player2.id) {
       if (this.paddle2Y >= 25)
         this.paddle2Y -= 10;
     }
   }
   movePaddleDown(clientId: string): void {
-    if (clientId === 'player1') {
+    if (clientId === this.player1.id) {
       if (this.paddle1Y <= this.gameHeight - this.paddleHeight - 10)
         this.paddle1Y += this.paddleMoveSpeed;
     } 
-    else if (clientId === 'player2') {
+    else if (clientId === this.player2.id) {
       if (this.paddle2Y <= this.gameHeight - this.paddleHeight - 10)
         this.paddle2Y += this.paddleMoveSpeed;
     }
   }
   stopPaddle(clientId: string): void {
-    if (clientId === 'player1') {
+    if (clientId === this.player1.id) {
       this.paddle1Y = this.paddle1Y;
-    } else if (clientId === 'player2') {
+    } else if (clientId === this.player2.id) {
       this.paddle2Y = this.paddle2Y;
     }
   }
@@ -148,7 +149,7 @@ export class GameService {
     // Check for end of game
     if (this.player1Score >= this.goalLimit || this.player2Score >= this.goalLimit) {
       // here we send a message to the clients to display a game over screen
-      this.server.emit('gameEnd', { player1Score: this.player1Score, player2Score: this.player2Score });
+      //this.server.emit('gameEnd', { player1Score: this.player1Score, player2Score: this.player2Score });
       // TODO : see if we can use the gameEnd event to display a game over screen
       // and buttons to play again or change game mode
     }
@@ -167,6 +168,8 @@ export class GameService {
 
 // Define an interface for the game state data that will be sent to the clients.
 export interface GameState {
+  player1: Socket;
+  player2: Socket;
   paddle1Y: number;
   paddle2Y: number;
   ballX: number;

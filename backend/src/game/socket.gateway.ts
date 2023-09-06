@@ -2,25 +2,44 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage } from '@nestjs/web
 import { Server, Socket } from 'socket.io';
 import { GameService, GameState } from './game.service';
 import { GameConfiguration } from './game.service';
+import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+import { MatchmakingService } from './matchmaking.service';
+import { Player } from './Player';
 
-@WebSocketGateway({ cors: true })
-export class SocketGateway {
-  constructor(private readonly gameService: GameService) {}
+@WebSocketGateway({ cors: true, namespace: 'game' })
+export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private readonly gameService: GameService,
+    private readonly matchmakingService: MatchmakingService) {}
 
+  handleConnection(client: Socket, ...args: any[]): void {
+    console.log('Client connected');
+    client.emit("connection");
+  }
+  handleDisconnect(client: any) {
+    console.log('Client disconnected');
+    client.emit("disconnection");
+  }
   @WebSocketServer()
   server: Server;
 
   // Other WebSocket event handlers and logic can be implemented here
 
+  @SubscribeMessage('selectGameMode') // Listen for the selectGameMode event
+  handleSelectGameMode(client: Socket, mode: string): void {
+	const player = new Player(client, 0, mode);
+    // place the player in the appropriate queue based on selected mode.
+    this.matchmakingService.enqueue(player);
+  }
+
   @SubscribeMessage('movePaddle')
   handleMovePaddle(client: Socket, data: { direction: string }): void {
     const { direction } = data;
     if (direction === 'up') {
-      this.gameService.movePaddleUp('player1'); //replace later with client.id
+      this.gameService.movePaddleUp(client.id); //replace later with client.id
     } else if (direction === 'down') {
-      this.gameService.movePaddleDown('player1'); //replace later with client.id
+      this.gameService.movePaddleDown(client.id); //replace later with client.id
     } else if (direction === 'stop') {
-      this.gameService.stopPaddle('player1'); //replace later with client.id
+      this.gameService.stopPaddle(client.id); //replace later with client.id
     }
   }
 

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { WebSocketContext } from '../../context/WebSocketContext.tsx';
+import { useSocketContext } from '../../context/WebSocketContext.tsx';
 import {GameState} from '../../../../backend/src/game/game.service.ts';
 import './Game.css';
-import { useContext } from 'react';
 
 const Game : React.FC = () => {
-  const socket = useContext(WebSocketContext); // Access the WebSocket context
+  const socket = useSocketContext(); // Access the WebSocket context
   const [gameState, setGameState] = useState<GameState | null>(null);
 
+  if (socket !== undefined){}
   useEffect(() => {
     // Send custom event to request game state from the server
     socket?.emit('getGameState');
@@ -15,7 +15,7 @@ const Game : React.FC = () => {
     // Set up WebSocket event listener to receive the game state from the server
     socket?.on('gameState', (data) => {
       setGameState(data);
-    });
+    },);
     // add event listener for game end
     socket?.on('gameEnd', (data) => {
       // display game end message
