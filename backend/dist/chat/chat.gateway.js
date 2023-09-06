@@ -29,22 +29,48 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
         this.logger.log("Websocket Initialized\n");
     }
     async handleConnection(client, ...args) {
-        this.chatService.new_cli(client, client.handshake.query.username);
+        console.log(client.handshake.query.username);
+        if (client.handshake.query.username !== 'null') {
+            this.chatService.new_cli(client, client.handshake.query.username);
+        }
         this.logger.log(`Client ${client.id} ${client.handshake.query.username} arrived`);
     }
     handleDisconnect(client) {
         this.logger.log(`Client ${client.id} left`);
     }
-    handleEvent(client, data) {
+    async handleEvent(client, data) {
         this.logger.log(`Message : ${data[0]} from : ${client.id} to: ${data[1]}`);
-        this.chatService.receiveMessage(client.id, data, this.cli_arr, this.id_msg);
-        this.id_msg = this.id_msg + 1;
-        console.log("\n");
-        this.cli_arr.map((elem) => { console.log(`client : ${elem.name} \n message: ${elem.messages[0]}\n`); });
-        this.chatService.sendTo(this.io, data[0], data[1], this.cli_arr);
+        const newMsg = this.chatService.receiveMessage(client.id, data);
+        this.chatService.sendTo(this.io, data[0], data[1]);
     }
     handleChannelJoining(client, data) {
         this.logger.log(`Channel : ${data}`);
+        try {
+            const existingChannel = this.prisma.channel.findUnique({
+                where: {
+                    name: data
+                }
+            });
+            if (existingChannel) {
+                client.join(data);
+            }
+            else {
+                const useUpdate = this.prisma.user.update({
+                    where: {
+                        socketId: socket_id
+                    },
+                    data: {}
+                });
+                const newchannel = this.prisma.channel.create({
+                    data: {
+                        name: data
+                    }
+                });
+            }
+        }
+        catch (error) {
+        }
+        this.prisma.channel.create;
         client.join(data);
     }
     handleChannelMessage(client, data) {
@@ -60,7 +86,7 @@ __decorate([
     (0, websockets_1.SubscribeMessage)('message'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Array]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handleEvent", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('JoinChannel'),

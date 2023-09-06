@@ -32,7 +32,7 @@ export class UserService {
             data: {
                 username: dto.username,
                 password: hash,
-                socketId: undefined 
+                socketId: 'null'
             }
         });
         delete user.password;

@@ -11,12 +11,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model UserChannel {
+  username String
+
+}
+
 model User {
   username       String
   id             Int       @id @default(autoincrement())
   password       String
-  messageReceived Message[]
-  CreatedChannel Channel[]
+  messageSent    Message[]
+  channelJoined  Channel[] @relation("Members", references: [id])
   socketId       String
 
   @@unique([username])
@@ -26,9 +31,9 @@ model User {
 model Message {
   id        Int      @id @default(autoincrement())
   content   String
-  author    User     @relation(fields: [userId], references: [id])
+  author    User     @relation(fields: [socketId], references: [socketId])
   createdAt DateTime @default(now())
-  userId    Int
+  socketId  String
   Channel   Channel? @relation(fields: [channelId], references: [id])
   channelId Int?
 }
@@ -36,8 +41,9 @@ model Message {
 model Channel {
   id       Int       @id @default(autoincrement())
   name     String
-  members  User[]
+  members  User[] @relation("Members", references: [id])
   messages Message[]
+  creator  String
 
   @@unique([name])
 }

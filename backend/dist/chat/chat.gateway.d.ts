@@ -18,7 +18,7 @@ declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, O
     afterInit(): void;
     handleConnection(client: any, ...args: any[]): Promise<void>;
     handleDisconnect(client: any): void;
-    handleEvent(client: any, data: string[]): void;
+    handleEvent(client: any, data: string[]): Promise<void>;
     handleChannelJoining(client: any, data: string): void;
     handleChannelMessage(client: Socket, data: string[]): void;
 }

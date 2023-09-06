@@ -6,9 +6,15 @@ export declare class ChatService {
     private readonly logger;
     prisma: PrismaClient<import(".prisma/client").Prisma.PrismaClientOptions, never, import("@prisma/client/runtime/library").DefaultArgs>;
     findUserById(client_id: string, cli_arr: Client_elem[]): Client_elem | undefined;
-    receiveMessage(client: any, message: string): Promise<void>;
+    receiveMessage(socket_id: any, message: string[]): Promise<{
+        id: number;
+        content: string;
+        createdAt: Date;
+        socketId: string;
+        channelId: number;
+    }>;
     new_cli(client: any, name: string): Promise<void>;
     sendMessage(io: Server, message: Message): void;
-    sendTo(io: Server, message: String, target: string, cli_arr: Client_elem[]): Promise<void>;
+    sendTo(io: Server, message: any, target: string): Promise<void>;
     sendToChannel(io: Server, channel: string, message: string): Promise<void>;
 }

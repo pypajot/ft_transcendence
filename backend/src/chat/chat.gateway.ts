@@ -24,13 +24,16 @@ class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGateway
 	private readonly logger = new Logger(ChatGateway.name);
 	constructor(private readonly chatService: ChatService){}
 		@WebSocketServer() io: Server<any, ServerToClientEvents>;
-
 		afterInit()
 		{
 			this.logger.log("Websocket Initialized\n");
 		}
 		async handleConnection(client: any, ...args: any[]) {
-			this.chatService.new_cli(client, client.handshake.query.username);
+			console.log(client.handshake.query.username)
+			if (client.handshake.query.username !== 'null')
+			{
+				this.chatService.new_cli(client, client.handshake.query.username);
+			}
 			this.logger.log(`Client ${client.id} ${client.handshake.query.username} arrived`);
 		}
 
@@ -39,20 +42,52 @@ class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGateway
 			this.logger.log(`Client ${client.id} left`);
 		}
 		@SubscribeMessage('message')
-		handleEvent(client: any, data: string[]): void {
+		async handleEvent(client: any, data: string[]): Promise<void> {
 			this.logger.log(`Message : ${data[0]} from : ${client.id} to: ${data[1]}`);
-			this.chatService.receiveMessage(client.id, data, this.cli_arr, this.id_msg)
-			this.id_msg = this.id_msg + 1;
-
-			console.log("\n");
-			this.cli_arr.map((elem) => {console.log(`client : ${elem.name} \n message: ${elem.messages[0]}\n`)})
-			this.chatService.sendTo(this.io, data[0], data[1], this.cli_arr);
+			const newMsg = this.chatService.receiveMessage(client.id, data);
+			this.chatService.sendTo(this.io, data[0], data[1]);
 	//		this.chatService.sendMessage(this.io, message_obj);
 		}
 
 		@SubscribeMessage('JoinChannel')
 		handleChannelJoining(client: any, data: string): void{
 			this.logger.log(`Channel : ${data}`);
+			try {
+				const existingChannel = this.prisma.channel.findUnique({
+					where: {
+						name : data
+					}
+				})
+				if (existingChannel) {
+					client.join(data);
+				}
+				else {
+					const user = await this.prisma.user.findUnique({
+								where: {
+									socketId: socket_id
+								},
+							})
+					const userUpdate = await this.prisma.user.update({
+						where: {
+							socketId: socket_id,
+						},
+						data: {
+							creator
+						}
+					})
+					const newchannel = this.prisma.channel.create({
+						data: {
+							name: data,
+							creator: userUpdate.username,
+
+						}
+					})
+				}
+			}
+			catch (error) { 
+
+			}
+			this.prisma.channel.create
 			client.join(data);
 		}
 
