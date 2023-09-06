@@ -1,14 +1,23 @@
+import { useNavigate } from "react-router-dom";
 import { refreshFetch } from "../fetch/refreshFetch";
+import { Button } from '@twilio-paste/core/button';
 
 export function LogoutButton() {
 
+	const navigate = useNavigate()
+	const Logout = async () => {
+		const response = await refreshFetch.post('/auth/logout');
+		if (response.data = "Logout successful")
+		{
+			sessionStorage.clear();
+			navigate("/landing");
+		}
+	}
 	return (
 		<>
-			<button onClick={() => {
-				refreshFetch.post('/auth/logout');
-			}}>
+			<Button variant="primary" onClick={Logout}>
 				Logout
-			</button>
+			</Button>
 		</>
 	);
 }

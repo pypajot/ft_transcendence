@@ -1,17 +1,15 @@
 import React from 'react';
-import logo from './logo.svg';
-import './Home.css';
+import './Chat.css';
 import Navbar from '../../components/Navbar';
 
-const Home = () => {
+const Chat = () => {
 	return (
 		<>
 		<Navbar />
 		<div className="App">
 			<header className="App-header">
-				<img src={logo} className="App-logo" alt="logo" />
 				<p>
-				Edit <code>src/App.tsx</code> and save to reload.
+				Chat
 				</p>
 				<a
 				className="App-link"
@@ -28,4 +26,4 @@ const Home = () => {
 	
 };
 
-export default Home;
+export default Chat;

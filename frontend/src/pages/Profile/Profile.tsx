@@ -4,6 +4,7 @@ import { refreshFetch } from '../../fetch/refreshFetch';
 import { LogoutButton } from '../../components/LogoutButton';
 import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
 
 const Profile = () => {
 
@@ -27,6 +28,7 @@ const Profile = () => {
 
 	return (
 		<>
+			<Navbar />
 			<div>
 				<h1>Profile</h1>
 			</div>
@@ -34,9 +36,6 @@ const Profile = () => {
 				<p>
 					{user}
 				</p>
-			</div>
-			<div>
-				<LogoutButton />
 			</div>
 		</>
 	);

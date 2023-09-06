@@ -244,7 +244,7 @@ export class AuthService {
 				family: payload.token_family,
 			}
 		})
-		res.clearCookie('refresh_token', {
+		await res.clearCookie('refresh_token', {
 			httpOnly: true,
 			sameSite: 'lax',
 			secure: false,

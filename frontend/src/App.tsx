@@ -7,6 +7,10 @@ import IntraLogin from './pages/Login/IntraLogin'
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing'
 import { AuthProvider } from './context/AuthContext';
+import Chat from './pages/Chat/Chat';
+import Game from './pages/Game/Game';
+import {Theme} from '@twilio-paste/core/theme';
+
 
 // Model for pages, put code in a subfolder of pages, and import it here
 
@@ -19,6 +23,9 @@ function AppRoutes() {
 				<Route path="/login" element={<Login />} />
 				<Route path="/intralogin" element={<IntraLogin />} />
 				<Route path="/profile" element={<Profile />} />
+				<Route path="/home" element={<Home />} />
+				<Route path="/chat" element={<Chat />} />
+				<Route path="/game" element={<Game />} />
 			</Routes>
 	  );
 }
@@ -28,9 +35,11 @@ function AppRoutes() {
 function App() {
   return (	
 	<AuthProvider>
-		<BrowserRouter>
-			<AppRoutes />
-		</BrowserRouter>
+		<Theme.Provider theme="dark">
+			<BrowserRouter>
+				<AppRoutes />
+			</BrowserRouter>
+		</Theme.Provider>
 	</AuthProvider>
   );
 }
