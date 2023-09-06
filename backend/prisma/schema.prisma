@@ -12,17 +12,22 @@ datasource db {
 }
 
 model UserChannel {
-  username String
-
+  id        Int       @id @default(autoincrement())
+  username  String
+  Channels  Channel[]
+  channelId Int
+  User      User?     @relation(fields: [userId], references: [id])
+  userId    Int?
 }
 
 model User {
-  username       String
-  id             Int       @id @default(autoincrement())
-  password       String
-  messageSent    Message[]
-  channelJoined  Channel[] @relation("Members", references: [id])
-  socketId       String
+  username    String
+  id          Int           @id @default(autoincrement())
+  password    String
+  messageSent Message[]
+  socketId    String
+  userChannel UserChannel[]
+  userchanId  Int
 
   @@unique([username])
   @@unique([socketId])
@@ -39,11 +44,12 @@ model Message {
 }
 
 model Channel {
-  id       Int       @id @default(autoincrement())
-  name     String
-  members  User[] @relation("Members", references: [id])
-  messages Message[]
-  creator  String
+  id            Int          @id @default(autoincrement())
+  name          String
+  messages      Message[]
+  creator       String
+  UserChannel   UserChannel? @relation(fields: [userChannelId], references: [id])
+  userChannelId Int?
 
   @@unique([name])
 }
