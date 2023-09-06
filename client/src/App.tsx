@@ -25,9 +25,11 @@ function AppRoutes() {
 
 function App() {
   return (
-		<BrowserRouter>
-				<AppRoutes />
-		</BrowserRouter>
+	<BrowserRouter>
+	    <SocketContextProvider>
+			<AppRoutes />
+		</SocketContextProvider>
+	</BrowserRouter>
 
   );
 }

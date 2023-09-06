@@ -39,7 +39,8 @@ let UserService = exports.UserService = class UserService {
             const user = await this.prismaService.user.create({
                 data: {
                     username: dto.username,
-                    password: hash
+                    password: hash,
+                    socketId: undefined
                 }
             });
             delete user.password;

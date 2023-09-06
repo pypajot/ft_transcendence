@@ -2,10 +2,9 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
 }
-
 
 datasource db {
   provider = "postgresql"
@@ -13,11 +12,34 @@ datasource db {
 }
 
 model User {
-	username	String
-	id			Int		@default(autoincrement()) @id
-	password	String
-	@@unique([username])
+  username       String
+  id             Int       @id @default(autoincrement())
+  password       String
+  messageReceived Message[]
+  CreatedChannel Channel[]
+  socketId       String
+
+  @@unique([username])
+  @@unique([socketId])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  author    User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  userId    Int
+  Channel   Channel? @relation(fields: [channelId], references: [id])
+  channelId Int?
+}
+
+model Channel {
+  id       Int       @id @default(autoincrement())
+  name     String
+  members  User[]
+  messages Message[]
+
+  @@unique([name])
 }
 
 //@@map("") to rename the model
-

@@ -18,21 +18,25 @@ let ChatService = exports.ChatService = ChatService_1 = class ChatService {
     findUserById(client_id, cli_arr) {
         return cli_arr.find(cli_arr => cli_arr.socket_id === client_id);
     }
-    receiveMessage(client_id, message, cli_arr, msg_id) {
-        let message_obj = {
-            message: message[0],
-            id: msg_id,
-            target: message[1],
-        };
-        let user = this.findUserById(client_id, cli_arr);
-        if (user) {
-            user.messages.push(message[0]);
-        }
+    async receiveMessage(client, message) {
+        const msg = await this.prisma.message.create({
+            data: {
+                content: message,
+                author: await this.prisma.user.findUnique({
+                    socketId: client.id
+                }),
+            }
+        });
     }
-    new_cli(id, name, client_id, cli_arr) {
-        this.logger.log(`New Client : ${client_id}, Username: ${name}`);
-        let cli = { id: id, name: name, socket_id: client_id, messages: [] };
-        cli_arr.push(cli);
+    async new_cli(client, name) {
+        const chatUser = await this.prisma.user.update({
+            where: {
+                username: name,
+            },
+            data: {
+                socketId: client.id,
+            }
+        });
     }
     sendMessage(io, message) {
         io.emit('message', message);
@@ -42,6 +46,9 @@ let ChatService = exports.ChatService = ChatService_1 = class ChatService {
         console.log(`${target_id.socket_id} || ${target_id.name}\n`);
         io.to(target_id.socket_id).emit('message', message);
         this.logger.log(`Sent ${message} to ${target}`);
+    }
+    async sendToChannel(io, channel, message) {
+        io.to(channel).emit('newChannelMessage', message);
     }
 };
 exports.ChatService = ChatService = ChatService_1 = __decorate([

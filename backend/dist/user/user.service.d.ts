@@ -7,10 +7,12 @@ export declare class UserService {
         username: string;
         id: number;
         password: string;
+        socketId: string;
     }>;
     signup(dto: AuthDto): Promise<{
         username: string;
         id: number;
         password: string;
+        socketId: string;
     }>;
 }

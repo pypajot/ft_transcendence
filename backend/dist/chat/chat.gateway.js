@@ -14,24 +14,25 @@ const common_1 = require("@nestjs/common");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const chat_service_1 = require("./chat.service");
+const dgram_1 = require("dgram");
+const client_1 = require("@prisma/client");
 let ChatGateway = ChatGateway_1 = class ChatGateway {
     constructor(chatService) {
         this.chatService = chatService;
         this.id = 0;
         this.id_msg = 0;
         this.cli_arr = [];
+        this.prisma = new client_1.PrismaClient();
         this.logger = new common_1.Logger(ChatGateway_1.name);
     }
     afterInit() {
         this.logger.log("Websocket Initialized\n");
     }
-    handleConnection(client, ...args) {
-        this.chatService.new_cli(this.id, client.handshake.query.username, client.id, this.cli_arr);
-        this.id = this.id + 1;
+    async handleConnection(client, ...args) {
+        this.chatService.new_cli(client, client.handshake.query.username);
         this.logger.log(`Client ${client.id} ${client.handshake.query.username} arrived`);
     }
     handleDisconnect(client) {
-        this.cli_arr = this.cli_arr.filter(cli_arr => cli_arr.socket_id !== client.id);
         this.logger.log(`Client ${client.id} left`);
     }
     handleEvent(client, data) {
@@ -41,6 +42,14 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
         console.log("\n");
         this.cli_arr.map((elem) => { console.log(`client : ${elem.name} \n message: ${elem.messages[0]}\n`); });
         this.chatService.sendTo(this.io, data[0], data[1], this.cli_arr);
+    }
+    handleChannelJoining(client, data) {
+        this.logger.log(`Channel : ${data}`);
+        client.join(data);
+    }
+    handleChannelMessage(client, data) {
+        console.log(`${data[0]}, ${data[1]}`);
+        this.chatService.sendToChannel(this.io, data[0], data[1]);
     }
 };
 __decorate([
@@ -53,6 +62,18 @@ __decorate([
     __metadata("design:paramtypes", [Object, Array]),
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleEvent", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('JoinChannel'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], ChatGateway.prototype, "handleChannelJoining", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('ChannelMessage'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [dgram_1.Socket, Array]),
+    __metadata("design:returntype", void 0)
+], ChatGateway.prototype, "handleChannelMessage", null);
 ChatGateway = ChatGateway_1 = __decorate([
     (0, websockets_1.WebSocketGateway)({ cors: '*', namespace: 'chat' }),
     __metadata("design:paramtypes", [chat_service_1.ChatService])

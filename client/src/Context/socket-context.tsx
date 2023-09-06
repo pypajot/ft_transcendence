@@ -15,18 +15,18 @@ export const SocketContext = createContext<WebContext | undefined>(undefined);
 
 export default function SocketContextProvider(props: SocketContextProviderProps){
 
-    const [socket, setSocket] = useState<WebContext>();
-    
+    const [socket, setSocket] = useState<WebContext>({} as WebContext);
+
     useEffect(() => {
-    const newSocket:WebContext = { io:io("http://localhost:3001/chat", {
-        query: {
-              username: localStorage.getItem("username"),
-          },
-    })};
-    setSocket(newSocket);
-        return () => {
-            newSocket.io.disconnect();
-        }
+        const newSocket:WebContext = { io:io("http://localhost:3001/chat", {
+            query: {
+                username: localStorage.getItem("username"),
+            },
+        })};
+            setSocket(newSocket);
+            return () => {
+                newSocket.io.disconnect();
+            }
     }, []);
     const value = useMemo(() => socket, [socket]);
     return (
