@@ -1,11 +1,12 @@
 import { ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import { AuthDto } from "./dto";
+import { AuthDto, CodeDto } from "./dto";
 import * as argon2 from 'argon2';
 import { Prisma } from "@prisma/client";
 import {JwtService} from '@nestjs/jwt'
 import { v4 as uuidv4 } from "uuid";
 import { HttpService } from "@nestjs/axios";
+import { firstValueFrom } from "rxjs";
 
 type RefreshPayloadType = {
 	sub: number;
@@ -45,9 +46,52 @@ export class AuthService {
 		
 	}
 
-	async intralogin(code: string) {
+	async intralogin(res: any, code: CodeDto) {
 		const url = "https://api.intra.42.fr/oauth/token";
-		
+		const parameters = { 
+			grant_type: "authorization_code",
+			client_id: process.env.INTRA_USER,
+			client_secret: process.env.INTRA_SECRET,
+			code: code.code,
+			redirect_uri: "http://localhost:3000/intralogin"
+		}
+		const response = await firstValueFrom(this.http.post(url, null, { params: parameters}))
+		// .then(response => console.log(response));
+		const user = await this.createIntraUser(response.data.access_token)
+		res.cookie('refresh_token', await this.signRefreshToken(user.id, user.username), {
+			httpOnly: true,
+			sameSite: 'lax',
+			secure: false,
+			path: '/',
+			maxAge: 600 * 1000,
+		});
+		return await this.signAccessToken(user.id, user.username);
+	}
+
+	async createIntraUser(access_token: string)
+	{
+		const response = await firstValueFrom(this.http.get("https://api.intra.42.fr/v2/me", {
+			headers: { "Authorization" : `Bearer ${access_token}`}
+		}));
+		const intraUser = response.data;
+		if (!(await this.prisma.user.findUnique({ where: { intralogin: intraUser.login }}))) {
+			await this.prisma.user.create({
+				data: {
+					username: await this.createUniqueUsername(intraUser.login),
+					intralogin: intraUser.login,
+				}
+			})
+		}
+		return this.prisma.user.findUnique({ where: { intralogin: intraUser.login }});
+	}
+
+	async createUniqueUsername(login: string) {
+		console.log('test');
+		var newName = login;
+		const alphanum = "ABDEFHIJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		while (await this.prisma.user.findUnique({ where: { username: newName }}))
+			newName += alphanum[Math.floor(Math.random() * 62)];
+		return newName;
 	}
 
 	async login(dto: AuthDto, res: any) : Promise<any> {

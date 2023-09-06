@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, UseGuards, Res, Req} from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { AuthDto } from "./dto";
+import { AuthDto, CodeDto } from "./dto";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { RefreshAuthGuard } from "./guards/refresh-auth.guard";
 import { JwtAuthGuard } from "./guards";
@@ -28,9 +28,17 @@ export class AuthController {
 		});
 	}
 
+	@Get('callback')
+	callback() {
+		console.log("test callback");
+	}
+
 	@Post('intralogin')
-	async intralogin(@Body() code: string) {
-		this.authservice.intralogin(code);
+	async intralogin(@Body() code: CodeDto, @Res() res: any) {
+		const token = await this.authservice.intralogin(res, code);
+		res.send({
+			access_token: token
+		});
 	}
 
 	@Get('refresh')
@@ -44,8 +52,8 @@ export class AuthController {
 	
 	@Post('logout')
 	@UseGuards(JwtAuthGuard)
-	logout(@Res() res: any, @Req() req: any) {
-		const result = this.authservice.logout(res, req.cookies.refresh_token);
+	async logout(@Res() res: any, @Req() req: any) {
+		const result = await this.authservice.logout(res, req.cookies.refresh_token);
 		res.send({ result });
 	}
 }
