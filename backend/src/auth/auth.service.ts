@@ -53,7 +53,7 @@ export class AuthService {
 			client_id: process.env.INTRA_USER,
 			client_secret: process.env.INTRA_SECRET,
 			code: code.code,
-			redirect_uri: "http://localhost:3000/intralogin"
+			redirect_uri: "http://localhost:5173/intralogin"
 		}
 		const response = await firstValueFrom(this.http.post(url, null, { params: parameters}))
 		// .then(response => console.log(response));

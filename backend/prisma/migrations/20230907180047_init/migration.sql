@@ -1,17 +1,9 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Users` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-DROP TABLE "Users";
-
 -- CreateTable
 CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
     "username" TEXT NOT NULL,
-    "hash" TEXT NOT NULL,
+    "hash" TEXT,
+    "intralogin" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -31,6 +23,9 @@ CREATE TABLE "usertokens" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_intralogin_key" ON "users"("intralogin");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "usertokens_family_key" ON "usertokens"("family");
