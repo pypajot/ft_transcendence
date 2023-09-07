@@ -14,7 +14,7 @@ const Game : React.FC = () => {
     socket?.emit('getGameState');
 
     // Set up WebSocket event listener to receive the game state from the server
-    socket?.on('gameState', (data) => {
+    socket?.on('gameState', (data: any) => {
       console.log('setting game state');
       setGameState(data);
     },);
