@@ -1,5 +1,4 @@
 import axios, { AxiosError } from "axios";
-import { access } from "fs";
 
 declare module 'axios' {
 	export interface AxiosRequestConfig {
@@ -33,7 +32,7 @@ refreshFetch.interceptors.response.use(
 	async (error: AxiosError) => {
 		const originalRequest = error.config;
 		if ( error.response && error.response.status === 401 && error.response.config.retry == false && originalRequest ) {
-			await fetch("/auth/refresh", {
+			await fetch("http://localhost:3333/auth/refresh", {
 				method: "GET",
 				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',

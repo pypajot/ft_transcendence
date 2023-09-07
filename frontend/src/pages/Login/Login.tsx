@@ -1,6 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
 import './Login.css';
-import { AuthContext, useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 
 function Login() {
@@ -29,7 +27,7 @@ function Login() {
 				"password": formData.get('password')
 		}
 		// alert(JSON.stringify(formBody));
-		await fetch('/auth/login', {
+		await fetch('http://localhost:3333/auth/login', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(formBody),

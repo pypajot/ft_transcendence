@@ -1,14 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import './Login.css';
 import { useSearchParams } from 'react-router-dom';
-import { AuthContext, useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 
 function IntraLogin() {
 
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const run = useRef(0);
 
@@ -19,7 +17,7 @@ function IntraLogin() {
 				navigate("/landing");
 				return ;
 			}
-			const response = await fetch("/auth/intralogin", {
+			const response = await fetch("http://localhost:3333/auth/intralogin", {
 				method: "POST",
 				headers: { "Content-type" : "application/json" },
 				body: JSON.stringify({ "code": searchParams.get("code")}),

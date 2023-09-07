@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import './Profile.css';
 import { refreshFetch } from '../../fetch/refreshFetch';
-import { LogoutButton } from '../../components/LogoutButton';
 import { useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 
 const Profile = () => {
@@ -15,7 +13,7 @@ const Profile = () => {
 	useEffect(() => {
 		const FetchUser = async () => {
 			
-			await refreshFetch("/user/me", {retry: false})
+			await refreshFetch("http://localhost:3333/user/me", {retry: false})
 			.then(response => setUser(JSON.stringify(response.data)))
 				
 			

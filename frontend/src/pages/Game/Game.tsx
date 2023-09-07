@@ -1,4 +1,3 @@
-import React from 'react';
 import './Game.css';
 import Navbar from '../../components/Navbar';
 

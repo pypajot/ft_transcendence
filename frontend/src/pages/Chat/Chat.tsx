@@ -1,4 +1,3 @@
-import React from 'react';
 import './Chat.css';
 import Navbar from '../../components/Navbar';
 

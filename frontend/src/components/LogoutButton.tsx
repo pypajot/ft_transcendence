@@ -6,7 +6,7 @@ export function LogoutButton() {
 
 	const navigate = useNavigate()
 	const Logout = async () => {
-		const response = await refreshFetch.post('/auth/logout');
+		const response = await refreshFetch.post('httpd://localhost:3333/auth/logout');
 		if (response.data = "Logout successful")
 		{
 			sessionStorage.clear();

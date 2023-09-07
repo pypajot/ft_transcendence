@@ -1,6 +1,3 @@
-import { useEffect, useState } from 'react';
-import { UserAPI } from './api/UserAPI';
-import { UserDTO } from './api/dto/user.dto';
 import './Signup.css';
 
 const Signup = () => {
@@ -30,7 +27,7 @@ const Signup = () => {
 				"password": formData.get('password')
 		}
 		alert(JSON.stringify(formBody));
-		await fetch('/auth/signup', {
+		await fetch('http://localhost:3333/auth/signup', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(formBody),
