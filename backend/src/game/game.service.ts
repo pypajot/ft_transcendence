@@ -47,13 +47,15 @@ export class GameService {
 
   // Properties for the game rules
   private goalLimit: number;
+  private gameConfiguration: GameConfiguration;
 
 
   constructor() {}
 
   initGame(gameConfiguration: GameConfiguration, Player1: Socket, Player2: Socket): void {
     // Initialize the game state depending on the game mode
-
+    console.log('Init game');
+    this.gameConfiguration = gameConfiguration;
     this.player1 = Player1;
     this.player2 = Player2;
     this.paddle1Y = 250; // Set initial Y position for paddle 1 (Player 1)
@@ -70,9 +72,6 @@ export class GameService {
     this.paddleMoveSpeed = gameConfiguration.paddleMoveSpeed;
     this.goalLimit = gameConfiguration.goalLimit;
   }
-
-  @WebSocketServer()
-  server: Server;
 
   // Add a method to get the current game state, which will be sent to the clients via WebSocket.
   getGameState(): GameState {
@@ -119,7 +118,7 @@ export class GameService {
     }
   }
   // Method to update the game state based on physics and user input
-  updateGameState(gameConfiguration: GameConfiguration): void {
+  updateGameState(): void {
     // Move the ball based on its current speed and direction
     this.ballX += this.ballSpeedX * this.ballSpeedXDirection;
     this.ballY += this.ballSpeedY * this.ballSpeedYDirection;
@@ -140,11 +139,11 @@ export class GameService {
     // Check for scoring when the ball crosses the left or right boundary
     if (this.ballX - this.ballSize / 2 <= 0) {
       this.player2Score++;
-      this.resetBall(gameConfiguration); // Reset the ball to the center
+      this.resetBall(); // Reset the ball to the center
     }
     else if (this.ballX + this.ballSize / 2 >= this.gameWidth) {
       this.player1Score++;
-      this.resetBall(gameConfiguration); // Reset the ball to the center
+      this.resetBall(); // Reset the ball to the center
     }
     // Check for end of game
     if (this.player1Score >= this.goalLimit || this.player2Score >= this.goalLimit) {
@@ -156,11 +155,11 @@ export class GameService {
   }
 
   // Method to reset the ball to the center after scoring or at the start of the game
-  private resetBall(gameConfiguration: GameConfiguration): void {
+  private resetBall(): void {
     this.ballX = this.gameWidth / 2;
     this.ballY = this.gameHeight / 2;
-    this.ballSpeedX = gameConfiguration.ballSpeed; 
-    this.ballSpeedY = gameConfiguration.ballSpeed;
+    this.ballSpeedX = this.gameConfiguration.ballSpeed; 
+    this.ballSpeedY = this.gameConfiguration.ballSpeed;
     this.ballSpeedXDirection = Math.random() > 0.5 ? 1 : -1; // Randomize the initial X-direction
     this.ballSpeedYDirection = Math.random() > 0.5 ? 1 : -1; // Randomize the initial Y-direction
   }

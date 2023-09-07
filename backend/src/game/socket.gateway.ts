@@ -8,8 +8,10 @@ import { Player } from './Player';
 
 @WebSocketGateway({ cors: true, namespace: 'game' })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly gameService: GameService,
-    private readonly matchmakingService: MatchmakingService) {}
+  constructor(private gameService: GameService,
+    private readonly matchmakingService: MatchmakingService) {
+      gameService = undefined;
+    }
 
   handleConnection(client: Socket, ...args: any[]): void {
     console.log('Client connected');
@@ -26,31 +28,52 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('selectGameMode') // Listen for the selectGameMode event
   handleSelectGameMode(client: Socket, mode: string): void {
-	const player = new Player(client, 0, mode);
+    const player = new Player(client, 0, mode);
+    console.log(`Player ${client.id} selected ${mode} mode`);
     // place the player in the appropriate queue based on selected mode.
-    this.matchmakingService.enqueue(player);
+    this.gameService = this.matchmakingService.enqueue(player);
   }
 
   @SubscribeMessage('movePaddle')
   handleMovePaddle(client: Socket, data: { direction: string }): void {
     const { direction } = data;
     if (direction === 'up') {
-      this.gameService.movePaddleUp(client.id); //replace later with client.id
-    } else if (direction === 'down') {
-      this.gameService.movePaddleDown(client.id); //replace later with client.id
-    } else if (direction === 'stop') {
-      this.gameService.stopPaddle(client.id); //replace later with client.id
+      this.gameService.movePaddleUp(client.id);
+    } 
+    else if (direction === 'down') {
+      this.gameService.movePaddleDown(client.id);
+    } 
+    else if (direction === 'stop') {
+      this.gameService.stopPaddle(client.id);
     }
   }
 
+  // @SubscribeMessage('startGame')
+  // handleStartGame(client: Socket, opponent: Socket, gameConfiguration: GameConfiguration): void {
+  //   console.log('Starting game');
+  //   this.gameService.initGame(gameConfiguration, client, opponent);
+  // }
+
   @SubscribeMessage('getGameState') // Custom event name to request game state from frontend
-  handleGetGameState(client: any, gameConfiguration: GameConfiguration): void {
-    const gameState: GameState = this.gameService.getGameState();
+  handleGetGameState(client: any): void {
+    let gameState = this.gameService?.getGameState();
+    console.log('handleGetGameState function');
     // create a loop with a delay of 50ms
-    setInterval(() => {
-      this.gameService.updateGameState(gameConfiguration); // Update the game state
-      const gameState: GameState = this.gameService.getGameState(); // Get the updated game state
-      client.emit('gameState', gameState); // Send the game state to the client
-    }, 50);
+    if (this.gameService !== undefined) {
+      setInterval(() => {
+        console.log('interval loop');
+        this.gameService?.updateGameState(); // Update the game state
+        gameState = this.gameService?.getGameState(); // Get the updated game state
+        // Send the game state to the client
+        client.emit('gameState', gameState.ballX);
+        client.emit('gameState', gameState.ballY);
+        client.emit('gameState', gameState.paddle1Y);
+        client.emit('gameState', gameState.paddle2Y);
+        client.emit('gameState', gameState.player1Score);
+        client.emit('gameState', gameState.player2Score);
+        client.emit('gameState', gameState.gameWidth);
+        client.emit('gameState', gameState.gameHeight);
+      }, 50);
+    }
   }
 }

@@ -6,23 +6,25 @@ import './Game.css';
 const Game : React.FC = () => {
   const socket = useSocketContext(); // Access the WebSocket context
   const [gameState, setGameState] = useState<GameState | null>(null);
+  console.log('game loaded');
 
-  if (socket !== undefined){}
   useEffect(() => {
     // Send custom event to request game state from the server
+    console.log('getGameState');
     socket?.emit('getGameState');
 
     // Set up WebSocket event listener to receive the game state from the server
     socket?.on('gameState', (data) => {
+      console.log('setting game state');
       setGameState(data);
     },);
     // add event listener for game end
-    socket?.on('gameEnd', (data) => {
-      // display game end message
-      alert(data);
-      // display 2 buttons: play again and go back to choose game mode
-      // if play again is clicked, emit play again event to server
-    });
+    // socket?.on('gameEnd', (data) => {
+    //   // display game end message
+    //   alert(data);
+    //   // display 2 buttons: play again and go back to choose game mode
+    //   // if play again is clicked, emit play again event to server
+    // });
 
     return () => {
       socket?.off('gameState');
