@@ -51,50 +51,13 @@ class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGateway
 
 		@SubscribeMessage('JoinChannel')
 		handleChannelJoining(client: any, data: string): void{
-			this.logger.log(`Channel : ${data}`);
-			try {
-				const existingChannel = this.prisma.channel.findUnique({
-					where: {
-						name : data
-					}
-				})
-				if (existingChannel) {
-					client.join(data);
-				}
-				else {
-					const user = await this.prisma.user.findUnique({
-								where: {
-									socketId: socket_id
-								},
-							})
-					const userUpdate = await this.prisma.user.update({
-						where: {
-							socketId: socket_id,
-						},
-						data: {
-							creator
-						}
-					})
-					const newchannel = this.prisma.channel.create({
-						data: {
-							name: data,
-							creator: userUpdate.username,
-
-						}
-					})
-				}
-			}
-			catch (error) { 
-
-			}
-			this.prisma.channel.create
-			client.join(data);
+			this.chatService.newMember(client, data);
 		}
 
 		@SubscribeMessage('ChannelMessage')
-		handleChannelMessage(client: Socket, data: string[]): void{
+		handleChannelMessage(client: any, data: string[]): void{
 			console.log(`${data[0]}, ${data[1]}`);
-			this.chatService.sendToChannel(this.io, data[0], data[1]);
+			this.chatService.sendToChannel(this.io, data[0], data[1], client.id);
 		}
 }
 

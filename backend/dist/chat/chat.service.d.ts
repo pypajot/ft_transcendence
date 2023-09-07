@@ -15,6 +15,7 @@ export declare class ChatService {
     }>;
     new_cli(client: any, name: string): Promise<void>;
     sendMessage(io: Server, message: Message): void;
+    newMember(client: any, channelName: string): Promise<void>;
     sendTo(io: Server, message: any, target: string): Promise<void>;
-    sendToChannel(io: Server, channel: string, message: string): Promise<void>;
+    sendToChannel(io: Server, channel: string, message: string, socket_id: string): Promise<void>;
 }

@@ -1,10 +1,8 @@
-/// <reference types="node" />
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from "@nestjs/websockets";
 import { Server } from 'socket.io';
 import { ServerToClientEvents } from "src/types/events";
 import { ChatService } from "./chat.service";
 import { Client_elem } from "src/types/client.entity";
-import { Socket } from "dgram";
 import { PrismaClient } from "@prisma/client";
 declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     private readonly chatService;
@@ -20,6 +18,6 @@ declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, O
     handleDisconnect(client: any): void;
     handleEvent(client: any, data: string[]): Promise<void>;
     handleChannelJoining(client: any, data: string): void;
-    handleChannelMessage(client: Socket, data: string[]): void;
+    handleChannelMessage(client: any, data: string[]): void;
 }
 export default ChatGateway;

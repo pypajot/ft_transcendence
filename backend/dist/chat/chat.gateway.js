@@ -14,7 +14,6 @@ const common_1 = require("@nestjs/common");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const chat_service_1 = require("./chat.service");
-const dgram_1 = require("dgram");
 const client_1 = require("@prisma/client");
 let ChatGateway = ChatGateway_1 = class ChatGateway {
     constructor(chatService) {
@@ -44,38 +43,11 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
         this.chatService.sendTo(this.io, data[0], data[1]);
     }
     handleChannelJoining(client, data) {
-        this.logger.log(`Channel : ${data}`);
-        try {
-            const existingChannel = this.prisma.channel.findUnique({
-                where: {
-                    name: data
-                }
-            });
-            if (existingChannel) {
-                client.join(data);
-            }
-            else {
-                const useUpdate = this.prisma.user.update({
-                    where: {
-                        socketId: socket_id
-                    },
-                    data: {}
-                });
-                const newchannel = this.prisma.channel.create({
-                    data: {
-                        name: data
-                    }
-                });
-            }
-        }
-        catch (error) {
-        }
-        this.prisma.channel.create;
-        client.join(data);
+        this.chatService.newMember(client, data);
     }
     handleChannelMessage(client, data) {
         console.log(`${data[0]}, ${data[1]}`);
-        this.chatService.sendToChannel(this.io, data[0], data[1]);
+        this.chatService.sendToChannel(this.io, data[0], data[1], client.id);
     }
 };
 __decorate([
@@ -97,7 +69,7 @@ __decorate([
 __decorate([
     (0, websockets_1.SubscribeMessage)('ChannelMessage'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [dgram_1.Socket, Array]),
+    __metadata("design:paramtypes", [Object, Array]),
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleChannelMessage", null);
 ChatGateway = ChatGateway_1 = __decorate([

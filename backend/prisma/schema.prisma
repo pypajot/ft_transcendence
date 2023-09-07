@@ -14,10 +14,12 @@ datasource db {
 model UserChannel {
   id        Int       @id @default(autoincrement())
   username  String
-  Channels  Channel[]
+  channel  Channel @relation(fields: [channelId], references: [id])
   channelId Int
   User      User?     @relation(fields: [userId], references: [id])
   userId    Int?
+
+  @@unique([id])
 }
 
 model User {
@@ -27,10 +29,10 @@ model User {
   messageSent Message[]
   socketId    String
   userChannel UserChannel[]
-  userchanId  Int
 
   @@unique([username])
   @@unique([socketId])
+  @@unique([id])
 }
 
 model Message {
@@ -48,10 +50,10 @@ model Channel {
   name          String
   messages      Message[]
   creator       String
-  UserChannel   UserChannel? @relation(fields: [userChannelId], references: [id])
-  userChannelId Int?
+  UserChannel   UserChannel[]
 
   @@unique([name])
+  @@unique([id])
 }
 
 //@@map("") to rename the model
