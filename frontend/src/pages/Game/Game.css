@@ -1,43 +1,46 @@
-#root {
-	max-width: 1280px;
-	margin: 0 auto;
-	padding: 2rem;
-	text-align: center;
+/* Game.css */
+
+.scores-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.score {
+  font-size: 20px; /* Adjust the font size as needed */
+  color: #fff; /* Text color */
+}
+
+.container {
+    position: relative;
+    width: 100%; /* 100% of the container's width */
+    padding-top: 75%; /* 75% of the container's width to set the aspect ratio (adjust as needed) */
+    border: 3px solid whitesmoke;
+    overflow: hidden;
   }
   
-  .logo {
-	height: 6em;
-	padding: 1.5em;
-	will-change: filter;
-	transition: filter 300ms;
-  }
-  .logo:hover {
-	filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.react:hover {
-	filter: drop-shadow(0 0 2em #61dafbaa);
+  .ball {
+    position: absolute;
+    width: 2%;
+    height: 2%;
+    background-color: whitesmoke;
+    border-radius: 50%;
   }
   
-  @keyframes logo-spin {
-	from {
-	  transform: rotate(0deg);
-	}
-	to {
-	  transform: rotate(360deg);
-	}
+  .paddle {
+    position: absolute;
+    width: 1%;
+    height: 12%;
   }
   
-  @media (prefers-reduced-motion: no-preference) {
-	a:nth-of-type(2) .logo {
-	  animation: logo-spin infinite 20s linear;
-	}
+  .paddle1 {
+    left: 1%; /* Adjust paddle position as needed */
+    background-color: whitesmoke;
   }
   
-  .card {
-	padding: 2em;
-  }
-  
-  .read-the-docs {
-	color: #888;
+  .paddle2 {
+    right: 1%; /* Adjust paddle position as needed */
+    background-color: whitesmoke;
   }
   

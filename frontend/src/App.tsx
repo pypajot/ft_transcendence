@@ -42,11 +42,11 @@ import Login from './pages/Login/Login';
 import IntraLogin from './pages/Login/IntraLogin'
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing'
-import { AuthProvider } from './context/AuthContext';
 import Chat from './pages/Chat/Chat';
 import Game from './pages/Game/Game';
-import {Theme} from '@twilio-paste/core/theme';
-
+import ModeSelection from './pages/Game/modeSelection';
+import { AuthProvider } from './context/AuthContext';
+import WebSocketProvider from './context/WebSocketContext';
 
 // Model for pages, put code in a subfolder of pages, and import it here
 
@@ -62,6 +62,7 @@ function AppRoutes() {
 				<Route path="/home" element={<Home />} />
 				<Route path="/chat" element={<Chat />} />
 				<Route path="/game" element={<Game />} />
+				<Route path="/selectmode" element={<ModeSelection />} />
 			</Routes>
 	  );
 }
@@ -71,11 +72,11 @@ function AppRoutes() {
 function App() {
   return (	
 	<AuthProvider>
-		<Theme.Provider theme="dark">
+		<WebSocketProvider>
 			<BrowserRouter>
 				<AppRoutes />
 			</BrowserRouter>
-		</Theme.Provider>
+		</WebSocketProvider>
 	</AuthProvider>
   );
 }

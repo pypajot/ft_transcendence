@@ -40,3 +40,12 @@
 .read-the-docs {
   color: #888;
 }
+
+.game {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin : auto;
+  width: 120%; /*temporary : increases the size of the game board*/
+}
