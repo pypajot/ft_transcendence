@@ -31,19 +31,21 @@ refreshFetch.interceptors.response.use(
 	},
 	async (error: AxiosError) => {
 		const originalRequest = error.config;
-		if ( error.response && error.response.status === 401 && error.response.config.retry == false && originalRequest ) {
-			await fetch("http://localhost:3333/auth/refresh", {
-				method: "GET",
-				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include',
-			})
-			.then(response => response.json())
-			.then(response => sessionStorage.setItem('access_token', response.access_token));
-			originalRequest.retry = true;
-			const accessToken = sessionStorage.getItem('access_token');
-			originalRequest.headers.Authorization = `Bearer ${accessToken}`
-			return refreshFetch(originalRequest);
-		}
-		return Promise.reject(error);
+		if ( error.response?.status !== 401 || error.response?.config.retry == true || !originalRequest )
+			return Promise.reject(error);
+
+		const response = await fetch("http://localhost:3333/auth/refresh", {
+			method: "GET",
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include',
+		});
+		if (response.status !== 201)
+			return Promise.reject(error); //disconnect
+
+		sessionStorage.setItem('access_token', (await response.json()).access_token);
+		originalRequest.retry = true;
+		const accessToken = sessionStorage.getItem('access_token');
+		originalRequest.headers.Authorization = `Bearer ${accessToken}`
+		return refreshFetch(originalRequest);
 	}
 );

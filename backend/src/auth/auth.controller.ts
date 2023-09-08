@@ -34,8 +34,8 @@ export class AuthController {
 	}
 
 	@Post('intralogin')
-	async intralogin(@Body() code: CodeDto, @Res() res: any) {
-		const token = await this.authservice.intralogin(res, code);
+	async intralogin( @Res() res: any,@Req() req: any) {
+		const token = await this.authservice.intralogin(res, req.body.code);
 		res.send({
 			access_token: token
 		});

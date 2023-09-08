@@ -1,5 +1,6 @@
 import './Login.css';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 function Login() {
 
@@ -15,11 +16,13 @@ function Login() {
 
 	// 	FetchUser();
 	// }, []);
+	const { setUser } = useAuth();
 
 	async function HandleSubmit(e: any)
 	{
 		e.preventDefault();
 
+		
 		const form = e.target;
 		const formData = new FormData(form);
 		const formBody = {
@@ -34,8 +37,8 @@ function Login() {
 			credentials: 'include',
 		})
 		.then(response => response.json())
-		.then(response => sessionStorage.setItem('access_token', response.access_token));
-		
+		.then(response => sessionStorage.setItem('access_token', response.access_token))
+		.then(response => setUser(1));
 	}
 
 	return (

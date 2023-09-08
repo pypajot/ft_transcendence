@@ -3,10 +3,12 @@ import './Login.css';
 import { useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 function IntraLogin() {
 
 	const [searchParams] = useSearchParams();
+	const { setUser } = useAuth();
 	const navigate = useNavigate();
 	const run = useRef(0);
 
@@ -26,7 +28,8 @@ function IntraLogin() {
 			if (response.status === 201)
 			{
 				// const data = await response.json();
-				sessionStorage.setItem('access_token', (await response.json()).access_token)
+				sessionStorage.setItem('access_token', (await response.json()).access_token);
+				setUser(1);
 				navigate("/profile");
 				return ;
 			}

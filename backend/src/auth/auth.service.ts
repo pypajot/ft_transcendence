@@ -46,18 +46,18 @@ export class AuthService {
 		
 	}
 
-	async intralogin(res: any, code: CodeDto) {
+	async intralogin(res: any, code: string) {
 		const url = "https://api.intra.42.fr/oauth/token";
 		const parameters = { 
 			grant_type: "authorization_code",
 			client_id: process.env.INTRA_USER,
 			client_secret: process.env.INTRA_SECRET,
-			code: code.code,
+			code: code,
 			redirect_uri: "http://localhost:5173/intralogin"
 		}
 		const response = await firstValueFrom(this.http.post(url, null, { params: parameters}))
 		// .then(response => console.log(response));
-		const user = await this.createIntraUser(response.data.access_token)
+		const user = await this.createIntraUser(response.data.access_token);
 		res.cookie('refresh_token', await this.signRefreshToken(user.id, user.username), {
 			httpOnly: true,
 			sameSite: 'lax',
@@ -65,6 +65,7 @@ export class AuthService {
 			path: '/',
 			maxAge: 600 * 1000,
 		});
+
 		return await this.signAccessToken(user.id, user.username);
 	}
 
@@ -86,7 +87,6 @@ export class AuthService {
 	}
 
 	async createUniqueUsername(login: string) {
-		console.log('test');
 		var newName = login;
 		const alphanum = "ABDEFHIJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		while (await this.prisma.user.findUnique({ where: { username: newName }}))

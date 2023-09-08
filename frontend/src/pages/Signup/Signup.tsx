@@ -26,11 +26,12 @@ const Signup = () => {
 				"username": formData.get('username'),
 				"password": formData.get('password')
 		}
-		alert(JSON.stringify(formBody));
+		const body = JSON.stringify(formBody);
+		// alert(JSON.stringify(formBody));
 		await fetch('http://localhost:3333/auth/signup', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(formBody),
+			body: body,
 		})
 	}
 
