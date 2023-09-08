@@ -5,14 +5,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var ChatService_1;
+var ChatGatewayService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ChatService = void 0;
+exports.ChatGatewayService = exports.ChatControllerService = void 0;
 const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
-let ChatService = exports.ChatService = ChatService_1 = class ChatService {
+let ChatControllerService = exports.ChatControllerService = class ChatControllerService {
     constructor() {
-        this.logger = new common_1.Logger(ChatService_1.name);
+        this.prisma = new client_1.PrismaClient();
+    }
+    async getlogs() {
+        this.prisma.message.
+        ;
+    }
+};
+exports.ChatControllerService = ChatControllerService = __decorate([
+    (0, common_1.Injectable)()
+], ChatControllerService);
+let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = class ChatGatewayService {
+    constructor() {
+        this.logger = new common_1.Logger(ChatGatewayService_1.name);
         this.prisma = new client_1.PrismaClient();
     }
     findUserById(client_id, cli_arr) {
@@ -133,7 +145,7 @@ let ChatService = exports.ChatService = ChatService_1 = class ChatService {
         }
     }
 };
-exports.ChatService = ChatService = ChatService_1 = __decorate([
+exports.ChatGatewayService = ChatGatewayService = ChatGatewayService_1 = __decorate([
     (0, common_1.Injectable)()
-], ChatService);
+], ChatGatewayService);
 //# sourceMappingURL=chat.service.js.map

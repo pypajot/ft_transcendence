@@ -11,24 +11,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model UserChannel {
-  id        Int       @id @default(autoincrement())
-  username  String
-  channel  Channel @relation(fields: [channelId], references: [id])
-  channelId Int
-  User      User?     @relation(fields: [userId], references: [id])
-  userId    Int?
-
-  @@unique([id])
-}
-
 model User {
-  username    String
-  id          Int           @id @default(autoincrement())
-  password    String
-  messageSent Message[]
-  socketId    String
-  userChannel UserChannel[]
+  username        String
+  id              Int           @id @default(autoincrement())
+  password        String
+  friends         String[]
+  socketId        String
+  channels        Channel[]     @relation("Memberships")
+  messagesSent    Message[]     @relation("Author")
+  messageReceived Message[]     @relation("Target")
 
   @@unique([username])
   @@unique([socketId])
@@ -36,21 +27,23 @@ model User {
 }
 
 model Message {
-  id        Int      @id @default(autoincrement())
-  content   String
-  author    User     @relation(fields: [socketId], references: [socketId])
-  createdAt DateTime @default(now())
-  socketId  String
-  Channel   Channel? @relation(fields: [channelId], references: [id])
-  channelId Int?
+  id             Int      @id @default(autoincrement())
+  content        String
+  author         User     @relation("Author", fields: [authorSocketId], references: [socketId])
+  target         User     @relation("Target", fields: [targetSocketId], references: [socketId])
+  createdAt      DateTime @default(now())
+  targetSocketId String
+  authorSocketId String
+  Channel        Channel? @relation(fields: [channelId], references: [id])
+  channelId      Int?
 }
 
 model Channel {
-  id            Int          @id @default(autoincrement())
-  name          String
-  messages      Message[]
-  creator       String
-  UserChannel   UserChannel[]
+  id          Int           @id @default(autoincrement())
+  name        String
+  messages    Message[]
+  members     User[]        @relation("Memberships")
+  creator     String
 
   @@unique([name])
   @@unique([id])

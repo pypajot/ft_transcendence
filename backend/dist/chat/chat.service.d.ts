@@ -2,7 +2,11 @@ import { Message } from "src/types/message.entity";
 import { Server } from 'socket.io';
 import { Client_elem } from "src/types/client.entity";
 import { PrismaClient } from "@prisma/client";
-export declare class ChatService {
+export declare class ChatControllerService {
+    prisma: PrismaClient<import(".prisma/client").Prisma.PrismaClientOptions, never, import("@prisma/client/runtime/library").DefaultArgs>;
+    getlogs(): Promise<void>;
+}
+export declare class ChatGatewayService {
     private readonly logger;
     prisma: PrismaClient<import(".prisma/client").Prisma.PrismaClientOptions, never, import("@prisma/client/runtime/library").DefaultArgs>;
     findUserById(client_id: string, cli_arr: Client_elem[]): Client_elem | undefined;

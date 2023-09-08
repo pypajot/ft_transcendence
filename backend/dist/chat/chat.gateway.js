@@ -74,7 +74,7 @@ __decorate([
 ], ChatGateway.prototype, "handleChannelMessage", null);
 ChatGateway = ChatGateway_1 = __decorate([
     (0, websockets_1.WebSocketGateway)({ cors: '*', namespace: 'chat' }),
-    __metadata("design:paramtypes", [chat_service_1.ChatService])
+    __metadata("design:paramtypes", [chat_service_1.ChatGatewayService])
 ], ChatGateway);
 exports.default = ChatGateway;
 //# sourceMappingURL=chat.gateway.js.map

@@ -12,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@lexical/react": "^0.12.0",
     "@mui/material": "^5.14.7",
     "@twilio-paste/chat-composer": "^5.0.0",
     "@twilio-paste/core": "^20.2.0",
@@ -20,10 +21,12 @@
     "axios": "^1.5.0",
     "draft-js": "^0.11.7",
     "htop": "^1.0.1",
+    "lexical": "^0.12.0",
     "prop-types": "^15.8.1",
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
     "react-router-dom": "^6.15.0",
+    "scroll-to": "^0.0.2",
     "socket.io-client": "^4.7.2"
   },
   "devDependencies": {

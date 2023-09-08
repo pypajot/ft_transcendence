@@ -7,9 +7,19 @@ import { PrismaClient } from "@prisma/client";
 import { Socket } from "dgram";
 import { WsException } from "@nestjs/websockets";
 
+
 @Injectable()
-export class ChatService {
-    private readonly logger = new Logger(ChatService.name);
+export class ChatControllerService{
+    prisma = new PrismaClient();
+
+    async getlogs() {
+        this.prisma.message.
+    }
+}
+
+@Injectable()
+export class ChatGatewayService {
+    private readonly logger = new Logger(ChatGatewayService.name);
     prisma = new PrismaClient();
 
     findUserById(client_id: string, cli_arr: Client_elem[]): Client_elem | undefined {

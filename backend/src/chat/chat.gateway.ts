@@ -9,7 +9,7 @@ import {
 	WebSocketServer } from "@nestjs/websockets";
 import { Server } from 'socket.io';
 import { ServerToClientEvents } from "src/types/events";
-import { ChatService } from "./chat.service";
+import { ChatGatewayService } from "./chat.service";
 import { Client_elem } from "src/types/client.entity";
 import { Socket } from "dgram";
 import { PrismaClient } from "@prisma/client";
@@ -22,7 +22,7 @@ class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGateway
 	public cli_arr:  Client_elem[] = [];
 	prisma = new PrismaClient();
 	private readonly logger = new Logger(ChatGateway.name);
-	constructor(private readonly chatService: ChatService){}
+	constructor(private readonly chatService: ChatGatewayService){}
 		@WebSocketServer() io: Server<any, ServerToClientEvents>;
 		afterInit()
 		{

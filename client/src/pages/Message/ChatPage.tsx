@@ -5,6 +5,10 @@ import LittleMessage from './LittleMessage'
 import MessageTarget from './MessageTarget'
 import { useSocketContext } from '../../Context/socket-context'
 import { ChannelComponent } from './ChannelComponent'
+import { ChatDialog } from './test'
+import { Conversation } from './Conversation'
+import { Editor } from 'draft-js'
+import { Editorr } from './text'
 
 //Access Username by global cookies or something ?
 
@@ -58,6 +62,7 @@ const ChatComponent = () => {
         <LittleMessage/>
         <ChannelComponent setChannel={setChannelTarget} sendToChannel={sendToChannel}/>
         <Messages message={messagesChan}/>
+        <Conversation />
         </>
     )
 }
