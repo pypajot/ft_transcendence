@@ -7,14 +7,12 @@ export declare class UserController {
         username: string;
         id: number;
         password: string;
-        friends: string[];
         socketId: string;
     }>;
     signin(dto: AuthDto): Promise<{
         username: string;
         id: number;
         password: string;
-        friends: string[];
         socketId: string;
     }>;
 }

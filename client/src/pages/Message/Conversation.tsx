@@ -1,6 +1,6 @@
 import { ChatComposer } from '@twilio-paste/chat-composer'
-import React, { useState } from 'react'
-import {$getRoot, $getSelection, $createParagraphNode, $createTextNode, createEditor, TextNode, EditorState} from 'lexical';
+import React, { useContext, useState } from 'react'
+import {$getRoot, $getSelection, $createParagraphNode, $createTextNode, EditorState} from '@twilio-paste/lexical-library';
 import { toggleTextFormatType } from 'lexical/LexicalUtils';
 import { render } from 'react-dom';
 import {useEffect} from 'react';
@@ -19,7 +19,8 @@ export const Conversation = () => {
 
     const handleComposerChange = (editorState: EditorState): void => {
       editorState.read(() => {
-        const text = $getRoot().getTextContent();
+        const root = $getRoot();
+        const text = root.getTextContent();
         console.log(text);
         setContent(text);
       });
@@ -36,7 +37,7 @@ export const Conversation = () => {
         onChange={handleComposerChange}
       />
         <div>Here is the content</div>
-        <h1>${content}</h1>
+        <h1>{content}</h1>
         </>
     )
   }
