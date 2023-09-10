@@ -10,12 +10,13 @@ const Game : React.FC = () => {
 
   useEffect(() => {
     // Send custom event to request game state from the server
-    console.log('getGameState');
     socket?.emit('getGameState');
 
     // Set up WebSocket event listener to receive the game state from the server
     socket?.on('gameState', (data) => {
-      console.log('setting game state');
+      // convert the game state to a JS object
+      data = JSON.parse(data);
+      // update the game state
       setGameState(data);
     },);
     // add event listener for game end

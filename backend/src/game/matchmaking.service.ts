@@ -45,7 +45,6 @@ export class MatchmakingService {
 		const mode = player.gameMode;
     	// Add the player to the appropriate queue based on selected mode.
 		if (mode === GameMode.Classic) {
-			console.log('Player added to classic queue');
 			this.classicQueue.push(player);
 		  }
 		else if (mode === GameMode.Party) {
@@ -89,7 +88,6 @@ export class MatchmakingService {
 			queue = this.hardcoreQueue;
 		}
 		if (queue.length >= 2) {
-			console.log('Matching players');
 		// Match the first two players and remove them from the queue
 			const player1 = queue.shift()!;
 			const player2 = queue.shift()!;

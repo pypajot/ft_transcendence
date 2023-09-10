@@ -5,6 +5,7 @@ import { GameConfiguration } from './game.service';
 import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { MatchmakingService } from './matchmaking.service';
 import { Player } from './Player';
+import { jsonc } from 'jsonc';
 
 @WebSocketGateway({ cors: true, namespace: 'game' })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -64,15 +65,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log('interval loop');
         this.gameService?.updateGameState(); // Update the game state
         gameState = this.gameService?.getGameState(); // Get the updated game state
+        // convert the gameState to a string
+        const gameStateString = jsonc.stringify(gameState);
         // Send the game state to the client
-        client.emit('gameState', gameState.ballX);
-        client.emit('gameState', gameState.ballY);
-        client.emit('gameState', gameState.paddle1Y);
-        client.emit('gameState', gameState.paddle2Y);
-        client.emit('gameState', gameState.player1Score);
-        client.emit('gameState', gameState.player2Score);
-        client.emit('gameState', gameState.gameWidth);
-        client.emit('gameState', gameState.gameHeight);
+        client.emit('gameState', gameStateString);
       }, 50);
     }
   }
