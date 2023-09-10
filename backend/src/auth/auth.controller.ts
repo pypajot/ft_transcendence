@@ -42,7 +42,6 @@ export class AuthController {
 	}
 
 	@Get('refresh')
-	@UseGuards(RefreshAuthGuard)
 	async refresh(@Res() res: any, @Req() req: any) {
 		const token = await this.authservice.refresh(res, req.cookies.refresh_token);
 		res.send({

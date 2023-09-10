@@ -26,6 +26,9 @@ export default function SocketContextProvider(props: SocketContextProviderProps)
             query: {
                 username: localStorage.getItem("username"),
             },
+			extraHeaders: {
+				'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`
+			}
         })};
 		setSocket(newSocket);
 		return () => {

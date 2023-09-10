@@ -5,16 +5,32 @@ import { GameConfiguration } from './game.service';
 import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { MatchmakingService } from './matchmaking.service';
 import { Player } from './Player';
+import { verify } from 'crypto';
+import { JwtService } from '@nestjs/jwt';
 
-@WebSocketGateway({ cors: true, namespace: 'game' })
+@WebSocketGateway({
+	cors: {
+		origin: 'http://localhost:5173',
+	},
+	namespace: 'game',
+	// verifyClient: async (info, done) => {
+	// 	const token = info.req.headers.authorization.split(' ')[1];
+	// 	const verified = token && this && (await this.jwt.verifyAsync(token, { secret: process.env.JWT_SECRET }));
+	// 	if (verified)
+	// 		return done(true, 200);
+	// 	return done(false, 401);
+	// },
+})
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private gameService: GameService,
-    private readonly matchmakingService: MatchmakingService) {
+    private readonly matchmakingService: MatchmakingService,
+	private jwt: JwtService) {
       gameService = undefined;
     }
 
   handleConnection(client: Socket, ...args: any[]): void {
     console.log('Client connected');
+	console.log(client.handshake.headers.authorization);
     client.emit("connection");
   }
   handleDisconnect(client: any) {

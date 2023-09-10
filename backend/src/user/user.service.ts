@@ -21,6 +21,7 @@ export class UserService {
 				id: Number(id),
 			},
 		});
-		return (user);
+		delete user.hash;
+		return user;
 	}
 }

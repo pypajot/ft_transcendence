@@ -14,6 +14,15 @@ type RefreshPayloadType = {
 	token_family: string;
 };
 
+
+const RefreshTokenParams = {
+	httpOnly: true,
+	sameSite: 'lax',
+	secure: false,
+	path: '/',
+	maxAge: 120 * 1000,
+}
+
 @Injectable()
 export class AuthService {
 	constructor(
@@ -21,6 +30,8 @@ export class AuthService {
 		private jwt: JwtService,
 		private http: HttpService,
 	) {}
+
+
 
 	async signup(dto: AuthDto) {
 		const hash = await argon2.hash(dto.password);
@@ -58,13 +69,7 @@ export class AuthService {
 		const response = await firstValueFrom(this.http.post(url, null, { params: parameters}))
 		// .then(response => console.log(response));
 		const user = await this.createIntraUser(response.data.access_token);
-		res.cookie('refresh_token', await this.signRefreshToken(user.id, user.username), {
-			httpOnly: true,
-			sameSite: 'lax',
-			secure: false,
-			path: '/',
-			maxAge: 600 * 1000,
-		});
+		res.cookie('refresh_token', await this.signRefreshToken(user.id, user.username), RefreshTokenParams);
 
 		return await this.signAccessToken(user.id, user.username);
 	}
@@ -100,13 +105,7 @@ export class AuthService {
 				username: dto.username,
 			}
 		})
-		res.cookie('refresh_token', await this.signRefreshToken(user.id, user.username), {
-			httpOnly: true,
-			sameSite: 'lax',
-			secure: false,
-			path: '/',
-			maxAge: 600 * 1000,
-		});
+		res.cookie('refresh_token', await this.signRefreshToken(user.id, user.username), RefreshTokenParams);
 		return await this.signAccessToken(user.id, user.username);
 	};
 
@@ -196,7 +195,7 @@ export class AuthService {
 		return tokenMatch;
 	}
 
-	async deleteIfReuse(payload: any) {
+	async deleteTokenFromDb(payload: any) {
 		await this.prisma.userToken.delete({
 			where: {			
 				UserId: payload.sub,
@@ -207,7 +206,24 @@ export class AuthService {
 
 
 	async refresh(res: any, refresh_token: any) {
-		const payload = this.jwt.decode(refresh_token) as RefreshPayloadType;
+		const payload = await  this.jwt.verifyAsync(refresh_token, {
+			secret: process.env.REFRESH_SECRET,
+		});
+		if (!payload) {
+			const payloadToDelete = this.jwt.decode(refresh_token);
+			this.deleteTokenFromDb(payloadToDelete);
+			await res.clearCookie('refresh_token', RefreshTokenParams);
+			throw new UnauthorizedException('Invalid refresh token');
+		}
+		const dbToken = await this.verifyFamilyInDb(payload);
+		if (!dbToken)
+			throw new UnauthorizedException();
+		const inDb = await this.isReuse(dbToken, refresh_token);
+		if (!inDb)
+		{
+			this.deleteTokenFromDb(payload);
+			throw new UnauthorizedException();
+		}
 		await this.prisma.userToken.delete({
 			where: {
 				UserId: payload.sub,
@@ -215,13 +231,7 @@ export class AuthService {
 			}
 		})
 		const newtoken = await this.signRefreshToken(payload.sub, payload.username, payload.token_family);
-		res.cookie('refresh_token', newtoken, {
-			httpOnly: true,
-			sameSite: 'lax',
-			secure: false,
-			path: '/',
-			maxAge: 600 * 1000,
-		});
+		res.cookie('refresh_token', newtoken, RefreshTokenParams);
 		return this.signAccessToken(payload.sub, payload.username);
 	}
 
@@ -244,13 +254,7 @@ export class AuthService {
 				family: payload.token_family,
 			}
 		})
-		await res.clearCookie('refresh_token', {
-			httpOnly: true,
-			sameSite: 'lax',
-			secure: false,
-			path: '/',
-			maxAge: 600 * 1000,
-		});
+		await res.clearCookie('refresh_token', RefreshTokenParams);
 		return ("Logout successful");
 	}
 }

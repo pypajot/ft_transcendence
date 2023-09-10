@@ -19,6 +19,7 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
 	private static ExtractJwtFromCookie(req: Request): string | null {
 		if (!req.cookies || !req.cookies.refresh_token )
 			return null;
+
 		return req.cookies.refresh_token;
 	}
 
@@ -29,7 +30,7 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
 		const inDb = await this.authService.isReuse(dbToken, req.cookies.refresh_token);
 		if (!inDb)
 		{
-			this.authService.deleteIfReuse(payload);
+			this.authService.deleteTokenFromDb(payload);
 			throw new UnauthorizedException();
 		}
 		return { userId: payload.sub, username: payload.token_family };

@@ -24,8 +24,8 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 		const token = sessionStorage.getItem('access_token');
 		if (!token)
 			return ;
-		refreshFetch.get("http://localhost:3333/user/me");
-
+		refreshFetch.get("http://localhost:3333/user/me")
+		.then(response => setUser(response.data.id))
 	}, [])
 	
 	return (

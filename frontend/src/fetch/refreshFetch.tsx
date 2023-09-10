@@ -39,8 +39,13 @@ refreshFetch.interceptors.response.use(
 			headers: { 'Content-Type': 'application/json' },
 			credentials: 'include',
 		});
-		if (response.status !== 201)
+		
+		if (response.status !== 200)
+		{
+			sessionStorage.removeItem("access_token");	
+			document.location.href = "http://localhost:5173/landing"
 			return Promise.reject(error); //disconnect
+		}
 
 		sessionStorage.setItem('access_token', (await response.json()).access_token);
 		originalRequest.retry = true;
