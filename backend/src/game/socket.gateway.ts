@@ -1,18 +1,15 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameService, GameState } from './game.service';
-import { GameConfiguration } from './game.service';
+import { GameService } from './game.service';
 import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { MatchmakingService } from './matchmaking.service';
 import { Player } from './Player';
 import { jsonc } from 'jsonc';
+import { GameConfiguration } from './game.service';
 
 @WebSocketGateway({ cors: true, namespace: 'game' })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private gameService: GameService,
-    private readonly matchmakingService: MatchmakingService) {
-      gameService = undefined;
-    }
+  constructor(private readonly matchmakingService: MatchmakingService) {}
 
   handleConnection(client: Socket, ...args: any[]): void {
     console.log('Client connected');
@@ -32,39 +29,45 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const player = new Player(client, 0, mode);
     console.log(`Player ${client.id} selected ${mode} mode`);
     // place the player in the appropriate queue based on selected mode.
-    this.gameService = this.matchmakingService.enqueue(player);
-  }
-
-  @SubscribeMessage('movePaddle')
-  handleMovePaddle(client: Socket, data: { direction: string }): void {
-    const { direction } = data;
-    if (direction === 'up') {
-      this.gameService.movePaddleUp(client.id);
-    } 
-    else if (direction === 'down') {
-      this.gameService.movePaddleDown(client.id);
-    } 
-    else if (direction === 'stop') {
-      this.gameService.stopPaddle(client.id);
+    this.matchmakingService.enqueue(player);
+    const lobbyId = this.matchmakingService.tryMatchPlayers(mode);
+    if (lobbyId !== undefined) {
+      // wait for 1 second before emitting the createLobby event
+      setTimeout(() => {
+      client.emit('createLobby', lobbyId);
+      this.matchmakingService.gameService[lobbyId].player1.emit('createLobby', lobbyId);
+      console.log(`Lobby ${lobbyId} created`);
+      }, 2000);
     }
   }
 
-  // @SubscribeMessage('startGame')
-  // handleStartGame(client: Socket, opponent: Socket, gameConfiguration: GameConfiguration): void {
-  //   console.log('Starting game');
-  //   this.gameService.initGame(gameConfiguration, client, opponent);
-  // }
+  @SubscribeMessage('movePaddle')
+  handleMovePaddle(client: Socket, data: {direction: string, lobbyId: string}): void {
+    const { direction } = data;
+    const { lobbyId } = data;
+    console.log (`lobbyId in movepaddle event: ` + lobbyId);
+    if (direction === 'up') {
+      this.matchmakingService.gameService[lobbyId].movePaddleUp(client.id);
+    } 
+    else if (direction === 'down') {
+      this.matchmakingService.gameService[lobbyId].movePaddleDown(client.id);
+    } 
+    else if (direction === 'stop') {
+      this.matchmakingService.gameService[lobbyId].stopPaddle(client.id);
+    }
+  }
 
   @SubscribeMessage('getGameState') // Custom event name to request game state from frontend
-  handleGetGameState(client: any): void {
-    let gameState = this.gameService?.getGameState();
-    console.log('handleGetGameState function');
+  handleGetGameState(client: any, id: {lobbyId: string}): void {
+    const lobbyId = id.lobbyId;
+    let gameState = this.matchmakingService.gameService[lobbyId]?.getGameState();
+    console.log(`Lobby ID: ${lobbyId}`);
     // create a loop with a delay of 50ms
-    if (this.gameService !== undefined) {
+  if (lobbyId !== undefined) {
       setInterval(() => {
         console.log('interval loop');
-        this.gameService?.updateGameState(); // Update the game state
-        gameState = this.gameService?.getGameState(); // Get the updated game state
+        this.matchmakingService.gameService[lobbyId]?.updateGameState(); // Update the game state
+        gameState = this.matchmakingService.gameService[lobbyId]?.getGameState(); // Get the updated game state
         // convert the gameState to a string
         const gameStateString = jsonc.stringify(gameState);
         // Send the game state to the client

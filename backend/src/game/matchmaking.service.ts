@@ -38,10 +38,11 @@ export class MatchmakingService {
 	private classicQueue: Player[] = [];
 	private partyQueue: Player[] = [];
 	private hardcoreQueue: Player[] = [];
+	public	gameService: { [key: string]: GameService } = {};
 
 	constructor() {}
   	// Add a player to the matchmaking queue
-	enqueue(player: Player): GameService {
+	enqueue(player: Player): void {
 		const mode = player.gameMode;
     	// Add the player to the appropriate queue based on selected mode.
 		if (mode === GameMode.Classic) {
@@ -53,9 +54,6 @@ export class MatchmakingService {
 		else if (mode === GameMode.Hardcore) {
 			this.hardcoreQueue.push(player);
 		  }
-		// Attempt to match players in the queue
-		const gameService = this.tryMatchPlayers(mode);
-		return gameService;
   	}
 
   	// Remove a player from the matchmaking queue
@@ -74,18 +72,23 @@ export class MatchmakingService {
 	}
 
 	// Attempt to match players in the queue
-	private tryMatchPlayers(mode: string): GameService {
+	tryMatchPlayers(mode: string): string {
 		
 		// Select the appropriate queue based on the game mode
 		let queue: Player[];
+		let gameConfiguration: GameConfiguration;
+		let gameId: string;
 		if (mode === GameMode.Classic) {
 			queue = this.classicQueue;
+			gameConfiguration = classicGameConfig;
 		}
 		else if (mode === GameMode.Party) {
 			queue = this.partyQueue;
+			gameConfiguration = partyGameConfig;
 		}
 		else if (mode === GameMode.Hardcore) {
 			queue = this.hardcoreQueue;
+			gameConfiguration = hardcoreGameConfig;
 		}
 		if (queue.length >= 2) {
 		// Match the first two players and remove them from the queue
@@ -95,44 +98,11 @@ export class MatchmakingService {
 			player1.socket.emit('matched');
 			player2.socket.emit('matched');
 		// Initialize a new game session with these players
-			const gameService = this.initializeGame(player1, player2);
-			return gameService;
+			gameId = player1.socket.id + player2.socket.id;
+			this.gameService[gameId] = new GameService();
+			this.gameService[gameId].initGame(gameConfiguration, player1.socket, player2.socket, gameId);
+			return gameId;
 		}
-		return null;
+		return undefined;
 	}
-
-  // Initialize a new game session with matched players
-  initializeGame(player1: Player, player2: Player): GameService {
-
-	if (player1.gameMode === GameMode.Classic) {
-		const gameService = new GameService();
-		gameService.initGame(classicGameConfig, player1.socket, player2.socket);
-		return gameService;
-	}
-	if (player1.gameMode === GameMode.Party) {
-		const gameService = new GameService();
-		gameService.initGame(partyGameConfig, player1.socket, player2.socket);
-		return gameService;
-	}
-	if (player1.gameMode === GameMode.Hardcore) {
-		const gameService = new GameService();
-		gameService.initGame(hardcoreGameConfig, player1.socket, player2.socket);
-		return gameService;
-	}
-  }
 }
-
-// @WebSocketGateway({ cors: true, namespace: 'matchmaking' })
-// export class MatchmakingGateway {
-//   constructor(private readonly matchmakingService: MatchmakingService) {}
-
-//   @WebSocketServer()
-//   server: Server;
-
-//   @SubscribeMessage('selectGameMode') // Listen for the selectGameMode event
-//   handleSelectGameMode(client: Socket, mode: string): void {
-// 	const player = new Player(client, 0, mode);
-//     // place the player in the appropriate queue based on selected mode.
-//     this.matchmakingService.enqueue(player);
-//   }
-// }

@@ -21,7 +21,6 @@ const ModeSelection = () => {
       socket?.on('matched', () => {
         // redirect to game page
         navigate('/game');
-      // socket?.emit('startGame', opponent_id);
         // reset the selected mode and loading state
         setSelectedMode(null);
         setIsLoading(false);

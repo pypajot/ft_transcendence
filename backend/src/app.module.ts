@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SocketGateway } from './game/socket.gateway';
 import { GameService } from './game/game.service';
 import { MatchmakingService } from './game/matchmaking.service';
+import { Socket } from 'socket.io';
 
 
 @Module({

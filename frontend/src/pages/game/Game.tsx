@@ -1,17 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext.tsx';
 import {GameState} from '../../../../backend/src/game/game.service.ts';
 import './Game.css';
 
 const Game : React.FC = () => {
   const socket = useSocketContext(); // Access the WebSocket context
-  const [gameState, setGameState] = useState<GameState | null>(null);
-  console.log('game loaded');
+  const [lobbyId, setLobbyId] = useState<string>(''); // The lobby ID to join
+  const [gameState, setGameState] = useState<GameState | null>(null); // The game state received from the server
+
+  const lobbyIdRef = useRef<string>('');
 
   useEffect(() => {
     // Send custom event to request game state from the server
-    socket?.emit('getGameState');
-
+    socket?.on('createLobby', (lobbyId: string) => {
+      setLobbyId(lobbyId);
+      lobbyIdRef.current = lobbyId;
+      socket?.emit('getGameState', { lobbyId });
+    },);
     // Set up WebSocket event listener to receive the game state from the server
     socket?.on('gameState', (data) => {
       // convert the game state to a JS object
@@ -28,6 +33,7 @@ const Game : React.FC = () => {
     // });
 
     return () => {
+      socket?.off('createLobby');
       socket?.off('gameState');
     };
   }, []);
@@ -38,7 +44,7 @@ const Game : React.FC = () => {
     // Handle user input (e.g., arrow keys) for moving paddles
     // Emit paddle movements to the server via WebSocket
     const direction = event.key === 'ArrowUp' ? 'up' : event.key === 'ArrowDown' ? 'down' : 'stop';
-    socket?.emit('movePaddle', { direction });
+    socket?.emit('movePaddle', { direction, lobbyId: lobbyIdRef.current});
   };
 
   useEffect(() => {

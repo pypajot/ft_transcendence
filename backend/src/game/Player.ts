@@ -6,11 +6,13 @@ export class Player {
 	paddleX: number;
 	score: number;
 	gameMode: string;
+	lobby: string;
 
 	constructor(socket: Socket, paddleX: number, gameMode: string) {
 		this.socket = socket;
 		this.paddleX = paddleX;
 		this.score = 0;
 		this.gameMode = gameMode;
+		this.lobby = '';
 	}
 };

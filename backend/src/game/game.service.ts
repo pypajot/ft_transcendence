@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { WebSocketServer } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-import { MatchmakingService } from './matchmaking.service';
+import { Socket } from 'socket.io';
+
 
 export enum GameMode {
   Classic = 'Classic',
@@ -23,8 +22,9 @@ export interface GameConfiguration {
 export class GameService {
 
   // Properties for the game state
-  private player1: Socket;
-  private player2: Socket;
+  private lobbyId: string;
+  public player1: Socket;
+  public player2: Socket;
   private paddle1Y: number; // Position of paddle 1 (Player 1)
   private paddle2Y: number; // Position of paddle 2 (Player 2)
   private ballX: number; // Position of the ball along the X-axis
@@ -52,9 +52,10 @@ export class GameService {
 
   constructor() {}
 
-  initGame(gameConfiguration: GameConfiguration, Player1: Socket, Player2: Socket): void {
+  initGame(gameConfiguration: GameConfiguration, Player1: Socket, Player2: Socket, lobbyId: string): void {
     // Initialize the game state depending on the game mode
     console.log('Init game');
+    this.lobbyId = lobbyId;
     this.gameConfiguration = gameConfiguration;
     this.player1 = Player1;
     this.player2 = Player2;
