@@ -1,5 +1,7 @@
-export class Message{
+export interface Message{
     id: String;
-    message: String;
-    target: String
+    content: String;
+    createdAt: Date;
+    autorSocketId: String;
+    targetSocketId: String
 }

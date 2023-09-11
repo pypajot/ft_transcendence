@@ -34,7 +34,6 @@ const ChatComponent = () => {
         const eventContent: string[] = [channelTarget, message];
         socket?.emit("ChannelMessage", eventContent)
     }
-
     const messageChanListener = (message:string) => {
         setMessageChan([...messagesChan, message]);
     }

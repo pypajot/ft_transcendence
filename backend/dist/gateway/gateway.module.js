@@ -14,7 +14,7 @@ let GatewayModule = exports.GatewayModule = class GatewayModule {
 };
 exports.GatewayModule = GatewayModule = __decorate([
     (0, common_1.Module)({
-        providers: [chat_gateway_1.default, chat_service_1.ChatService]
+        providers: [chat_gateway_1.default, chat_service_1.ChatGatewayService]
     })
 ], GatewayModule);
 //# sourceMappingURL=gateway.module.js.map

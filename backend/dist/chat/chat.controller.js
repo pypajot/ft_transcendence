@@ -8,27 +8,41 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a;
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatController = void 0;
 const common_1 = require("@nestjs/common");
 const chat_service_1 = require("./chat.service");
+const dto_1 = require("../dto");
 let ChatController = exports.ChatController = class ChatController {
     constructor(chatService) {
         this.chatService = chatService;
     }
-    getlogs() {
-        return;
+    getLogsSender(dto) {
+        return this.chatService.getLogs(dto.sender, dto.receiver);
+    }
+    getLogsReceiver(dto) {
+        return (this.chatService.getLogs(dto.sender, dto.receiver));
     }
 };
 __decorate([
-    Get('getLogs'),
+    (0, common_1.Post)('getMessageSent'),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [dto_1.PrivMsgLogsDto]),
     __metadata("design:returntype", Object)
-], ChatController.prototype, "getlogs", null);
+], ChatController.prototype, "getLogsSender", null);
+__decorate([
+    (0, common_1.Post)('getMessageReceived'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [dto_1.PrivMsgLogsDto]),
+    __metadata("design:returntype", Object)
+], ChatController.prototype, "getLogsReceiver", null);
 exports.ChatController = ChatController = __decorate([
-    (0, common_1.Controller)('messagesLogs'),
-    __metadata("design:paramtypes", [typeof (_a = typeof chat_service_1.ChatService !== "undefined" && chat_service_1.ChatService) === "function" ? _a : Object])
+    (0, common_1.Controller)('chat'),
+    __metadata("design:paramtypes", [chat_service_1.ChatControllerService])
 ], ChatController);
 //# sourceMappingURL=chat.controller.js.map

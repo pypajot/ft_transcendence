@@ -39,8 +39,8 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
     }
     async handleEvent(client, data) {
         this.logger.log(`Message : ${data[0]} from : ${client.id} to: ${data[1]}`);
-        const newMsg = this.chatService.receiveMessage(client.id, data);
-        this.chatService.sendTo(this.io, data[0], data[1]);
+        const newMsg = this.chatService.createMessage(client.id, data[0], data[1]);
+        this.chatService.sendTo(this.io, await newMsg);
     }
     handleChannelJoining(client, data) {
         this.chatService.newMember(client, data);

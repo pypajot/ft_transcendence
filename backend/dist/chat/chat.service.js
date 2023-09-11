@@ -14,9 +14,37 @@ let ChatControllerService = exports.ChatControllerService = class ChatController
     constructor() {
         this.prisma = new client_1.PrismaClient();
     }
-    async getlogs() {
-        this.prisma.message.
-        ;
+    async getLogs(sender_name, receiver_name) {
+        console.log(`Nice : ${sender_name}, ${receiver_name}`);
+        try {
+            const sender = await this.prisma.user.findUnique({
+                where: {
+                    username: sender_name
+                }
+            });
+            console.log(`Let goo : ${(await sender.username)}`);
+            const receiver = await this.prisma.user.findUnique({
+                where: {
+                    username: receiver_name
+                }
+            });
+            const json_messages = this.getMessages(await sender, await receiver);
+            return (json_messages);
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+    async getMessages(sender, receiver) {
+        console.log(`${sender.id}, ${receiver.id}`);
+        const messages = await this.prisma.message.findMany({
+            where: {
+                authorSocketId: sender.socketId,
+                targetSocketId: receiver.socketId
+            }
+        });
+        console.log(JSON.stringify(messages));
+        return (JSON.stringify(messages));
     }
 };
 exports.ChatControllerService = ChatControllerService = __decorate([
@@ -30,14 +58,22 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
     findUserById(client_id, cli_arr) {
         return cli_arr.find(cli_arr => cli_arr.socket_id === client_id);
     }
-    async receiveMessage(socket_id, message) {
+    async createMessage(socket_id, message, target) {
+        const targetUser = await this.prisma.user.findUnique({
+            where: {
+                username: target
+            },
+        });
         try {
             const msg = await this.prisma.message.create({
                 data: {
-                    content: message[0],
+                    content: message,
                     author: {
                         connect: { socketId: socket_id }
-                    }
+                    },
+                    target: {
+                        connect: { socketId: targetUser.socketId }
+                    },
                 }
             });
             return (msg);
@@ -72,54 +108,33 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
             },
         });
         if (existingChannel) {
-            const newUserChannel = await this.prisma.userChannel.create({
+            const newUserChannel = await this.prisma.channel.update({
+                where: {
+                    name: channelName
+                },
                 data: {
-                    username: user.username,
-                    User: {
-                        connect: { id: user.id }
-                    },
-                    channel: {
-                        connect: { id: existingChannel.id }
-                    }
+                    members: { connect: { id: user.id } }
                 }
             });
             client.join(channelName);
         }
         else {
-            const user = await this.prisma.user.findUnique({
-                where: {
-                    socketId: socket_id
-                },
-            });
             const newchannel = await this.prisma.channel.create({
                 data: {
                     name: channelName,
                     creator: user.username,
-                }
-            });
-            const newUserChannel = await this.prisma.userChannel.create({
-                data: {
-                    username: user.username,
-                    User: {
+                    members: {
                         connect: { id: user.id }
-                    },
-                    channel: {
-                        connect: { id: newchannel.id }
                     }
                 }
             });
             client.join(channelName);
         }
     }
-    async sendTo(io, message, target) {
-        console.log(`test : ${message}`);
-        const target_user = await this.prisma.user.findUnique({
-            where: {
-                username: target
-            },
-        });
-        io.to(target_user.socketId).emit('message', message);
-        this.logger.log(`Sent ${message} to ${target}`);
+    async sendTo(io, message) {
+        console.log(`test : ${message.content}`);
+        io.to(message.targetSocketId).emit('message', message.content);
+        this.logger.log(`Sent ${message}`);
     }
     async sendToChannel(io, channel, message, socket_id) {
         try {

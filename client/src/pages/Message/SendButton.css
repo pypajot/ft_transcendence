@@ -1,0 +1,9 @@
+ .send-button {
+            float: right;
+            background-color: #2182d1;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            margin: 8px 16px;
+            cursor: pointer;
+}

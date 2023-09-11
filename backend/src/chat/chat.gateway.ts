@@ -44,8 +44,8 @@ class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGateway
 		@SubscribeMessage('message')
 		async handleEvent(client: any, data: string[]): Promise<void> {
 			this.logger.log(`Message : ${data[0]} from : ${client.id} to: ${data[1]}`);
-			const newMsg = this.chatService.receiveMessage(client.id, data);
-			this.chatService.sendTo(this.io, data[0], data[1]);
+			const newMsg = this.chatService.createMessage(client.id, data[0], data[1]);
+			this.chatService.sendTo(this.io, await newMsg);
 	//		this.chatService.sendMessage(this.io, message_obj);
 		}
 

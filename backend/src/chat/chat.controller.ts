@@ -1,5 +1,7 @@
-import { Controller } from "@nestjs/common";
-import { ChatService } from "./chat.service";
+import { Body, Controller, Get, Post } from "@nestjs/common";
+import { ChatControllerService } from "./chat.service";
+import { PrismaClient } from "@prisma/client";
+import { PrivMsgLogsDto } from "src/dto";
 
 export interface Message {
     content: String,
@@ -9,12 +11,16 @@ export interface Message {
     channel: String
 }
 
-@Controller('messagesLogs')
+@Controller('chat')
 export class ChatController {
-    constructor(private chatService: ChatService){}
+    constructor(private chatService: ChatControllerService){}
 
-    @Get('getLogs')
-    getlogs(): any {
-        return ;
+    @Post('getMessageSent')
+    getLogsSender(@Body() dto: PrivMsgLogsDto ): any {
+        return this.chatService.getLogs(dto.sender, dto.receiver);
+    }
+    @Post('getMessageReceived')
+    getLogsReceiver(@Body() dto: PrivMsgLogsDto): any{
+        return (this.chatService.getLogs(dto.sender, dto.receiver))
     }
 }
