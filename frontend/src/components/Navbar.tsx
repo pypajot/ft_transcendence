@@ -1,8 +1,11 @@
-import { LogoutButton } from "./LogoutButton";
 import { InPageNavigation, InPageNavigationItem } from "@twilio-paste/core";
 import { Link } from "react-router-dom";
+import { Button } from "@twilio-paste/core/button";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
+	const { logout } = useAuth();
+
 	return (
 		<InPageNavigation aria-label="get started">
 		<Link to='/home'>
@@ -25,7 +28,9 @@ const Navbar = () => {
 				Chat
 			</InPageNavigationItem>
 		</Link>
-		<LogoutButton />
+		<Button variant="primary" onClick={logout}>
+				Logout
+		</Button>
 		</InPageNavigation>
 	);
 };

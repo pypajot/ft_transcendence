@@ -16,7 +16,7 @@ function Login() {
 
 	// 	FetchUser();
 	// }, []);
-	const { setUser } = useAuth();
+	const { setAccessToken } = useAuth();
 
 	async function HandleSubmit(e: any)
 	{
@@ -30,15 +30,15 @@ function Login() {
 				"password": formData.get('password')
 		}
 		// alert(JSON.stringify(formBody));
-		await fetch('http://localhost:3333/auth/login', {
+		const response = await fetch('http://localhost:3333/auth/login', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(formBody),
 			credentials: 'include',
 		})
+		// sessionStorage('access_token', (await response.json()).access_token);
 		.then(response => response.json())
-		.then(response => sessionStorage.setItem('access_token', response.access_token))
-		.then(response => setUser(1));
+		.then(response => setAccessToken(response.access_token))
 	}
 
 	return (

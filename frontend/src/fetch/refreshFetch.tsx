@@ -41,11 +41,7 @@ refreshFetch.interceptors.response.use(
 		});
 		
 		if (response.status !== 200)
-		{
-			sessionStorage.removeItem("access_token");	
-			document.location.href = "http://localhost:5173/landing"
 			return Promise.reject(error); //disconnect
-		}
 
 		sessionStorage.setItem('access_token', (await response.json()).access_token);
 		originalRequest.retry = true;

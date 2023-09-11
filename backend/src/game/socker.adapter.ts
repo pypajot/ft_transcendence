@@ -11,7 +11,7 @@ export class AuthenticatedSocketIoAdapter extends IoAdapter {
 
   createIOServer(port: number, options?: any): any {
     options.allowRequest = async (request, allowFunction) => {
-      const token = request.query.headers.Authorization.split(' ')[1];
+      const token = request._query.token;
       const verified = token && (await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET }));
       if (verified) {
         return allowFunction(null, true);

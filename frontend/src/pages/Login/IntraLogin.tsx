@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 function IntraLogin() {
 
 	const [searchParams] = useSearchParams();
-	const { setUser } = useAuth();
+	const { setAccessToken } = useAuth();
 	const navigate = useNavigate();
 	const run = useRef(0);
 
@@ -25,15 +25,11 @@ function IntraLogin() {
 				body: JSON.stringify({ "code": searchParams.get("code")}),
 				credentials: 'include',
 			})
-			if (response.status === 201)
-			{
-				// const data = await response.json();
-				sessionStorage.setItem('access_token', (await response.json()).access_token);
-				setUser(1);
-				navigate("/profile");
-				return ;
-			}
-			navigate("/landing");
+			if (response.status !== 201)
+				navigate("/landing");
+			setAccessToken((await response.json()).access_token);
+			navigate('/home')
+			return ;
 		};
 		if (run.current !== 0)
 			HandleIntra();

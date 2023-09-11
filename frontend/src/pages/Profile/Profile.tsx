@@ -12,8 +12,9 @@ const Profile = () => {
 				<h1>Profile</h1>
 			</div>
 			<div>
+				username:
 				<p>
-					{user}
+					{user?.username}
 				</p>
 			</div>
 		</>

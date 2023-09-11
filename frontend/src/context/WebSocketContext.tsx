@@ -17,18 +17,16 @@ export const SocketContext = createContext<WebContext | undefined>(undefined);
 export default function SocketContextProvider(props: SocketContextProviderProps){
 
     const [socket, setSocket] = useState<WebContext>({} as WebContext);
-	const { user } = useAuth();
+	const { user, accessToken } = useAuth();
 
     useEffect(() => {
 		if (!user)
 			return ;
         const newSocket:WebContext = { io:io("http://localhost:3333/game", {
             query: {
-                username: localStorage.getItem("username"),
-            },
-			extraHeaders: {
-				'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`
-			}
+				user: user,
+				token: accessToken,
+			},
         })};
 		setSocket(newSocket);
 		return () => {
