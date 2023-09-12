@@ -19,8 +19,7 @@ class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGateway
 {
 	public id = 0;
 	public id_msg = 0;
-	public cli_arr:  Client_elem[] = [];
-	prisma = new PrismaClient();
+	public username = null;
 	private readonly logger = new Logger(ChatGateway.name);
 	constructor(private readonly chatService: ChatGatewayService){}
 		@WebSocketServer() io: Server<any, ServerToClientEvents>;
@@ -32,11 +31,11 @@ class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGateway
 			console.log(client.handshake.query.username)
 			if (client.handshake.query.username !== 'null')
 			{
+				this.username = client.handshake.query.username;
 				this.chatService.new_cli(client, client.handshake.query.username);
 			}
 			this.logger.log(`Client ${client.id} ${client.handshake.query.username} arrived`);
 		}
-
 		handleDisconnect(client: any){
 			//Remove the client.id and the username
 			this.logger.log(`Client ${client.id} left`);
@@ -58,6 +57,11 @@ class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGateway
 		handleChannelMessage(client: any, data: string[]): void{
 			console.log(`${data[0]}, ${data[1]}`);
 			this.chatService.sendToChannel(this.io, data[0], data[1], client.id);
+		}
+
+		@SubscribeMessage('GetFriendsList')
+		handleGetFriendsList(client: any, data: string[]):void{
+			this.chatService.respondToGetFriendsList(this.username, this.io);
 		}
 }
 

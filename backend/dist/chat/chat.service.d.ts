@@ -11,6 +11,7 @@ export declare class ChatGatewayService {
     private readonly logger;
     prisma: PrismaClient<import(".prisma/client").Prisma.PrismaClientOptions, never, import("@prisma/client/runtime/library").DefaultArgs>;
     findUserById(client_id: string, cli_arr: Client_elem[]): Client_elem | undefined;
+    respondToGetFriendsList(user_name: string, io: Server): Promise<void>;
     createMessage(socket_id: any, message: string, target: string): Promise<{
         id: number;
         content: string;

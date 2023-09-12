@@ -2,14 +2,11 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from "@nestjs
 import { Server } from 'socket.io';
 import { ServerToClientEvents } from "src/types/events";
 import { ChatGatewayService } from "./chat.service";
-import { Client_elem } from "src/types/client.entity";
-import { PrismaClient } from "@prisma/client";
 declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     private readonly chatService;
     id: number;
     id_msg: number;
-    cli_arr: Client_elem[];
-    prisma: PrismaClient<import(".prisma/client").Prisma.PrismaClientOptions, never, import("@prisma/client/runtime/library").DefaultArgs>;
+    username: any;
     private readonly logger;
     constructor(chatService: ChatGatewayService);
     io: Server<any, ServerToClientEvents>;
@@ -19,5 +16,6 @@ declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, O
     handleEvent(client: any, data: string[]): Promise<void>;
     handleChannelJoining(client: any, data: string): void;
     handleChannelMessage(client: any, data: string[]): void;
+    handleGetFriendsList(client: any, data: string[]): void;
 }
 export default ChatGateway;

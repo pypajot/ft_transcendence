@@ -1,34 +1,23 @@
 import { ChatBubble, ChatLog, ChatMessage } from "@twilio-paste/core";
 
-const sortMessages = (messages: JSON[]) => {
-    messages = messages.sort((a, b) => {
-        if (a.date > b.date)
-        {
-            return (-1);
-        }
-        return (0);
-    });
-    return (messages);
-}
-
-export const BasicOutMessage = (content:string) => {
+export const BasicOutMessage = ({ content }: { content: string }) => {
     return (
       <ChatLog>
         <ChatMessage variant='outbound'>
           <ChatBubble>
-            ${content}
+            {content}
           </ChatBubble>
         </ChatMessage>
       </ChatLog>
     );
 };
 
-export const BasicInMessage = (content:string) => {
+export const BasicInMessage = ({content}: {content: string}) => {
     return (
       <ChatLog>
         <ChatMessage variant='inbound'>
           <ChatBubble>
-            ${content}
+            {content}
           </ChatBubble>
         </ChatMessage>
       </ChatLog>

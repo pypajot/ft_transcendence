@@ -14,14 +14,12 @@ const common_1 = require("@nestjs/common");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const chat_service_1 = require("./chat.service");
-const client_1 = require("@prisma/client");
 let ChatGateway = ChatGateway_1 = class ChatGateway {
     constructor(chatService) {
         this.chatService = chatService;
         this.id = 0;
         this.id_msg = 0;
-        this.cli_arr = [];
-        this.prisma = new client_1.PrismaClient();
+        this.username = null;
         this.logger = new common_1.Logger(ChatGateway_1.name);
     }
     afterInit() {
@@ -30,6 +28,7 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
     async handleConnection(client, ...args) {
         console.log(client.handshake.query.username);
         if (client.handshake.query.username !== 'null') {
+            this.username = client.handshake.query.username;
             this.chatService.new_cli(client, client.handshake.query.username);
         }
         this.logger.log(`Client ${client.id} ${client.handshake.query.username} arrived`);
@@ -48,6 +47,9 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
     handleChannelMessage(client, data) {
         console.log(`${data[0]}, ${data[1]}`);
         this.chatService.sendToChannel(this.io, data[0], data[1], client.id);
+    }
+    handleGetFriendsList(client, data) {
+        this.chatService.respondToGetFriendsList(this.username, this.io);
     }
 };
 __decorate([
@@ -72,6 +74,12 @@ __decorate([
     __metadata("design:paramtypes", [Object, Array]),
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleChannelMessage", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('GetFriendsList'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Array]),
+    __metadata("design:returntype", void 0)
+], ChatGateway.prototype, "handleGetFriendsList", null);
 ChatGateway = ChatGateway_1 = __decorate([
     (0, websockets_1.WebSocketGateway)({ cors: '*', namespace: 'chat' }),
     __metadata("design:paramtypes", [chat_service_1.ChatGatewayService])

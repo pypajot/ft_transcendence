@@ -1,20 +1,25 @@
 import { ChatComposer } from '@twilio-paste/chat-composer'
-import React, { useContext, useEffect, useState } from 'react'
-import {$getRoot, $getSelection, $createParagraphNode, $createTextNode, EditorState, ClearEditorPlugin} from '@twilio-paste/lexical-library';
+import {useEffect, useState } from 'react'
+import {$getRoot,EditorState, ClearEditorPlugin} from '@twilio-paste/lexical-library';
 import { Box } from '@twilio-paste/core';
 import SendButton from './SendButton';
 import getMesageReceived from './Hooks/GetUserMessageReceived';
 import getMessageSent from './Hooks/GetUserMessageSent';
-import { applySelectionTransforms } from 'lexical/LexicalSelection';
-import { Message } from '../../../public/message.entity'
+import { Message } from '../../../public/Types/message.entity'
+import { BasicInMessage, BasicOutMessage } from './BasicMessage';
 
-const requestData = async(user: string, target: string) => {
-  const json_msgs = await getMesageReceived({sender: user, receiver: target})
-  return json_msgs;
+const sortByDate = () =>{
+  return function(a: any, b:any){
+    if (a.createdAt > b.createdAt){
+      return 1;
+    } else if (a.createdAt < b.createdAt){
+      return -1;
+    }
+    return 0;
+  }
 }
 
-export const Conversation = () => {
-  const contact = 'dudu'
+export const Conversation = ({contact}: {contact: string}) => {
     const [content, setContent] = useState<string>("A basic chat composer");
     const user = localStorage.getItem('username');
     const [sentMessage, setSentMessage] = useState<Message[]>();
@@ -27,24 +32,34 @@ export const Conversation = () => {
         setReceivedMessage(res);
         })
       }
-    }, [])
+    }, [contact])
     useEffect(() => {
       if (contact)
       {
         getMessageSent({sender: user, receiver: contact}).then((res) => {
         setSentMessage(res);
-        if (sentMessage)
-          {
-        console.log(`There ${sentMessage[0]} `);
-          }
         })
       }
-    }, [])
-    console.log(receivedMessage);
+    }, [contact])
+    if (receivedMessage)
+    {
+      receivedMessage.forEach(function(obj){
+        obj.sent = false;
+      })
+    }
+    if (sentMessage != undefined)
+    {
+      sentMessage.forEach(function(obj){
+        obj.sent = true;
+      })
+    }
+    let allMessages = undefined; 
     if (receivedMessage && sentMessage)
     {
-      const allMessages = sentMessage.concat(receivedMessage);
+      allMessages = sentMessage.concat(receivedMessage);
+      allMessages.sort(sortByDate());
     }
+    console.log(allMessages);
 
     const handleComposerChange = (editorState: EditorState): void => {
       editorState.read(() => {
@@ -71,6 +86,22 @@ export const Conversation = () => {
         <h1>{content}</h1>*/
 
     return (
+
+          <>
+          {allMessages && allMessages.map(function(message, i){
+            if (message.sent){
+              return (
+              <div key={i}>
+              < BasicOutMessage content={message.content}></BasicOutMessage>
+              </div>)
+            }
+            else{
+              return (
+              <div key={i}>
+              < BasicInMessage content={message.content}></BasicInMessage>
+              </div>)
+            }
+          })}
           <Box
           borderStyle="solid"
           borderWidth="borderWidth0"
@@ -97,5 +128,6 @@ export const Conversation = () => {
           </ChatComposer>
           <SendButton onClick={sendMessage} />
           </Box>
+          </>
     )
   }

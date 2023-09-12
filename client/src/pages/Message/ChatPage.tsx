@@ -1,14 +1,13 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import MessageInput from './MessageInput'
 import Messages from './Messages'
 import LittleMessage from './LittleMessage'
 import MessageTarget from './MessageTarget'
 import { useSocketContext } from '../../Context/socket-context'
 import { ChannelComponent } from './ChannelComponent'
-import { ChatDialog } from './test'
 import { Conversation } from './Conversation'
-import { Editor } from 'draft-js'
-import { Editorr } from './text'
+import Contact from './Contact'
+import { Box, Flex } from '@twilio-paste/core'
 
 //Access Username by global cookies or something ?
 
@@ -18,6 +17,7 @@ const ChatComponent = () => {
     const [target, setTarget] = useState<String>("");
     const [channelTarget, setChannelTarget] = useState<string>("")
     const [messagesChan, setMessageChan] = useState<String[]>([])
+    const [contact, setContact] = useState<string>("");
     const socket = useSocketContext();
 
     useEffect(() => {
@@ -61,7 +61,28 @@ const ChatComponent = () => {
         <LittleMessage/>
         <ChannelComponent setChannel={setChannelTarget} sendToChannel={sendToChannel}/>
         <Messages message={messagesChan}/>
-        <Conversation />
+        <Flex>
+    <Flex grow shrink basis="1px">
+      <Box
+        backgroundColor="colorBackgroundPrimaryWeak"
+        padding="space40"
+        width="100%"
+      >
+        <Contact setConversation={setContact}/>
+        Left area
+      </Box>
+    </Flex>
+    <Flex grow shrink basis="1px">
+      <Box
+        backgroundColor="colorBackgroundPrimaryWeaker"
+        padding="space40"
+        width="100%"
+      >
+        <Conversation contact={contact}/>
+        Right area
+      </Box>
+    </Flex>
+  </Flex>
         </>
     )
 }

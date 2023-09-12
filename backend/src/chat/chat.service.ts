@@ -28,7 +28,8 @@ export class ChatControllerService{
                 username: receiver_name
             }
         })
-        const json_messages = this.getMessages(await sender, await receiver);
+        const json_messages = await this.getMessages(await sender, await receiver);
+        console.log(`from : ${sender_name} to ${receiver_name} \n ${json_messages}`);
         return (json_messages);
     }
     catch(error)
@@ -45,7 +46,6 @@ export class ChatControllerService{
                 targetSocketId: receiver.socketId
             }
         })
-        console.log(JSON.stringify(messages));
         return (JSON.stringify(messages));
     }
 }
@@ -59,6 +59,14 @@ export class ChatGatewayService {
         return cli_arr.find(cli_arr => cli_arr.socket_id === client_id);
       }
 
+    async respondToGetFriendsList(user_name: string, io: Server){
+        const userList = await this.prisma.user.findMany({
+            where: {
+                username: {not : user_name}
+            },
+        });
+        io.emit('ResponseGetFriendsList', await userList);
+    }
     async createMessage(socket_id: any, message: string, target: string) {
         /*
         let message_obj: Message = {
