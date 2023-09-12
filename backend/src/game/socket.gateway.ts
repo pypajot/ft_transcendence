@@ -9,9 +9,7 @@ import { verify } from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway({
-	cors: {
-		origin: 'http://localhost:5173',
-	},
+	cors: true,
 	namespace: 'game',
 	// verifyClient: async (info, done) => {
 	// 	const token = info.req.headers.authorization.split(' ')[1];
@@ -30,7 +28,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: Socket, ...args: any[]): void {
     console.log('Client connected');
-	console.log(client.handshake.headers.authorization);
     client.emit("connection");
   }
   handleDisconnect(client: any) {

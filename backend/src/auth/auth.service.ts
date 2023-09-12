@@ -205,7 +205,9 @@ export class AuthService {
 	}
 
 
-	async refresh(res: any, refresh_token: any) {
+	async refresh(res: any, refresh_token?: any) {
+		if (!refresh_token)
+			throw new UnauthorizedException();
 		const payload = await  this.jwt.verifyAsync(refresh_token, {
 			secret: process.env.REFRESH_SECRET,
 		});

@@ -35,10 +35,11 @@ function Login() {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(formBody),
 			credentials: 'include',
-		})
-		// sessionStorage('access_token', (await response.json()).access_token);
-		.then(response => response.json())
-		.then(response => setAccessToken(response.access_token))
+		});
+		sessionStorage.setItem('access_token', (await response.json()).access_token);
+		setAccessToken(sessionStorage.getItem('access_token'));
+		// .then(response => response.json())
+		// .then(response => sessionStorage.setItem("access_token",response.access_token))
 	}
 
 	return (

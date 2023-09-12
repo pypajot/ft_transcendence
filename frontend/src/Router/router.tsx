@@ -12,19 +12,19 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function AppRoutes() {
-	const { user } = useAuth();
+	const { accessToken } = useAuth();
 	return (
 		  <Routes>
-			  <Route path="/" element={user ? <Navigate to='/home' /> : <Landing />} />
-			  <Route path="/signup" element={user ? <Navigate to='/home' /> : <Signup />} />
-			  <Route path="/landing" element={user ? <Navigate to='/home' /> : <Landing />} />
-			  <Route path="/login" element={user ? <Navigate to='/home' /> : <Login />} />
-			  <Route path="/intralogin" element={user ? <Navigate to='/home' /> : <IntraLogin />} />
-			  <Route path="/profile" element={user ? <Profile /> : <Navigate to='/landing' />} />
-			  <Route path="/home" element={user ? <Home /> : <Navigate to='/landing' />} />
-			  <Route path="/chat" element={user ? <Chat /> : <Navigate to='/landing' />} />
-			  <Route path="/game" element={user ? <Game /> : <Navigate to='/landing' />} />
-			  <Route path="/selectmode" element={user ? <ModeSelection /> : <Navigate to='/landing' />} />
+			  <Route path="/" element={accessToken ? <Navigate to='/home' /> : <Landing />} />
+			  <Route path="/signup" element={accessToken ? <Navigate to='/home' /> : <Signup />} />
+			  <Route path="/landing" element={accessToken ? <Navigate to='/home' /> : <Landing />} />
+			  <Route path="/login" element={accessToken ? <Navigate to='/home' /> : <Login />} />
+			  <Route path="/intralogin" element={accessToken ? <Navigate to='/home' /> : <IntraLogin />} />
+			  <Route path="/profile" element={accessToken ? <Profile /> : <Navigate to='/landing' />} />
+			  <Route path="/home" element={accessToken ? <Home /> : <Navigate to='/landing' />} />
+			  <Route path="/chat" element={accessToken ? <Chat /> : <Navigate to='/landing' />} />
+			  <Route path="/game" element={accessToken ? <Game /> : <Navigate to='/landing' />} />
+			  <Route path="/selectmode" element={accessToken ? <ModeSelection /> : <Navigate to='/landing' />} />
 		  </Routes>
 	);
 }

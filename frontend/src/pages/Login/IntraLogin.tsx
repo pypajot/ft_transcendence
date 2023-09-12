@@ -26,9 +26,9 @@ function IntraLogin() {
 				credentials: 'include',
 			})
 			if (response.status !== 201)
-				navigate("/landing");
-			setAccessToken((await response.json()).access_token);
-			navigate('/home')
+				return ;
+			sessionStorage.setItem("access_token",(await response.json()).access_token);
+			setAccessToken(sessionStorage.getItem("access_token"));
 			return ;
 		};
 		if (run.current !== 0)

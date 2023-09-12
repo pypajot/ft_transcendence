@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Res, Req} from "@nestjs/common";
+import { Controller, Post, Body, Get, UseGuards, Res, Req, HttpCode, HttpStatus} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto, CodeDto } from "./dto";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
@@ -50,6 +50,7 @@ export class AuthController {
 	}
 	
 	@Post('logout')
+	@HttpCode(HttpStatus.OK)
 	@UseGuards(JwtAuthGuard)
 	async logout(@Res() res: any, @Req() req: any) {
 		const result = await this.authservice.logout(res, req.cookies.refresh_token);

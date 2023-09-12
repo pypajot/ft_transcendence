@@ -1,3 +1,4 @@
+import { access } from 'fs';
 import { createContext, useState, useContext } from 'react';
 import * as React from 'react';
 import { useEffect } from 'react';
@@ -14,7 +15,7 @@ export interface AuthContextData {
 	accessToken: string | null;
 	setAccessToken: (token: string | null) => void;
 	logout: () => void;
-	refreshFetch: (request: any) => any;
+	refreshFetch: (address: any, params?: any) => any;
 }
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
@@ -24,13 +25,19 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 	const [accessToken, setAccessToken] = useState<string | null>(null);
 
 	useEffect(() => {
-		// if (!accessToken)
-		// 	return ;
+		const token = sessionStorage.getItem('access_token');
+		if (token)
+			setAccessToken(token);
+	}, [])
+
+	useEffect(() => {
+		if (!accessToken)
+			return ;
 		refreshFetch('http://localhost:3333/user/me', {
-			headers: { 'Authorization': `Bearer ${accessToken}` },
+			headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` },
 		})
-		.then(response => response.json())
-		.then(response => setUser(response))
+		.then((response) => response.json())
+		.then((response) => setUser(response));
 	}, [accessToken])
 
 
@@ -46,25 +53,28 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 		if (response.status !== 200)
 		{
 			setUser(null);
-			setAccessToken(null);
+			sessionStorage.removeItem("access_token");
+			setAccessToken("");
 			return response;
 		}
 		const token = (await response.json()).access_token;
-		console.log(token);
-		setAccessToken(token);
-		params.headers.Authorization = `Bearer ${accessToken}`;
+		console.log("refresh", token);
+		sessionStorage.setItem("access_token", token);
+		params.headers.Authorization = `Bearer ${token}`;
 		response = await fetch(address, params);
 		return response;
 	}
 
 	const logout = async () => {
-		console.log(accessToken)
+		console.log("logout", accessToken)
 		refreshFetch('http://localhost:3333/auth/logout', {
 			method: 'POST',
-			headers: { 'Authorization': `Bearer ${accessToken}` },
+			headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` },
+			credentials: 'include',
 		});
 		setUser(null);
-		setAccessToken(null);
+		setAccessToken("");
+		sessionStorage.removeItem("access_token");
 	}
 
 	return (
