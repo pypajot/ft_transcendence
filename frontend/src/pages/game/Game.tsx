@@ -9,17 +9,19 @@ const Game : React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [showGo, setShowGo] = useState(false); // The game state received from the server
+  const [gameEnd, setGameEnd] = useState(false); // The game state received from the server
+  const [gameEndMessage, setGameEndMessage] = useState(''); // The game state received from the server
 
   useEffect(() => {
     // Send custom event to request game state from the server
     socket?.on('createLobby', (lobbyId: string) => {
       setLobbyId(lobbyId);
-      setTimeout(() => { setCountdown(3)}, 1000);
       setTimeout(() => { socket?.emit('getGameState', { lobbyId })}, 1000);
+      setTimeout(() => { setCountdown(3)}, 1000);
       setTimeout(() => { setCountdown(2)}, 2000);
       setTimeout(() => { setCountdown(1)}, 3000);
       setTimeout(() => { setShowGo(true)}, 4000);
-      setTimeout(() => { socket?.emit('launchGame', { lobbyId })}, 4000);
+      setTimeout(() => { socket?.emit('launchBall', { lobbyId })}, 4000);
     },);
 
     // Set up WebSocket event listener to receive the game state from the server
@@ -29,13 +31,20 @@ const Game : React.FC = () => {
       // update the game state
       setGameState(data);
     },);
-    // add event listener for game end
-    // socket?.on('gameEnd', (data) => {
-    //   // display game end message
-    //   alert(data);
-    //   // display 2 buttons: play again and go back to choose game mode
-    //   // if play again is clicked, emit play again event to server
-    // });
+    //add event listener for game end
+    socket?.on('gameEnd', (data) => {
+      // display game end message
+      setGameEnd(true);
+      setGameState(null);
+      if (data === socket?.id) {
+        setGameEndMessage('You win!');
+      }
+      else {
+        setGameEndMessage('You lose!');
+      }
+      // display 2 buttons: play again and go back to choose game mode
+      // if play again is clicked, emit play again event to server
+    });
 
     return () => {
       socket?.off('createLobby');
@@ -79,6 +88,7 @@ const Game : React.FC = () => {
     <div className="container">
       {countdown && <div className="countdown">{countdown}</div>}
       {showGo && <div className="go-message">GO!</div>}
+      {gameEnd && <div className="gameEnd">{gameEndMessage}</div>}
       {/* Render the ball */}
       {gameState && (
         <div

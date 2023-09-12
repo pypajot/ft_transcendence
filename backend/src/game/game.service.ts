@@ -31,8 +31,8 @@ export class GameService {
   private ballY: number; // Position of the ball along the Y-axis
   private ballSpeedX: number; // Ball movement speed along the X-axis
   private ballSpeedY: number; // Ball movement speed along the Y-axis
-  private player1Score: number;
-  private player2Score: number;
+  public player1Score: number;
+  public player2Score: number;
 
   // Properties for the game physics
   private readonly gameWidth: number = 800;
@@ -46,7 +46,7 @@ export class GameService {
   private paddleMoveSpeed: number;
 
   // Properties for the game rules
-  private goalLimit: number;
+  public goalLimit: number;
   private gameConfiguration: GameConfiguration;
 
 
@@ -74,7 +74,7 @@ export class GameService {
     this.goalLimit = gameConfiguration.goalLimit;
   }
 
-  launchGame(): void {
+  launchBall(): void {
     this.ballSpeedXDirection = 1;
     this.ballSpeedYDirection = 1;
   }
@@ -127,20 +127,19 @@ export class GameService {
     // Move the ball based on its current speed and direction
     this.ballX += this.ballSpeedX * this.ballSpeedXDirection;
     this.ballY += this.ballSpeedY * this.ballSpeedYDirection;
-    // Check for collisions with the game boundaries (top and bottom walls)
+    // Check for collisions with top and bottom walls
     if (this.ballY - this.ballSize / 2 <= 0 || this.ballY + this.ballSize / 2 >= this.gameHeight) {
       this.ballSpeedYDirection *= -1; // Reverse the Y-direction when the ball hits the top or bottom wall
     }
     // Check for collisions with the paddles
     if (
       (this.ballX - this.ballSize / 2 <= this.paddleWidth && this.ballY >= this.paddle1Y && this.ballY <= this.paddle1Y + this.paddleHeight) ||
-      (this.ballX + this.ballSize / 2 >= this.gameWidth - this.paddleWidth && this.ballY >= this.paddle2Y && this.ballY <= this.paddle2Y + this.paddleHeight)
+      (this.ballX + this.ballSize / 2 >= this.gameWidth - this.paddleWidth - this.gameWidth/100 && this.ballY >= this.paddle2Y && this.ballY <= this.paddle2Y + this.paddleHeight)
     ) {
       // Reverse the X-direction and increase the ball speed after hitting a paddle
       this.ballSpeedXDirection *= -1;
       this.ballSpeedX *= this.ballSpeedIncreaseFactor;
     }
-  
     // Check for scoring when the ball crosses the left or right boundary
     if (this.ballX - this.ballSize / 2 <= 0) {
       this.player2Score++;

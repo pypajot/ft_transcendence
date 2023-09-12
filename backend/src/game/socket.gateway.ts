@@ -37,14 +37,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.emit('createLobby', lobbyId);
       this.matchmakingService.gameService[lobbyId].player1.emit('createLobby', lobbyId);
       console.log(`Lobby ${lobbyId} created`);
-      }, 1000);
+      }, 500);
     }
   }
 
-  @SubscribeMessage('launchGame')
+  @SubscribeMessage('launchBall')
   handleLaunchGame(client: Socket, data: {lobbyId: string}): void {
     const { lobbyId } = data;
-    this.matchmakingService.gameService[lobbyId].launchGame();
+    this.matchmakingService.gameService[lobbyId].launchBall();
   }
 
   @SubscribeMessage('movePaddle')
@@ -68,13 +68,24 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     let gameState = this.matchmakingService.gameService[lobbyId]?.getGameState();
     // create a loop with a delay of 50ms
   if (lobbyId !== undefined) {
-      setInterval(() => {
+      let interval = setInterval(() => {
         this.matchmakingService.gameService[lobbyId]?.updateGameState(); // Update the game state
         gameState = this.matchmakingService.gameService[lobbyId]?.getGameState(); // Get the updated game state
         // convert the gameState to a string
         const gameStateString = jsonc.stringify(gameState);
         // Send the game state to the client
         client.emit('gameState', gameStateString);
+        // check for game end
+        if (this.matchmakingService.gameService[lobbyId]?.player1Score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
+          // send the game end event to the client
+          client.emit('gameEnd', this.matchmakingService.gameService[lobbyId]?.player1.id);
+          // stop the loop
+          clearInterval(interval);
+        }
+        else if (this.matchmakingService.gameService[lobbyId]?.player2Score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
+          client.emit('gameEnd', this.matchmakingService.gameService[lobbyId]?.player2.id);
+          clearInterval(interval);
+        }
       }, 50);
     }
   }
