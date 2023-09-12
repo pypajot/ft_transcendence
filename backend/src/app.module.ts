@@ -7,7 +7,10 @@ import { SocketGateway } from './game/socket.gateway';
 import { GameService } from './game/game.service';
 import { MatchmakingService } from './game/matchmaking.service';
 import { Socket } from 'socket.io';
+<<<<<<< HEAD
 
+=======
+>>>>>>> eddd2534 (multiple lobbies system ok)
 
 
 @Module({
