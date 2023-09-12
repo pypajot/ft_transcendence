@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext.tsx';
 import {GameState} from '../../../../backend/src/game/game.service.ts';
 import './Game.css';
@@ -6,17 +6,22 @@ import './Game.css';
 const Game : React.FC = () => {
   const socket = useSocketContext(); // Access the WebSocket context
   const [lobbyId, setLobbyId] = useState<string>(''); // The lobby ID to join
-  const [gameState, setGameState] = useState<GameState | null>(null); // The game state received from the server
-
-  //const lobbyIdRef = useRef<string>('');
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [showGo, setShowGo] = useState(false); // The game state received from the server
 
   useEffect(() => {
     // Send custom event to request game state from the server
     socket?.on('createLobby', (lobbyId: string) => {
       setLobbyId(lobbyId);
-      //lobbyIdRef.current = lobbyId;
-      socket?.emit('getGameState', { lobbyId });
+      setTimeout(() => { setCountdown(3)}, 1000);
+      setTimeout(() => { socket?.emit('getGameState', { lobbyId })}, 1000);
+      setTimeout(() => { setCountdown(2)}, 2000);
+      setTimeout(() => { setCountdown(1)}, 3000);
+      setTimeout(() => { setShowGo(true)}, 4000);
+      setTimeout(() => { socket?.emit('launchGame', { lobbyId })}, 4000);
     },);
+
     // Set up WebSocket event listener to receive the game state from the server
     socket?.on('gameState', (data) => {
       // convert the game state to a JS object
@@ -42,8 +47,8 @@ const Game : React.FC = () => {
 
   const handleKeyPress = (event: any) => {
     // Handle user input (e.g., arrow keys) for moving paddles
-    // Emit paddle movements to the server via WebSocket
     const direction = event.key === 'ArrowUp' ? 'up' : event.key === 'ArrowDown' ? 'down' : 'stop';
+    // Emit paddle movements to the server via WebSocket
     socket?.emit('movePaddle', { direction, lobbyId});
   };
 
@@ -72,6 +77,8 @@ const Game : React.FC = () => {
           )}
         </div>
     <div className="container">
+      {countdown && <div className="countdown">{countdown}</div>}
+      {showGo && <div className="go-message">GO!</div>}
       {/* Render the ball */}
       {gameState && (
         <div

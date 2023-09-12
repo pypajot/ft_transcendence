@@ -38,8 +38,8 @@ export class GameService {
   private readonly gameWidth: number = 800;
   private readonly gameHeight: number = 600;
   private readonly ballSize: number = 10;
-  private ballSpeedXDirection: number = 1; // Ball movement direction along the X-axis (1 or -1)
-  private ballSpeedYDirection: number = 1; // Ball movement direction along the Y-axis (1 or -1)
+  private ballSpeedXDirection: number = 0; // Ball movement direction along the X-axis (1 or -1)
+  private ballSpeedYDirection: number = 0; // Ball movement direction along the Y-axis (1 or -1)
   private ballSpeedIncreaseFactor: number;
   private paddleWidth: number;
   private paddleHeight: number;
@@ -74,6 +74,10 @@ export class GameService {
     this.goalLimit = gameConfiguration.goalLimit;
   }
 
+  launchGame(): void {
+    this.ballSpeedXDirection = 1;
+    this.ballSpeedYDirection = 1;
+  }
   // Add a method to get the current game state, which will be sent to the clients via WebSocket.
   getGameState(): GameState {
     return {

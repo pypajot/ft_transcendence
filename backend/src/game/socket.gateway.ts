@@ -37,15 +37,20 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.emit('createLobby', lobbyId);
       this.matchmakingService.gameService[lobbyId].player1.emit('createLobby', lobbyId);
       console.log(`Lobby ${lobbyId} created`);
-      }, 2000);
+      }, 1000);
     }
+  }
+
+  @SubscribeMessage('launchGame')
+  handleLaunchGame(client: Socket, data: {lobbyId: string}): void {
+    const { lobbyId } = data;
+    this.matchmakingService.gameService[lobbyId].launchGame();
   }
 
   @SubscribeMessage('movePaddle')
   handleMovePaddle(client: Socket, data: {direction: string, lobbyId: string}): void {
     const { direction } = data;
     const { lobbyId } = data;
-    console.log (`lobbyId in movepaddle event: ` + lobbyId);
     if (direction === 'up') {
       this.matchmakingService.gameService[lobbyId].movePaddleUp(client.id);
     } 
@@ -61,11 +66,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleGetGameState(client: any, id: {lobbyId: string}): void {
     const lobbyId = id.lobbyId;
     let gameState = this.matchmakingService.gameService[lobbyId]?.getGameState();
-    console.log(`Lobby ID: ${lobbyId}`);
     // create a loop with a delay of 50ms
   if (lobbyId !== undefined) {
       setInterval(() => {
-        console.log('interval loop');
         this.matchmakingService.gameService[lobbyId]?.updateGameState(); // Update the game state
         gameState = this.matchmakingService.gameService[lobbyId]?.getGameState(); // Get the updated game state
         // convert the gameState to a string

@@ -43,4 +43,23 @@
     right: 1%; /* Adjust paddle position as needed */
     background-color: whitesmoke;
   }
+
+  .countdown, .go-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 5rem;
+    z-index: 10;
+    animation: fadeOut 3s forwards;
+  }
   
+  .go-message {
+    animation: fadeOut 1s forwards;
+  }
+  
+  @keyframes fadeOut {
+    to {
+      opacity: 0;
+    }
+  }
