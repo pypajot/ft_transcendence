@@ -8,9 +8,9 @@ const Game : React.FC = () => {
   const [lobbyId, setLobbyId] = useState<string>(''); // The lobby ID to join
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
-  const [showGo, setShowGo] = useState(false); // The game state received from the server
-  const [gameEnd, setGameEnd] = useState(false); // The game state received from the server
-  const [gameEndMessage, setGameEndMessage] = useState(''); // The game state received from the server
+  const [showGo, setShowGo] = useState(false);
+  const [gameEnd, setGameEnd] = useState(false);
+  const [gameEndMessage, setGameEndMessage] = useState('');
 
   useEffect(() => {
     // Send custom event to request game state from the server
