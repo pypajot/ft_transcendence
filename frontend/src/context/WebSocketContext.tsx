@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Socket, io } from "socket.io-client";
+import { useAuth } from './AuthContext';
+import { access } from 'fs';
 
 
 type WebContext = {
@@ -16,19 +18,24 @@ export const SocketContext = createContext<WebContext | undefined>(undefined);
 export default function SocketContextProvider(props: SocketContextProviderProps){
 
     const [socket, setSocket] = useState<WebContext>({} as WebContext);
+	const {  user } = useAuth();
 
     useEffect(() => {
-        const newSocket:WebContext = { io:io("http://localhost:8000/game", {
+		if (!user)
+			return ;
+        const newSocket:WebContext = { io:io("http://localhost:3333/game", {
             query: {
-                username: localStorage.getItem("username"),
-            },
+				token: sessionStorage.getItem("access_token"),
+			},
         })};
-            setSocket(newSocket);
-            return () => {
-                newSocket.io.disconnect();
-            }
-    }, []);
+		setSocket(newSocket);
+		return () => {
+			newSocket.io.disconnect();
+		}
+    }, [user]);
+
     const value = useMemo(() => socket, [socket]);
+
     return (
         <SocketContext.Provider value={value}>
             {props.children}

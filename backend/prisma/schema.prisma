@@ -8,15 +8,28 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+	id			Int		@default(autoincrement()) @id
 
-  email String @unique
-  hash String
+	username	String	@unique
+	hash		String?
+	intralogin	String?	@unique
+	createdAt	DateTime @default(now())
+	updatedAt	DateTime @updatedAt
 
-  firstName String?
-  lastName String?
+	tokens		UserToken[]
 
-  @@map("users")
+	@@map("users")
+}	
+
+model UserToken {
+	id			String @id @default(uuid())
+
+	user		User @relation(fields: [UserId], references: [id], onDelete: Cascade)
+	UserId		Int
+
+	refreshToken	String
+	family			String @unique
+	createdAt		DateTime @default(now())
+
+	@@map("usertokens")
 }

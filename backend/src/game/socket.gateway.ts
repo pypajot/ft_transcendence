@@ -7,7 +7,17 @@ import { Player } from './Player';
 import { jsonc } from 'jsonc';
 import { GameConfiguration } from './game.service';
 
-@WebSocketGateway({ cors: true, namespace: 'game' })
+@WebSocketGateway({
+	cors: true,
+	namespace: 'game',
+	// verifyClient: async (info, done) => {
+	// 	const token = info.req.headers.authorization.split(' ')[1];
+	// 	const verified = token && this && (await this.jwt.verifyAsync(token, { secret: process.env.JWT_SECRET }));
+	// 	if (verified)
+	// 		return done(true, 200);
+	// 	return done(false, 401);
+	// },
+})
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly matchmakingService: MatchmakingService) {}
 

@@ -1,10 +1,11 @@
-import React from 'react';
 import logo from './logo.svg';
 import './Home.css';
+import Navbar, { Navbar2 } from '../../components/Navbar';
 
 const Home = () => {
 	return (
 		<>
+		<Navbar/>
 		<div className="App">
 			<header className="App-header">
 				<img src={logo} className="App-logo" alt="logo" />
