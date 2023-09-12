@@ -1,5 +1,4 @@
-import { access } from 'fs';
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useMemo } from 'react';
 import * as React from 'react';
 import { useEffect } from 'react';
 
@@ -31,13 +30,17 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 	}, [])
 
 	useEffect(() => {
+		const getCurrentUser = async () => {
+			const response = await refreshFetch('http://localhost:3333/user/me', {
+				headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` },
+			});
+			if (response.status !== 200)
+				return ;
+			setUser(await response.json());
+		};
 		if (!accessToken)
 			return ;
-		refreshFetch('http://localhost:3333/user/me', {
-			headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` },
-		})
-		.then((response) => response.json())
-		.then((response) => setUser(response));
+		getCurrentUser();
 	}, [accessToken])
 
 
@@ -53,12 +56,11 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 		if (response.status !== 200)
 		{
 			setUser(null);
+			setAccessToken(null);
 			sessionStorage.removeItem("access_token");
-			setAccessToken("");
 			return response;
 		}
 		const token = (await response.json()).access_token;
-		console.log("refresh", token);
 		sessionStorage.setItem("access_token", token);
 		params.headers.Authorization = `Bearer ${token}`;
 		response = await fetch(address, params);
@@ -66,19 +68,27 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 	}
 
 	const logout = async () => {
-		console.log("logout", accessToken)
 		refreshFetch('http://localhost:3333/auth/logout', {
 			method: 'POST',
 			headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` },
 			credentials: 'include',
 		});
 		setUser(null);
-		setAccessToken("");
+		setAccessToken(null);
 		sessionStorage.removeItem("access_token");
 	}
 
+	const value = useMemo(() => ({
+		user,
+		setUser,
+		accessToken,
+		setAccessToken,
+		logout,
+		refreshFetch
+	}), [user, setUser, accessToken, setAccessToken, logout, refreshFetch]);
+
 	return (
-		<AuthContext.Provider value={{ user, setUser, logout, accessToken, setAccessToken, refreshFetch }}>
+		<AuthContext.Provider value={value}>
 			{children}
 		</AuthContext.Provider>
 	);

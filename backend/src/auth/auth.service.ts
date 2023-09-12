@@ -17,10 +17,10 @@ type RefreshPayloadType = {
 
 const RefreshTokenParams = {
 	httpOnly: true,
-	sameSite: 'lax',
+	sameSite: 'Lax',
 	secure: false,
 	path: '/',
-	maxAge: 120 * 1000,
+	maxAge: 60 * 60 * 1000,
 }
 
 @Injectable()
@@ -207,7 +207,7 @@ export class AuthService {
 
 	async refresh(res: any, refresh_token?: any) {
 		if (!refresh_token)
-			throw new UnauthorizedException();
+			throw new UnauthorizedException('No refresh token');
 		const payload = await  this.jwt.verifyAsync(refresh_token, {
 			secret: process.env.REFRESH_SECRET,
 		});
@@ -219,12 +219,12 @@ export class AuthService {
 		}
 		const dbToken = await this.verifyFamilyInDb(payload);
 		if (!dbToken)
-			throw new UnauthorizedException();
+			throw new UnauthorizedException('Invalid family');
 		const inDb = await this.isReuse(dbToken, refresh_token);
 		if (!inDb)
 		{
 			this.deleteTokenFromDb(payload);
-			throw new UnauthorizedException();
+			throw new UnauthorizedException('Reused token');
 		}
 		await this.prisma.userToken.delete({
 			where: {
@@ -237,7 +237,9 @@ export class AuthService {
 		return this.signAccessToken(payload.sub, payload.username);
 	}
 
-	async logout(res: any, refresh_token: any) {
+	async logout(res: any, refresh_token?: any) {
+		if (!refresh_token)
+			throw new UnauthorizedException('No refresh token');
 		const payload = await this.jwt.verifyAsync(refresh_token, {
 			secret: process.env.REFRESH_SECRET,
 		});
