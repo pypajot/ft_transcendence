@@ -5,7 +5,9 @@ import { useEffect } from 'react';
 export const useAuth = () => useContext(AuthContext);
 
 export interface User {
+	id: number
 	username: string
+	twofactorAuthActive: boolean
 }
 
 export interface AuthContextData {

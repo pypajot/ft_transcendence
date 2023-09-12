@@ -32,7 +32,7 @@ export default function SocketContextProvider(props: SocketContextProviderProps)
 		return () => {
 			newSocket.io.disconnect();
 		}
-    }, [user]);
+    }, [user?.id]);
 
     const value = useMemo(() => socket, [socket]);
 

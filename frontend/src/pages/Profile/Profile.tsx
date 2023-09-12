@@ -24,6 +24,7 @@ const Profile = () => {
 				<p>
 					{user?.username}
 				</p>
+				
 			</div>
 		</>
 	);

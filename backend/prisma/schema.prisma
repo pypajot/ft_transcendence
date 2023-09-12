@@ -18,7 +18,7 @@ model User {
 
 	tokens		UserToken[]
 
-	twoFactorAuthActive	boolean @default(0)
+	twoFactorAuthActive	Boolean @default(false)
 	twoFactorAuthSecret	String?
 
 	@@map("users")

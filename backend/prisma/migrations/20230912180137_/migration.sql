@@ -6,6 +6,8 @@ CREATE TABLE "users" (
     "intralogin" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "twoFactorAuthActive" BOOLEAN NOT NULL DEFAULT false,
+    "twoFactorAuthSecret" TEXT,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );

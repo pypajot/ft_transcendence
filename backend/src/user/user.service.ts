@@ -21,7 +21,6 @@ export class UserService {
 				id: Number(id),
 			},
 		});
-		delete user.hash;
-		return user;
+		return { username: user.username, twofactorAuthActive: user.twoFactorAuthActive};
 	}
 }
