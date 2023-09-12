@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext.tsx';
 import {GameState} from '../../../../backend/src/game/game.service.ts';
 import './Game.css';

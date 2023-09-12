@@ -9,7 +9,6 @@ import { MatchmakingService } from './game/matchmaking.service';
 import { Socket } from 'socket.io';
 
 
-
 @Module({
 	imports: [ConfigModule.forRoot(), PrismaModule, AuthModule, UserModule],
 	providers: [SocketGateway, GameService, MatchmakingService],
