@@ -26,6 +26,9 @@ let ChatController = exports.ChatController = class ChatController {
     getLogsReceiver(dto) {
         return (this.chatService.getLogs(dto.sender, dto.receiver));
     }
+    getFriends(username) {
+        return ((this.chatService.getFriendsList(username.user_name)));
+    }
 };
 __decorate([
     (0, common_1.Post)('getMessageSent'),
@@ -41,6 +44,13 @@ __decorate([
     __metadata("design:paramtypes", [dto_1.PrivMsgLogsDto]),
     __metadata("design:returntype", Object)
 ], ChatController.prototype, "getLogsReceiver", null);
+__decorate([
+    (0, common_1.Get)('getFriendsList'),
+    __param(0, (0, common_1.Query)('username')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], ChatController.prototype, "getFriends", null);
 exports.ChatController = ChatController = __decorate([
     (0, common_1.Controller)('chat'),
     __metadata("design:paramtypes", [chat_service_1.ChatControllerService])

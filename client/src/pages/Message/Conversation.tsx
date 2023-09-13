@@ -7,6 +7,7 @@ import getMesageReceived from './Hooks/GetUserMessageReceived';
 import getMessageSent from './Hooks/GetUserMessageSent';
 import { Message } from '../../../public/Types/message.entity'
 import { BasicInMessage, BasicOutMessage } from './BasicMessage';
+import { useSocketContext } from '../../Context/socket-context';
 
 const sortByDate = () =>{
   return function(a: any, b:any){
@@ -24,15 +25,20 @@ export const Conversation = ({contact}: {contact: string}) => {
     const user = localStorage.getItem('username');
     const [sentMessage, setSentMessage] = useState<Message[]>();
     const [receivedMessage, setReceivedMessage] = useState<Message[]>();
+    const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
 
-    console.log(`Helllo ${contact}`);
+
+    //Make a component to get the previous messsage
+    const socket = useSocketContext();
     useEffect(() => {
+      console.log(`Helllo ${contact}`);
       if (contact){
         getMesageReceived({sender: contact, receiver: user}).then((res) => {
         setReceivedMessage(res);
         })
       }
     }, [contact])
+
     useEffect(() => {
       if (contact)
       {
@@ -41,54 +47,62 @@ export const Conversation = ({contact}: {contact: string}) => {
         })
       }
     }, [contact])
-    if (receivedMessage)
-    {
-      receivedMessage.forEach(function(obj){
-        obj.sent = false;
-      })
-    }
-    if (sentMessage != undefined)
-    {
-      sentMessage.forEach(function(obj){
-        obj.sent = true;
-      })
-    }
-    let allMessages = undefined; 
-    if (receivedMessage && sentMessage)
-    {
-      allMessages = sentMessage.concat(receivedMessage);
-      allMessages.sort(sortByDate());
-    }
-    console.log(allMessages);
 
+    useEffect(() => {
+      if (receivedMessage)
+      {
+        receivedMessage.forEach(function(obj){
+          obj.sent = false;
+        })
+      }
+      if (sentMessage != undefined)
+      {
+        sentMessage.forEach(function(obj){
+          obj.sent = true;
+        })
+      }
+      if (receivedMessage && sentMessage)
+      {
+        setConversationMsg((sentMessage.concat(receivedMessage)).sort(sortByDate()));
+        console.log(conversationMsg);
+      }
+    }, [sentMessage, receivedMessage])
     const handleComposerChange = (editorState: EditorState): void => {
       editorState.read(() => {
         const root = $getRoot();
         const text = root.getTextContent();
-        console.log(text);
         setContent(text);
       });
     };
 
-    const sendMessage = () => {
-      alert(1);
+    const messageListener = (message: Message) => {
+      console.log(message);
+      setConversationMsg([...conversationMsg, message]);
     }
-/*
-      <ChatComposer
-        ariaLabel="A rich text chat composer"
-        config={{
-          namespace: 'customer-chat',
-          onError (e) { throw e },
-        }}
-        onChange={handleComposerChange}
-      />
-        <div>Here is the content</div>
-        <h1>{content}</h1>*/
 
+    const sendMessage = () => {
+      if (content){
+        const message_content: string[] = [content, contact];
+        socket?.emit("message", message_content);
+      }
+    }
+    useEffect(() => {
+      socket?.on("messageSent", messageListener);
+      return () => {
+        socket?.off("messageSent", messageListener);
+      }
+    }, [messageListener])
+
+    useEffect(() => {
+      socket?.on("messageRcv", messageListener);
+      return () => {
+        socket?.off("messageRcv", messageListener);
+      }
+    }, [messageListener])
     return (
 
           <>
-          {allMessages && allMessages.map(function(message, i){
+          {conversationMsg && conversationMsg.map(function(message, i){
             if (message.sent){
               return (
               <div key={i}>

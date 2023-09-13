@@ -39,7 +39,7 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
     async handleEvent(client, data) {
         this.logger.log(`Message : ${data[0]} from : ${client.id} to: ${data[1]}`);
         const newMsg = this.chatService.createMessage(client.id, data[0], data[1]);
-        this.chatService.sendTo(this.io, await newMsg);
+        this.chatService.sendTo(this.io, await newMsg, client.id);
     }
     handleChannelJoining(client, data) {
         this.chatService.newMember(client, data);
@@ -47,9 +47,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
     handleChannelMessage(client, data) {
         console.log(`${data[0]}, ${data[1]}`);
         this.chatService.sendToChannel(this.io, data[0], data[1], client.id);
-    }
-    handleGetFriendsList(client, data) {
-        this.chatService.respondToGetFriendsList(this.username, this.io);
     }
 };
 __decorate([
@@ -74,12 +71,6 @@ __decorate([
     __metadata("design:paramtypes", [Object, Array]),
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleChannelMessage", null);
-__decorate([
-    (0, websockets_1.SubscribeMessage)('GetFriendsList'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Array]),
-    __metadata("design:returntype", void 0)
-], ChatGateway.prototype, "handleGetFriendsList", null);
 ChatGateway = ChatGateway_1 = __decorate([
     (0, websockets_1.WebSocketGateway)({ cors: '*', namespace: 'chat' }),
     __metadata("design:paramtypes", [chat_service_1.ChatGatewayService])

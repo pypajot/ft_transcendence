@@ -1,8 +1,8 @@
 export interface Message{
-    id: String;
+    id: string;
     content: string;
     createdAt: Date;
-    autorSocketId: String;
-    targetSocketId: String;
+    autorSocketId: string;
+    targetSocketId: string;
     sent: boolean;
 }

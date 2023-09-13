@@ -36,17 +36,19 @@ let UserService = exports.UserService = class UserService {
         console.log(dto.password);
         const hash = await argon.hash(dto.password);
         try {
+            let r = (Math.random() + 1).toString(36).substring(7);
             const user = await this.prismaService.user.create({
                 data: {
                     username: dto.username,
                     password: hash,
-                    socketId: 'null'
+                    socketId: r
                 }
             });
             delete user.password;
             return user;
         }
         catch (error) {
+            console.log(error);
             if (error instanceof library_1.PrismaClientKnownRequestError) {
                 if (error.code === 'P2002') {
                     throw new common_1.ForbiddenException('Credentials taken');

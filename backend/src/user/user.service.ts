@@ -28,17 +28,19 @@ export class UserService {
         const hash = await argon.hash(dto.password);
 
         try {
-        const user = await this.prismaService.user.create({
-            data: {
-                username: dto.username,
-                password: hash,
-                socketId: 'null'
-            }
+            let r = (Math.random() + 1).toString(36).substring(7);
+            const user = await this.prismaService.user.create({
+                data: {
+                    username: dto.username,
+                    password: hash,
+                    socketId: r 
+                }
         });
         delete user.password;
         //Or use select object in user.create
         return user;
         } catch (error) {
+            console.log(error)
             if (error instanceof PrismaClientKnownRequestError) {
                 if (error.code === 'P2002'){
                     throw new ForbiddenException('Credentials taken');
@@ -46,6 +48,5 @@ export class UserService {
             }
             throw error;
         }
-
     }
 }

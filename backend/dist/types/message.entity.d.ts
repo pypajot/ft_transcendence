@@ -1,5 +1,8 @@
-export declare class Message {
-    id: String;
-    message: String;
-    target: String;
+export interface Message {
+    id: number;
+    content: string;
+    createdAt: Date;
+    authorSocketId: string;
+    targetSocketId: string;
+    sent: boolean;
 }

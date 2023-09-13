@@ -13,6 +13,7 @@ import { ChatGatewayService } from "./chat.service";
 import { Client_elem } from "src/types/client.entity";
 import { Socket } from "dgram";
 import { PrismaClient } from "@prisma/client";
+import { Message } from "src/types/message.entity";
 
 @WebSocketGateway({cors: '*', namespace: 'chat'})
 class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit 
@@ -44,7 +45,7 @@ class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGateway
 		async handleEvent(client: any, data: string[]): Promise<void> {
 			this.logger.log(`Message : ${data[0]} from : ${client.id} to: ${data[1]}`);
 			const newMsg = this.chatService.createMessage(client.id, data[0], data[1]);
-			this.chatService.sendTo(this.io, await newMsg);
+			this.chatService.sendTo(this.io, await newMsg, client.id);
 	//		this.chatService.sendMessage(this.io, message_obj);
 		}
 
@@ -59,10 +60,6 @@ class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGateway
 			this.chatService.sendToChannel(this.io, data[0], data[1], client.id);
 		}
 
-		@SubscribeMessage('GetFriendsList')
-		handleGetFriendsList(client: any, data: string[]):void{
-			this.chatService.respondToGetFriendsList(this.username, this.io);
-		}
 }
 
 export default ChatGateway;

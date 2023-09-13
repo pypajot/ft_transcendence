@@ -3,6 +3,7 @@ import { useSocketContext } from '../../Context/socket-context'
 import { Box, Button, Sidebar, SidebarBody, SidebarCollapseButton, SidebarFooter, SidebarHeader, SidebarHeaderIconButton, SidebarHeaderLabel, SidebarNavigation, SidebarOverlayContentWrapper } from '@twilio-paste/core';
 import { User } from '../../../public/Types/user.entity'
 import { ContactElement } from './ContactElement';
+import { getFriendsList } from './Hooks/GetFriendsList';
 
 //Possible to have channel Or People
 
@@ -15,54 +16,34 @@ import { ContactElement } from './ContactElement';
 
 //For the moment i will just display all user
 
-export default function Contact({setConversation}: {
-    setConversation: (val: string) => void
-    }) {
+interface ContactProps {
+    setConversation: (val: string) => void;
+    contact: string;
+}
+
+export const Contact: React.FC<ContactProps> = ({setConversation, contact}) =>{
     const [friends, setFriends] = useState<User[]>()
     const socket = useSocketContext();
+    const user_name = localStorage.getItem('username')
     let sidebarNavigationSkipLinkID = '1';
     let topbarSkipLinkID = '2';
     let mainContentSkipLinkID = '3';
 
     useEffect (() => 
     {
-        socket?.emit("GetFriendsList");
-        socket?.on("ResponseGetFriendsList", function(UserList: any) {
-            if (UserList)
-                setFriends(UserList)
+        getFriendsList({user_name}).then((res: User[]) => {
+            console.log(res);
+            setFriends(res);
         })
-    }, [socket])
-    console.log(friends);
+    }, [])
     //Ask the back for the userList
-
-    
   return (
     <>
-        <Sidebar
-        sidebarNavigationSkipLinkID={sidebarNavigationSkipLinkID}
-        topbarSkipLinkID={topbarSkipLinkID}
-        mainContentSkipLinkID={mainContentSkipLinkID}
-        collapsed={false}
-        variant="default"
-        >
-        <SidebarHeader>
-            <SidebarHeaderLabel>Contact</SidebarHeaderLabel>
-        </SidebarHeader>
         {friends != undefined && friends.map(function(user, i){
             return (<div key={i}>
                 <ContactElement content={user.username} setConversation={setConversation}></ContactElement>
             </div>)
         })}
-        <SidebarFooter>
-            <SidebarCollapseButton
-            i18nCollapseLabel="Close sidebar"
-            i18nExpandLabel="Open sidebar"
-            />
-        </SidebarFooter>
-        </Sidebar>
-
-        <SidebarOverlayContentWrapper collapsed={false} variant="default">
-        </SidebarOverlayContentWrapper>
-        </>
+    </>
   )
 }

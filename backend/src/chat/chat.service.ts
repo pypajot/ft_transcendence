@@ -7,6 +7,7 @@ import { PrismaClient } from "@prisma/client";
 import { Socket } from "dgram";
 import { WsException } from "@nestjs/websockets";
 import { PrivMsgLogsDto } from "src/dto";
+import { throwError } from "rxjs";
 
 
 @Injectable()
@@ -14,9 +15,29 @@ export class ChatControllerService{
     prisma = new PrismaClient();
 
     //Receive an event asking for messages
+
+    async getFriendsList(user_name: string)
+    {
+        try {
+
+            const friendsList = await this.prisma.user.findMany({
+                where:{
+                    NOT: {
+                        username: user_name
+                    }
+                }
+            })
+            console.log(await friendsList);
+            return (await friendsList);
+        }
+        catch(error)
+        {
+            console.log(error);
+        }
+    }
     async getLogs(sender_name: string, receiver_name: string) {
-    console.log(`Nice : ${sender_name}, ${receiver_name}`)
     try {
+        console.log(`Nice : ${sender_name}, ${receiver_name}`)
         const sender = await this.prisma.user.findUnique({
             where:{
                 username: sender_name 
@@ -39,6 +60,7 @@ export class ChatControllerService{
     }
 
     async getMessages(sender: any, receiver: any) {
+        try {
         console.log(`${sender.id}, ${receiver.id}`);
         const messages = await this.prisma.message.findMany({
             where: {
@@ -47,6 +69,10 @@ export class ChatControllerService{
             }
         })
         return (JSON.stringify(messages));
+    }
+    catch(error){
+        console.log(error);
+    }
     }
 }
 
@@ -59,13 +85,17 @@ export class ChatGatewayService {
         return cli_arr.find(cli_arr => cli_arr.socket_id === client_id);
       }
 
-    async respondToGetFriendsList(user_name: string, io: Server){
+    async respondToGetFriendsList(socket_id: string, io: Server){
+        try {
         const userList = await this.prisma.user.findMany({
             where: {
-                username: {not : user_name}
+                socketId: {not : socket_id}
             },
         });
-        io.emit('ResponseGetFriendsList', await userList);
+            console.log(await userList);
+            io.emit('ResponseGetFriendsList', await userList);
+        }   
+        catch(error){console.log(error)}
     }
     async createMessage(socket_id: any, message: string, target: string) {
         /*
@@ -74,12 +104,13 @@ export class ChatGatewayService {
             id:msg_id,
             target: message[1],
         }*/
+        try {
+        console.log(message)
         const targetUser = await this.prisma.user.findUnique({
             where: {
                 username: target
             },
         });
-        try {
         const msg = await this.prisma.message.create({
             data: {
                 content: message,
@@ -95,11 +126,13 @@ export class ChatGatewayService {
         }
         catch(error)
         {
+            console.log(error);
 //Catch if we cant create the message
         }
     }
 
     async new_cli(client: any, name: string) {
+        try {
 		const chatUser = await this.prisma.user.update({
 			where: {
 					username : name,
@@ -109,6 +142,10 @@ export class ChatGatewayService {
 			}
            });
            console.log(chatUser.socketId);
+        }catch(error)
+        {
+            console.log(error);
+        }
     }
 
     sendMessage(io: Server, message: Message){
@@ -117,6 +154,7 @@ export class ChatGatewayService {
 
     async newMember(client: any, channelName: string){
         const socket_id = client.id;
+        try {
 			const existingChannel = await this.prisma.channel.findUnique({
 				where: {
 					name : channelName
@@ -150,13 +188,30 @@ export class ChatGatewayService {
 					});
                     client.join(channelName);
 			}
+        }catch(error) {
+            console.log(error);
+        }
    }
-
-    async sendTo(io:Server, message: any){
+    async sendTo(io:Server, message: any, socket_id: string){
+        try {
         console.log(`test : ${message.content}`)
-        io.to(message.targetSocketId).emit('message', message.content);
-        this.logger.log(`Sent ${message}`);
+         let msgRes: Message = await {
+            id: message.id,
+            authorSocketId: message.authorSocketId,
+            targetSocketId: message.targetSocketId,
+            sent: true,
+            content: message.content,
+            createdAt: message.createdAt,
+        };
+        io.to(socket_id).emit('messageSent', msgRes);
+        msgRes.sent = false;
+        io.to(message.targetSocketId).emit('messageRcv', msgRes);
+        this.logger.log(`Sent ${message.content}`);
+        } catch(error){
+            console.log(error);
+        }
     }
+
     async sendToChannel(io:Server, channel:string, message:string, socket_id: string){
         try {
 		    const existingChannel = await this.prisma.channel.findUnique({
@@ -183,4 +238,4 @@ export class ChatGatewayService {
         }
         //
     }
-}
+};

@@ -6,11 +6,10 @@ import MessageTarget from './MessageTarget'
 import { useSocketContext } from '../../Context/socket-context'
 import { ChannelComponent } from './ChannelComponent'
 import { Conversation } from './Conversation'
-import Contact from './Contact'
 import { Box, Flex } from '@twilio-paste/core'
+import { Contact } from './Contact'
 
 //Access Username by global cookies or something ?
-
 
 const ChatComponent = () => {
     const [messages, setMessages] = useState<String[]>([])
@@ -58,7 +57,6 @@ const ChatComponent = () => {
         <MessageInput send={send}/>
         <Messages message={messages}/>
         <MessageTarget target={setTarget}/>
-        <LittleMessage/>
         <ChannelComponent setChannel={setChannelTarget} sendToChannel={sendToChannel}/>
         <Messages message={messagesChan}/>
         <Flex>
@@ -68,7 +66,7 @@ const ChatComponent = () => {
         padding="space40"
         width="100%"
       >
-        <Contact setConversation={setContact}/>
+        <Contact setConversation={setContact} contact={contact}/>
         Left area
       </Box>
     </Flex>
@@ -78,7 +76,8 @@ const ChatComponent = () => {
         padding="space40"
         width="100%"
       >
-        <Conversation contact={contact}/>
+        <Conversation contact={contact} />
+        <LittleMessage />
         Right area
       </Box>
     </Flex>

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { ChatControllerService } from "./chat.service";
 import { PrismaClient } from "@prisma/client";
 import { PrivMsgLogsDto } from "src/dto";
@@ -22,5 +22,9 @@ export class ChatController {
     @Post('getMessageReceived')
     getLogsReceiver(@Body() dto: PrivMsgLogsDto): any{
         return (this.chatService.getLogs(dto.sender, dto.receiver))
+    }
+    @Get('getFriendsList')
+    getFriends(@Query('username') username: any){
+        return((this.chatService.getFriendsList(username.user_name)));
     }
 }
