@@ -23,7 +23,7 @@ export default function SocketContextProvider(props: SocketContextProviderProps)
     useEffect(() => {
 		if (!user)
 			return ;
-        const newSocket:WebContext = { io:io("http://localhost:3333/game", {
+        const newSocket:WebContext = { io:io("http://localhost:3333/", {
             query: {
 				token: sessionStorage.getItem("access_token"),
 			},
@@ -32,7 +32,7 @@ export default function SocketContextProvider(props: SocketContextProviderProps)
 		return () => {
 			newSocket.io.disconnect();
 		}
-    }, [user?.id]);
+    }, [user && user.id]);
 
     const value = useMemo(() => socket, [socket]);
 
