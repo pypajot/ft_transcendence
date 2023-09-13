@@ -7,12 +7,19 @@ import {JwtService} from '@nestjs/jwt'
 import { v4 as uuidv4 } from "uuid";
 import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
+import { authenticator } from "otplib";
+import { toDataURL } from "qrcode";
 
 type RefreshPayloadType = {
 	sub: number;
 	username: string;
 	token_family: string;
 };
+
+type JwtPaylodType = {
+	sub: number;
+	username: string
+}
 
 
 const RefreshTokenParams = {
@@ -261,4 +268,50 @@ export class AuthService {
 		await res.clearCookie('refresh_token', RefreshTokenParams);
 		return ("Logout successful");
 	}
+
+	async activate2fa(req: any) {
+		const payload = this.jwt.decode(req.headers.authorization.split(' ')[1]) as JwtPaylodType
+		const user = await this.prisma.user.findUnique({
+			where: {
+				id: payload.sub,
+			}
+		});
+		const secret = authenticator.generateSecret();
+		await this.prisma.user.update({
+			where: {
+				id: payload.sub,
+			},
+			data: {
+				twoFactorAuthSecret: secret,
+			}
+		});
+		const otp = authenticator.keyuri(user.username, process.env.TWOFACTOR_APP_NAME, secret);
+		const imagePath = await toDataURL(otp);
+		return {path: imagePath};
+	}
+
+	async confirm2fa(req: any) {
+		const payload = this.jwt.decode(req.headers.authorization.split(' ')[1]) as JwtPaylodType
+		const user = await this.prisma.user.findUnique({
+			where: {
+				id: payload.sub,
+			}
+		});
+		const isValid = authenticator.verify({
+			token: req.body.code,
+			secret: user.twoFactorAuthSecret,
+		});
+		if (!isValid)
+			throw new ForbiddenException('Invalid code');
+		await this.prisma.user.update({
+			where: {
+				id: payload.sub,
+			},
+			data: {
+				twoFactorAuthActive: true,
+			}
+		});
+		return ("2FA activated");
+	}
+	
 }

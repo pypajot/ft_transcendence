@@ -26,8 +26,6 @@ export class UserService {
 	}
 
 	async updateUser(user: UserDTO) {
-		console.log(user);
-		console.log(user.twoFactorAuthActive);
 		await this.prisma.user.update({
 			where: {
 				id: user.id
@@ -36,6 +34,16 @@ export class UserService {
 				username: user.username,
 				twoFactorAuthActive: user.twoFactorAuthActive,
 			}
-		})
+		});
+		if (!user.twoFactorAuthActive) {
+			await this.prisma.user.update({
+				where: {
+					id: user.id
+				},
+				data: {
+					twoFactorAuthSecret: null,
+				}
+			});
+		}
 	}
 }

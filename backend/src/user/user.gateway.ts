@@ -23,8 +23,6 @@ export class UserGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('updateUser')
 	async handleUpdateUser(client: Socket, user: UserDTO) {
-		console.log(user);
-		console.log(user.twoFactorAuthActive);
 		await this.userService.updateUser(user);
 	}
 
