@@ -1,13 +1,22 @@
-import axios from "axios";
+export const getFriendsList = async ( username: string ) => {
+    const url = `http://localhost:3001/chat/getFriendsList?username=${username}`;
 
-export const getFriendsList = async (obj: any) => {
-    const url = "http://localhost:3001/chat/getFriendsList";
     try {
-        const val = await axios.get(url, {params: { username: obj}} );
-        return (val.data);
-    }
-    catch(err)
-    {
-        console.log(err);
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error("There was an error fetching the data", error);
     }
 }
+

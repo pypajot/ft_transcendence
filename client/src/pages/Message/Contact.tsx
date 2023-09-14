@@ -27,11 +27,19 @@ export const Contact: React.FC<ContactProps> = ({setConversation, contact}) =>{
     const user_name = localStorage.getItem('username')
     let sidebarNavigationSkipLinkID = '1';
     let topbarSkipLinkID = '2';
+	const getName = () => {
+		const name = localStorage.getItem('username');
+		if (!name){
+		return ""}
+		else{
+			return name;
+		}
+	}
     let mainContentSkipLinkID = '3';
 
     useEffect (() => 
     {
-        getFriendsList({user_name}).then((res: User[]) => {
+        getFriendsList(getName()).then((res: User[]) => {
             console.log(res);
             setFriends(res);
         })

@@ -1,19 +1,26 @@
-import axios from "axios";
-
-const getMessageSent = async (obj: any) => {
-    console.log(obj.sender);
-    console.log(obj.receiver);
+const getMessageSent = async (obj: { sender: string, receiver: string }) => {
     const url = "http://localhost:3001/chat/getMessageSent";
+    
     try {
-        const val = await axios.post(url, {
-            sender: obj.sender,
-            receiver: obj.receiver,
-        })
-        return (val.data);
-    }
-    catch(err)
-    {
-        console.log(err);
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                sender: obj.sender,
+                receiver: obj.receiver
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error("There was an error fetching the data", error);
     }
 }
 

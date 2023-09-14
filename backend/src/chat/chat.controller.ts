@@ -25,6 +25,7 @@ export class ChatController {
     }
     @Get('getFriendsList')
     getFriends(@Query('username') username: any){
-        return((this.chatService.getFriendsList(username.user_name)));
+		console.log("username: ", username);
+        return((this.chatService.getFriendsList(username)));
     }
 }

@@ -27,7 +27,8 @@ let ChatController = exports.ChatController = class ChatController {
         return (this.chatService.getLogs(dto.sender, dto.receiver));
     }
     getFriends(username) {
-        return ((this.chatService.getFriendsList(username.user_name)));
+        console.log("username: ", username);
+        return ((this.chatService.getFriendsList(username)));
     }
 };
 __decorate([
