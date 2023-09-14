@@ -15,7 +15,7 @@ export const ProfileProvider: React.FC<{children: React.ReactNode}> = ({ childre
 	const { user } = useAuth();
 
 	useEffect(() => {
-		if (!user || !socket)
+		if (!user || !socket || user.twoFactorAuthActive )
 			return ;
 		socket.emit("updateUser", user);
 	}, [user && user.twoFactorAuthActive]);

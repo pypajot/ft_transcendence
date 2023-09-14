@@ -16,30 +16,22 @@ export class AuthController {
 	}
 
 	@Post('signup')
-	signin(@Body() dto: AuthDto) {
-		return this.authservice.signup(dto);
+	async signin(@Body() dto: AuthDto, @Res() res: any) {
+		const response = await this.authservice.signup(dto, res);
+		res.send(response);
 	}
 	
 	@Post('login')
 	@UseGuards(LocalAuthGuard)
 	async login(@Body() dto: AuthDto, @Res() res: any) {
 		const token = await this.authservice.login(dto, res);
-		res.send({
-			access_token: token
-		});
-	}
-
-	@Get('callback')
-	callback() {
-		console.log("test callback");
+		res.send(token);
 	}
 
 	@Post('intralogin')
 	async intralogin( @Res() res: any,@Req() req: any) {
 		const token = await this.authservice.intralogin(res, req.body.code);
-		res.send({
-			access_token: token
-		});
+		res.send(token);
 	}
 
 	@Get('refresh')
@@ -62,7 +54,7 @@ export class AuthController {
 	@UseGuards(JwtAuthGuard)
 	async activate2fa(@Req() req: any) {
 		const response = await this.authservice.activate2fa(req)
-		return {imagePath: response};
+		return { imagePath: response };
 	}
 
 	@Post('2fa/confirm')
@@ -70,5 +62,12 @@ export class AuthController {
 	async confirm2fa(@Req() req: any) {
 		const response = await this.authservice.confirm2fa(req);
 		return { result: response };
+	}
+
+	@Post('2fa/login')
+	@UseGuards(JwtAuthGuard)
+	async login2fa(@Res() res: any, @Req() req: any) {
+		const response = await this.authservice.login2fa(res, req);
+		res.send(response);
 	}
 }

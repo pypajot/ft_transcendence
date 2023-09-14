@@ -26,6 +26,8 @@ export class UserService {
 	}
 
 	async updateUser(user: UserDTO) {
+		if (user.twoFactorAuthActive)
+			return ;
 		await this.prisma.user.update({
 			where: {
 				id: user.id

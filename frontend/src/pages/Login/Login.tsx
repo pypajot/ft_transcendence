@@ -1,22 +1,12 @@
 import './Login.css';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
 
-	// const [user, setUser] = useState<UserDTO>();
-
-
-	// useEffect(() => {
-	// 	async function FetchUser() {
-	// 		const response = await UserAPI.getUser();
-	// 		console.log(response);
-	// 		setUser(response);
-	// 	}
-
-	// 	FetchUser();
-	// }, []);
 	const { setAccessToken } = useAuth();
+	const navigate = useNavigate();
 
 	async function HandleSubmit(e: any)
 	{
@@ -36,8 +26,17 @@ function Login() {
 			body: JSON.stringify(formBody),
 			credentials: 'include',
 		});
-		sessionStorage.setItem('access_token', (await response.json()).access_token);
-		setAccessToken(sessionStorage.getItem('access_token'));
+		if (response.status !== 201)
+			return ;
+		const responseJson = await response.json();
+		if (responseJson.user2fa) {
+			sessionStorage.setItem('2faToken', responseJson.access_token);
+			navigate('/login2fa');
+		}
+		else {
+			sessionStorage.setItem('access_token', responseJson.access_token);
+			setAccessToken(sessionStorage.getItem('access_token'));
+		}
 		// .then(response => response.json())
 		// .then(response => sessionStorage.setItem("access_token",response.access_token))
 	}
@@ -56,7 +55,7 @@ function Login() {
 					</div>
 					<div>
 						<label>
-							Password: <input type="text" name="password" />
+							Password: <input type="password" name="password" />
 						</label>
 					</div>
 					<div>
