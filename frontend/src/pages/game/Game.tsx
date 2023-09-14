@@ -87,7 +87,7 @@ const Game : React.FC = () => {
             </>
           )}
         </div>
-    <div className="container">
+    <div className="game-board">
       {countdown && <div className="countdown">{countdown}</div>}
       {showGo && <div className="go-message">GO!</div>}
       {gameEnd && (
