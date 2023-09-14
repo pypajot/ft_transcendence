@@ -96,11 +96,13 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
     async createMessage(socket_id, message, target) {
         try {
             console.log(message);
+            console.log(await target);
             const targetUser = await this.prisma.user.findUnique({
                 where: {
                     username: target,
                 },
             });
+            console.log(await targetUser);
             const msg = await this.prisma.message.create({
                 data: {
                     content: message,
@@ -108,7 +110,7 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
                         connect: { socketId: socket_id },
                     },
                     target: {
-                        connect: { socketId: targetUser.socketId },
+                        connect: { socketId: await targetUser.socketId },
                     },
                 },
             });

@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Form,
   FormControl,
   Heading,
@@ -26,9 +27,20 @@ export const CreateNewConversation = () => {
 
   useEffect(() => {
     setChannelType(getChannelType());
+    console.log(channelType);
   }, []);
 
-  //UseEffec
+  /*
+  const channelCreation = () => {
+    //Checker si le channel name est pas pris
+    //Checker si le channel est public ou priver
+    //Checker si il y a un password ou pas
+
+    //Cree le channel en fonction de ses infos
+    //Display le channel sur la droite 
+
+    //Reflechir a comment organiser la liste des conversations sur la gauches
+*/
 
   return (
     <Box display="flex">
@@ -62,6 +74,11 @@ export const CreateNewConversation = () => {
                 id={"channelPassword"}
                 placeholder="Enter a Channel Password"
               />
+            </FormControl>
+            <FormControl>
+              <Button variant="primary" onClick={}>
+                Create !
+              </Button>
             </FormControl>
           </Form>
         </Popover>

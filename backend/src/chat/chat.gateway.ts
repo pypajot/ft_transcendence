@@ -25,7 +25,7 @@ class ChatGateway
     this.logger.log('Websocket Initialized\n');
   }
   async handleConnection(client: any, ...args: any[]) {
-    console.log(client.handshake.query.username);
+    console.log(`New Connection Sokcet" ${client.handshake.query.username}`);
     if (client.handshake.query.username !== 'null') {
       this.username = client.handshake.query.username;
       this.chatService.new_cli(client, client.handshake.query.username);
