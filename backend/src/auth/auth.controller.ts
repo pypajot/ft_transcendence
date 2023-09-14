@@ -4,6 +4,7 @@ import { AuthDto, CodeDto } from "./dto";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { RefreshAuthGuard } from "./guards/refresh-auth.guard";
 import { JwtAuthGuard } from "./guards";
+import { get } from "http";
 
 @Controller('auth')
 export class AuthController {
@@ -55,5 +56,19 @@ export class AuthController {
 	async logout(@Res() res: any, @Req() req: any) {
 		const result = await this.authservice.logout(res, req.cookies.refresh_token);
 		res.send({ result });
+	}
+
+	@Get('2fa/activate')
+	@UseGuards(JwtAuthGuard)
+	async activate2fa(@Req() req: any) {
+		const response = await this.authservice.activate2fa(req)
+		return {imagePath: response};
+	}
+
+	@Post('2fa/confirm')
+	@UseGuards(JwtAuthGuard)
+	async confirm2fa(@Req() req: any) {
+		const response = await this.authservice.confirm2fa(req);
+		return { result: response };
 	}
 }
