@@ -11,6 +11,7 @@ const Game : React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [showGo, setShowGo] = useState(false);
+  const [showBall, setShowBall] = useState(true);
   const [gameEnd, setGameEnd] = useState(false);
   const [gameEndMessage, setGameEndMessage] = useState('');
 
@@ -18,12 +19,12 @@ const Game : React.FC = () => {
     // Send custom event to request game state from the server
     socket?.on('createLobby', (lobbyId: string) => {
       setLobbyId(lobbyId);
-      setTimeout(() => { socket?.emit('getGameState', { lobbyId })}, 1000);
-      setTimeout(() => { setCountdown(3)}, 1000);
-      setTimeout(() => { setCountdown(2)}, 2000);
-      setTimeout(() => { setCountdown(1)}, 3000);
-      setTimeout(() => { setShowGo(true)}, 4000);
-      setTimeout(() => { socket?.emit('launchBall', { lobbyId })}, 4000);
+      socket?.emit('getGameState', { lobbyId });
+      setCountdown(3);
+      setTimeout(() => { setCountdown(2)}, 1000);
+      setTimeout(() => { setCountdown(1)}, 2000);
+      setTimeout(() => { setShowGo(true)}, 3000);
+      setTimeout(() => { socket?.emit('launchBall', { lobbyId })}, 3000);
     },);
 
     // Set up WebSocket event listener to receive the game state from the server
@@ -36,6 +37,8 @@ const Game : React.FC = () => {
     //add event listener for game end
     socket?.on('gameEnd', (data) => {
       // display game end message
+      setGameEnd(true);
+      setShowBall(false);
       if (data === socket?.id) {
         setGameEndMessage('You win!');
         setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
@@ -43,8 +46,6 @@ const Game : React.FC = () => {
       else {
         setGameEndMessage('You lose!');
       }
-      setGameEnd(true);
-      setGameState(null);
     });
 
     return () => {
@@ -52,7 +53,7 @@ const Game : React.FC = () => {
       socket?.off('gameState');
       socket?.off('gameEnd');
     };
-  }, [lobbyId]);
+  }, []);
 
   // Other game logic and rendering based on the received gameState
 
@@ -104,7 +105,7 @@ const Game : React.FC = () => {
         </div>
       )}
       {/* Render the ball */}
-      {gameState && (
+      {gameState && showBall && (
         <div
           className="ball"
           style={{
