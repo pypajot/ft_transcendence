@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext.tsx';
 import {GameState} from '../../../../backend/src/game/game.service.ts';
 import './Game.css';
+import { Button, ButtonGroup, Heading } from '@twilio-paste/core';
+import { Link } from 'react-router-dom';
 
 const Game : React.FC = () => {
   const socket = useSocketContext(); // Access the WebSocket context
@@ -38,17 +40,17 @@ const Game : React.FC = () => {
       setGameState(null);
       if (data === socket?.id) {
         setGameEndMessage('You win!');
+        setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
       }
       else {
         setGameEndMessage('You lose!');
       }
-      // display 2 buttons: play again and go back to choose game mode
-      // if play again is clicked, emit play again event to server
     });
 
     return () => {
       socket?.off('createLobby');
       socket?.off('gameState');
+      socket?.off('gameEnd');
     };
   }, []);
 
@@ -88,7 +90,19 @@ const Game : React.FC = () => {
     <div className="container">
       {countdown && <div className="countdown">{countdown}</div>}
       {showGo && <div className="go-message">GO!</div>}
-      {gameEnd && <div className="gameEnd">{gameEndMessage}</div>}
+      {gameEnd && (
+        <div className="gameEnd">
+        <Heading as='h6' variant='heading20'> {gameEndMessage}</Heading>
+        <ButtonGroup>
+          <Link to="/selectmode">
+            <Button variant="secondary">Try again</Button>
+          </Link>
+          <Link to="/">
+            <Button variant="secondary">Back to home</Button>
+          </Link>
+        </ButtonGroup>
+        </div>
+      )}
       {/* Render the ball */}
       {gameState && (
         <div
@@ -99,7 +113,6 @@ const Game : React.FC = () => {
           }}
         />
       )}
-
       {/* Render paddles */}
       {gameState && (
         <>

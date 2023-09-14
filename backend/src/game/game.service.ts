@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 
-
 export enum GameMode {
   Classic = 'Classic',
   Party = 'Party',
@@ -33,6 +32,7 @@ export class GameService {
   private ballSpeedY: number; // Ball movement speed along the Y-axis
   public player1Score: number;
   public player2Score: number;
+  private winner: string = '';
 
   // Properties for the game physics
   private readonly gameWidth: number = 800;
@@ -148,13 +148,6 @@ export class GameService {
     else if (this.ballX + this.ballSize / 2 >= this.gameWidth) {
       this.player1Score++;
       this.resetBall(); // Reset the ball to the center
-    }
-    // Check for end of game
-    if (this.player1Score >= this.goalLimit || this.player2Score >= this.goalLimit) {
-      // here we send a message to the clients to display a game over screen
-      //this.server.emit('gameEnd', { player1Score: this.player1Score, player2Score: this.player2Score });
-      // TODO : see if we can use the gameEnd event to display a game over screen
-      // and buttons to play again or change game mode
     }
   }
 

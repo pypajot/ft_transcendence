@@ -71,22 +71,29 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       let interval = setInterval(() => {
         this.matchmakingService.gameService[lobbyId]?.updateGameState(); // Update the game state
         gameState = this.matchmakingService.gameService[lobbyId]?.getGameState(); // Get the updated game state
-        // convert the gameState to a string
-        const gameStateString = jsonc.stringify(gameState);
-        // Send the game state to the client
-        client.emit('gameState', gameStateString);
         // check for game end
         if (this.matchmakingService.gameService[lobbyId]?.player1Score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
-          // send the game end event to the client
+          console.log('IF player' + this.matchmakingService.gameService[lobbyId]?.player1.id + ' wins');
           client.emit('gameEnd', this.matchmakingService.gameService[lobbyId]?.player1.id);
           // stop the loop
           clearInterval(interval);
         }
         else if (this.matchmakingService.gameService[lobbyId]?.player2Score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
+          console.log('ELSEIF player' + this.matchmakingService.gameService[lobbyId]?.player1.id + ' wins');
           client.emit('gameEnd', this.matchmakingService.gameService[lobbyId]?.player2.id);
           clearInterval(interval);
         }
+        // convert the gameState to a string
+        const gameStateString = jsonc.stringify(gameState);
+        // Send the game state to the client
+        client.emit('gameState', gameStateString);
       }, 50);
     }
+  }
+
+  @SubscribeMessage('destroyLobby')
+  handleDestroyLobby(client: Socket, lobbyId: string): void {
+    console.log(`Lobby ${lobbyId} destroyed`);
+    delete this.matchmakingService.gameService[lobbyId];
   }
 }
