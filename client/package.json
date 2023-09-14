@@ -28,6 +28,7 @@
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
     "react-router-dom": "^6.15.0",
+    "reactjs-popup": "^2.0.6",
     "scroll-to": "^0.0.2",
     "socket.io-client": "^4.7.2"
   },
@@ -38,9 +39,10 @@
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react-swc": "^3.3.2",
-    "eslint": "^8.45.0",
+    "eslint": "^8.49.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "prettier": "^2.8.8",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
   }

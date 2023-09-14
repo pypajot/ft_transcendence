@@ -1,7 +1,7 @@
-import { Message } from "src/types/message.entity";
+import { Message } from 'src/types/message.entity';
 import { Server } from 'socket.io';
-import { Client_elem } from "src/types/client.entity";
-import { PrismaClient } from "@prisma/client";
+import { Client_elem } from 'src/types/client.entity';
+import { PrismaClient } from '@prisma/client';
 export declare class ChatControllerService {
     prisma: PrismaClient<import(".prisma/client").Prisma.PrismaClientOptions, never, import("@prisma/client/runtime/library").DefaultArgs>;
     getFriendsList(user_name: string): Promise<{

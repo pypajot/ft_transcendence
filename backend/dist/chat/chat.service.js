@@ -19,12 +19,12 @@ let ChatControllerService = exports.ChatControllerService = class ChatController
             const friendsList = await this.prisma.user.findMany({
                 where: {
                     NOT: {
-                        username: user_name
-                    }
-                }
+                        username: user_name,
+                    },
+                },
             });
             console.log(await friendsList);
-            return (await friendsList);
+            return await friendsList;
         }
         catch (error) {
             console.log(error);
@@ -35,18 +35,18 @@ let ChatControllerService = exports.ChatControllerService = class ChatController
             console.log(`Nice : ${sender_name}, ${receiver_name}`);
             const sender = await this.prisma.user.findUnique({
                 where: {
-                    username: sender_name
-                }
+                    username: sender_name,
+                },
             });
-            console.log(`Let goo : ${(await sender.username)}`);
+            console.log(`Let goo : ${await sender.username}`);
             const receiver = await this.prisma.user.findUnique({
                 where: {
-                    username: receiver_name
-                }
+                    username: receiver_name,
+                },
             });
             const json_messages = await this.getMessages(await sender, await receiver);
             console.log(`from : ${sender_name} to ${receiver_name} \n ${json_messages}`);
-            return (json_messages);
+            return json_messages;
         }
         catch (error) {
             console.log(error);
@@ -58,10 +58,10 @@ let ChatControllerService = exports.ChatControllerService = class ChatController
             const messages = await this.prisma.message.findMany({
                 where: {
                     authorSocketId: sender.socketId,
-                    targetSocketId: receiver.socketId
-                }
+                    targetSocketId: receiver.socketId,
+                },
             });
-            return (JSON.stringify(messages));
+            return JSON.stringify(messages);
         }
         catch (error) {
             console.log(error);
@@ -77,13 +77,13 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
         this.prisma = new client_1.PrismaClient();
     }
     findUserById(client_id, cli_arr) {
-        return cli_arr.find(cli_arr => cli_arr.socket_id === client_id);
+        return cli_arr.find((cli_arr) => cli_arr.socket_id === client_id);
     }
     async respondToGetFriendsList(socket_id, io) {
         try {
             const userList = await this.prisma.user.findMany({
                 where: {
-                    socketId: { not: socket_id }
+                    socketId: { not: socket_id },
                 },
             });
             console.log(await userList);
@@ -98,21 +98,21 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
             console.log(message);
             const targetUser = await this.prisma.user.findUnique({
                 where: {
-                    username: target
+                    username: target,
                 },
             });
             const msg = await this.prisma.message.create({
                 data: {
                     content: message,
                     author: {
-                        connect: { socketId: socket_id }
+                        connect: { socketId: socket_id },
                     },
                     target: {
-                        connect: { socketId: targetUser.socketId }
+                        connect: { socketId: targetUser.socketId },
                     },
-                }
+                },
             });
-            return (msg);
+            return msg;
         }
         catch (error) {
             console.log(error);
@@ -126,7 +126,7 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
                 },
                 data: {
                     socketId: client.id,
-                }
+                },
             });
             console.log(chatUser.socketId);
         }
@@ -142,22 +142,22 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
         try {
             const existingChannel = await this.prisma.channel.findUnique({
                 where: {
-                    name: channelName
-                }
+                    name: channelName,
+                },
             });
             const user = await this.prisma.user.findUnique({
                 where: {
-                    socketId: socket_id
+                    socketId: socket_id,
                 },
             });
             if (existingChannel) {
                 const newUserChannel = await this.prisma.channel.update({
                     where: {
-                        name: channelName
+                        name: channelName,
                     },
                     data: {
-                        members: { connect: { id: user.id } }
-                    }
+                        members: { connect: { id: user.id } },
+                    },
                 });
                 client.join(channelName);
             }
@@ -167,9 +167,9 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
                         name: channelName,
                         creator: user.username,
                         members: {
-                            connect: { id: user.id }
-                        }
-                    }
+                            connect: { id: user.id },
+                        },
+                    },
                 });
                 client.join(channelName);
             }
@@ -181,7 +181,7 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
     async sendTo(io, message, socket_id) {
         try {
             console.log(`test : ${message.content}`);
-            let msgRes = await {
+            const msgRes = await {
                 id: message.id,
                 authorSocketId: message.authorSocketId,
                 targetSocketId: message.targetSocketId,
@@ -202,19 +202,19 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
         try {
             const existingChannel = await this.prisma.channel.findUnique({
                 where: {
-                    name: channel
-                }
+                    name: channel,
+                },
             });
             const msg = await this.prisma.message.create({
                 data: {
                     content: message,
                     author: {
-                        connect: { socketId: socket_id }
+                        connect: { socketId: socket_id },
                     },
                     Channel: {
-                        connect: { id: existingChannel.id }
-                    }
-                }
+                        connect: { id: existingChannel.id },
+                    },
+                },
             });
             io.to(channel).emit('newChannelMessage', message);
         }
@@ -225,5 +225,4 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
 exports.ChatGatewayService = ChatGatewayService = ChatGatewayService_1 = __decorate([
     (0, common_1.Injectable)()
 ], ChatGatewayService);
-;
 //# sourceMappingURL=chat.service.js.map

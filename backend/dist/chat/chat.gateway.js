@@ -23,7 +23,7 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
         this.logger = new common_1.Logger(ChatGateway_1.name);
     }
     afterInit() {
-        this.logger.log("Websocket Initialized\n");
+        this.logger.log('Websocket Initialized\n');
     }
     async handleConnection(client, ...args) {
         console.log(client.handshake.query.username);
