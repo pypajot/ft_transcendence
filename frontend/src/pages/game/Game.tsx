@@ -36,8 +36,6 @@ const Game : React.FC = () => {
     //add event listener for game end
     socket?.on('gameEnd', (data) => {
       // display game end message
-      setGameEnd(true);
-      setGameState(null);
       if (data === socket?.id) {
         setGameEndMessage('You win!');
         setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
@@ -45,6 +43,8 @@ const Game : React.FC = () => {
       else {
         setGameEndMessage('You lose!');
       }
+      setGameEnd(true);
+      setGameState(null);
     });
 
     return () => {
@@ -52,7 +52,7 @@ const Game : React.FC = () => {
       socket?.off('gameState');
       socket?.off('gameEnd');
     };
-  }, []);
+  }, [lobbyId]);
 
   // Other game logic and rendering based on the received gameState
 

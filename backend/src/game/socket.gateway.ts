@@ -92,7 +92,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('destroyLobby')
-  handleDestroyLobby(client: Socket, lobbyId: string): void {
+  handleDestroyLobby(client: Socket, id: {lobbyId: string}): void {
+    const lobbyId = id.lobbyId;
     console.log(`Lobby ${lobbyId} destroyed`);
     delete this.matchmakingService.gameService[lobbyId];
   }
