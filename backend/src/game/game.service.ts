@@ -98,11 +98,11 @@ export class GameService {
   movePaddleUp(clientId: string): void {
     if (clientId === this.player1.id) {
       if (this.paddle1Y >= 25) // prevents paddle from going off screen
-        this.paddle1Y -= 10;
+        this.paddle1Y -= this.paddleMoveSpeed;
     }
     else if (clientId === this.player2.id) {
       if (this.paddle2Y >= 25)
-        this.paddle2Y -= 10;
+        this.paddle2Y -= this.paddleMoveSpeed;
     }
   }
   movePaddleDown(clientId: string): void {

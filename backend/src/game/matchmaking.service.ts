@@ -9,7 +9,7 @@ const classicGameConfig: GameConfiguration = {
 	paddleWidth: 10,
 	paddleHeight: 100,
 	paddleMoveSpeed: 20,
-	goalLimit: 10,
+	goalLimit: 5,
 };
 
 const partyGameConfig: GameConfiguration = {
@@ -19,7 +19,7 @@ const partyGameConfig: GameConfiguration = {
 	paddleWidth: 10,
 	paddleHeight: 100,
 	paddleMoveSpeed: 30,
-	goalLimit: 10,
+	goalLimit: 5,
 };
 
 const hardcoreGameConfig: GameConfiguration = {
