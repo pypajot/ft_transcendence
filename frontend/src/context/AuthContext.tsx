@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useMemo } from 'react';
 import * as React from 'react';
 import { useEffect } from 'react';
+import { useRef } from 'react';
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -25,6 +26,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 	
 	const [user, setUser] = useState<User | null>(null);
 	const [accessToken, setAccessToken] = useState<string | null>(sessionStorage.getItem('access_token'));
+	const run = useRef(false);
 
 	// useEffect(() => {
 	// 	const token = sessionStorage.getItem('access_token');
@@ -43,7 +45,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 		};
 		if (!accessToken)
 			return ;
-		getCurrentUser();
+		if (run.current === false)
+			getCurrentUser();
+		run.current = true;
 	}, [accessToken])
 
 	const refreshFetch = async (address: any, params?: any) => {
