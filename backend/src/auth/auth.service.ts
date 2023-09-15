@@ -82,7 +82,7 @@ export class AuthService {
 			access_token: await this.signAccessToken(user.id, user.username),
 			user2fa: user.twoFactorAuthActive
 		};
-	}
+	} 
 
 	async createIntraUser(access_token: string)
 	{
@@ -143,7 +143,7 @@ export class AuthService {
 
 	async signAccessToken(id: number, username: string, time?: string) : Promise<any> {
 		if (!time)
-			time = "120s";
+			time = "30s";   
 		const payload = {
 			sub: id,
 			username: username
@@ -190,7 +190,7 @@ export class AuthService {
 				secret: process.env.REFRESH_SECRET,
 			}
 		);
-		this.addTokenToDb(token, id, token_family);
+		await this.addTokenToDb(token, id, token_family);
 		return token;
 	}
 
@@ -224,22 +224,23 @@ export class AuthService {
 	async refresh(res: any, refresh_token?: any) {
 		if (!refresh_token)
 			throw new UnauthorizedException('No refresh token');
-		const payload = await  this.jwt.verifyAsync(refresh_token, {
-			secret: process.env.REFRESH_SECRET,
-		});
-		if (!payload) {
+		try {
+			await this.jwt.verifyAsync(refresh_token, {
+				secret: process.env.REFRESH_SECRET,
+			});
+		} catch (e) {
 			const payloadToDelete = this.jwt.decode(refresh_token);
-			this.deleteTokenFromDb(payloadToDelete);
+			await this.deleteTokenFromDb(payloadToDelete);
 			await res.clearCookie('refresh_token', RefreshTokenParams);
 			throw new UnauthorizedException('Invalid refresh token');
 		}
+		const payload = this.jwt.decode(refresh_token) as { [key: string] : any};
 		const dbToken = await this.verifyFamilyInDb(payload);
 		if (!dbToken)
 			throw new UnauthorizedException('Invalid family');
 		const inDb = await this.isReuse(dbToken, refresh_token);
-		if (!inDb)
-		{
-			this.deleteTokenFromDb(payload);
+		if (!inDb) {
+			await this.deleteTokenFromDb(payload);
 			throw new UnauthorizedException('Reused token');
 		}
 		await this.prisma.userToken.delete({
@@ -250,7 +251,7 @@ export class AuthService {
 		})
 		const newtoken = await this.signRefreshToken(payload.sub, payload.username, payload.token_family);
 		res.cookie('refresh_token', newtoken, RefreshTokenParams);
-		return this.signAccessToken(payload.sub, payload.username);
+		return await this.signAccessToken(payload.sub, payload.username);
 	}
 
 	async logout(res: any, refresh_token?: any) {
@@ -259,10 +260,8 @@ export class AuthService {
 		const payload = await this.jwt.verifyAsync(refresh_token, {
 			secret: process.env.REFRESH_SECRET,
 		});
-
 		const token = await this.prisma.userToken.findUnique({
 			where: {
-				UserId: payload.sub,
 				family: payload.token_family,
 			}
 		});

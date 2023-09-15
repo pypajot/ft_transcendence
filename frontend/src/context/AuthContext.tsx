@@ -70,11 +70,15 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 	}
 
 	const logout = async () => {
-		refreshFetch('http://localhost:3333/auth/logout', {
-			method: 'POST',
-			headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` },
-			credentials: 'include',
-		});
+		try {
+			await refreshFetch('http://localhost:3333/auth/logout', {
+				method: 'POST',
+				headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` },
+				credentials: 'include',
+			});
+		} catch {
+			console.log("error")
+		}
 		setUser(null);
 		setAccessToken(null);
 		sessionStorage.removeItem("access_token");
