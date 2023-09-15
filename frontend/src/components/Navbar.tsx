@@ -18,7 +18,7 @@ const Navbar = () => {
 				Profile
 			</InPageNavigationItem>
 		</Link>
-		<Link to='/selectmode'>
+		<Link to='/game'>
 			<InPageNavigationItem href="">
 				Game
 			</InPageNavigationItem>

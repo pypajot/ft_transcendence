@@ -5,9 +5,7 @@ import Landing from "../pages/Landing/Landing";
 import Login from "../pages/Login/Login";
 import IntraLogin from "../pages/Login/IntraLogin";
 import Profile from "../pages/Profile/Profile";
-import Chat from "../pages/Chat/Chat";
 import Game from "../pages/Game/Game";
-import ModeSelection from "../pages/Game/modeSelection";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ChatComponent from "../pages/Message/ChatPage";
@@ -23,9 +21,7 @@ function AppRoutes() {
 			  <Route path="/intralogin" element={accessToken ? <Navigate to='/home' /> : <IntraLogin />} />
 			  <Route path="/profile" element={accessToken ? <Profile /> : <Navigate to='/landing' />} />
 			  <Route path="/home" element={accessToken ? <Home /> : <Navigate to='/landing' />} />
-
 			  <Route path="/game" element={accessToken ? <Game /> : <Navigate to='/landing' />} />
-			  <Route path="/selectmode" element={accessToken ? <ModeSelection /> : <Navigate to='/landing' />} />
 			 <Route path="/chatapp" element={accessToken ? <ChatComponent /> : <Navigate to ='/landing' />} />
 		  </Routes>
 	);
