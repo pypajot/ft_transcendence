@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { UserDTO } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -21,7 +22,30 @@ export class UserService {
 				id: Number(id),
 			},
 		});
-		delete user.hash;
-		return user;
+		return { id: user.id, username: user.username, twoFactorAuthActive: user.twoFactorAuthActive};
+	}
+
+	async updateUser(user: UserDTO) {
+		if (user.twoFactorAuthActive)
+			return ;
+		await this.prisma.user.update({
+			where: {
+				id: user.id
+			},
+			data: {
+				username: user.username,
+				twoFactorAuthActive: user.twoFactorAuthActive,
+			}
+		});
+		if (!user.twoFactorAuthActive) {
+			await this.prisma.user.update({
+				where: {
+					id: user.id
+				},
+				data: {
+					twoFactorAuthSecret: null,
+				}
+			});
+		}
 	}
 }

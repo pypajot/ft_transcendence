@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 
-
 export enum GameMode {
   Classic = 'Classic',
   Party = 'Party',
@@ -35,8 +34,8 @@ export class GameService {
   public player2Score: number;
 
   // Properties for the game physics
-  private readonly gameWidth: number = 800;
-  private readonly gameHeight: number = 600;
+  private readonly gameWidth: number = 600;
+  private readonly gameHeight: number = 450;
   private readonly ballSize: number = 10;
   private ballSpeedXDirection: number = 0; // Ball movement direction along the X-axis (1 or -1)
   private ballSpeedYDirection: number = 0; // Ball movement direction along the Y-axis (1 or -1)
@@ -59,10 +58,10 @@ export class GameService {
     this.gameConfiguration = gameConfiguration;
     this.player1 = Player1;
     this.player2 = Player2;
-    this.paddle1Y = 250; // Set initial Y position for paddle 1 (Player 1)
-    this.paddle2Y = 250; // Set initial Y position for paddle 2 (Player 2)
-    this.ballX = 400; // Set initial X position for the ball
-    this.ballY = 300; // Set initial Y position for the ball
+    this.paddle1Y = this.gameHeight / 2; // Set initial Y position for paddle 1 (Player 1)
+    this.paddle2Y = this.gameHeight / 2; // Set initial Y position for paddle 2 (Player 2)
+    this.ballX = this.gameWidth / 2; // Set initial X position for the ball
+    this.ballY = this.gameHeight / 2; // Set initial Y position for the ball
     this.ballSpeedX = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the X-axis
     this.ballSpeedY = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the Y-axis
     this.ballSpeedIncreaseFactor = gameConfiguration.ballSpeedIncreaseFactor;
@@ -74,15 +73,9 @@ export class GameService {
     this.goalLimit = gameConfiguration.goalLimit;
   }
 
-  launchBall(): void {
-    this.ballSpeedXDirection = 1;
-    this.ballSpeedYDirection = 1;
-  }
   // Add a method to get the current game state, which will be sent to the clients via WebSocket.
   getGameState(): GameState {
     return {
-      player1: this.player1,
-      player2: this.player2,
       paddle1Y: this.paddle1Y,
       paddle2Y: this.paddle2Y,
       ballX: this.ballX,
@@ -94,32 +87,25 @@ export class GameService {
     };
   }
 
-  // Methods to move the paddles up and down, and to stop them.
+  // Methods to move the paddles up and down
   movePaddleUp(clientId: string): void {
     if (clientId === this.player1.id) {
-      if (this.paddle1Y >= 25) // prevents paddle from going off screen
-        this.paddle1Y -= 10;
+      if (this.paddle1Y >= this.paddleMoveSpeed + (this.gameHeight / 50)) // prevents paddle from going off screen
+        this.paddle1Y -= this.paddleMoveSpeed;
     }
     else if (clientId === this.player2.id) {
-      if (this.paddle2Y >= 25)
-        this.paddle2Y -= 10;
+      if (this.paddle2Y >= this.paddleMoveSpeed + (this.gameHeight / 50))
+        this.paddle2Y -= this.paddleMoveSpeed;
     }
   }
   movePaddleDown(clientId: string): void {
     if (clientId === this.player1.id) {
-      if (this.paddle1Y <= this.gameHeight - this.paddleHeight - 10)
+      if (this.paddle1Y <= (this.gameHeight - this.paddleMoveSpeed - this.paddleHeight))
         this.paddle1Y += this.paddleMoveSpeed;
     } 
     else if (clientId === this.player2.id) {
-      if (this.paddle2Y <= this.gameHeight - this.paddleHeight - 10)
+      if (this.paddle2Y <= (this.gameHeight - this.paddleMoveSpeed - this.paddleHeight))
         this.paddle2Y += this.paddleMoveSpeed;
-    }
-  }
-  stopPaddle(clientId: string): void {
-    if (clientId === this.player1.id) {
-      this.paddle1Y = this.paddle1Y;
-    } else if (clientId === this.player2.id) {
-      this.paddle2Y = this.paddle2Y;
     }
   }
   // Method to update the game state based on physics and user input
@@ -131,48 +117,39 @@ export class GameService {
     if (this.ballY - this.ballSize / 2 <= 0 || this.ballY + this.ballSize / 2 >= this.gameHeight) {
       this.ballSpeedYDirection *= -1; // Reverse the Y-direction when the ball hits the top or bottom wall
     }
+    const collisionPaddle1 = this.ballX - this.ballSize / 2 <= this.paddleWidth && this.ballY >= this.paddle1Y && this.ballY <= this.paddle1Y + this.paddleHeight;
+    const collisionPaddle2 = this.ballX + this.ballSize / 2 >= this.gameWidth - this.paddleWidth - (this.gameWidth / 100) && this.ballY >= this.paddle2Y && this.ballY <= this.paddle2Y + this.paddleHeight;
     // Check for collisions with the paddles
-    if (
-      (this.ballX - this.ballSize / 2 <= this.paddleWidth && this.ballY >= this.paddle1Y && this.ballY <= this.paddle1Y + this.paddleHeight) ||
-      (this.ballX + this.ballSize / 2 >= this.gameWidth - this.paddleWidth - this.gameWidth/100 && this.ballY >= this.paddle2Y && this.ballY <= this.paddle2Y + this.paddleHeight)
-    ) {
+    if (collisionPaddle1 || collisionPaddle2) {
       // Reverse the X-direction and increase the ball speed after hitting a paddle
       this.ballSpeedXDirection *= -1;
       this.ballSpeedX *= this.ballSpeedIncreaseFactor;
+      this.ballSpeedY *= this.ballSpeedIncreaseFactor;
     }
     // Check for scoring when the ball crosses the left or right boundary
     if (this.ballX - this.ballSize / 2 <= 0) {
       this.player2Score++;
-      this.resetBall(); // Reset the ball to the center
+      this.resetBall();
     }
     else if (this.ballX + this.ballSize / 2 >= this.gameWidth) {
       this.player1Score++;
-      this.resetBall(); // Reset the ball to the center
-    }
-    // Check for end of game
-    if (this.player1Score >= this.goalLimit || this.player2Score >= this.goalLimit) {
-      // here we send a message to the clients to display a game over screen
-      //this.server.emit('gameEnd', { player1Score: this.player1Score, player2Score: this.player2Score });
-      // TODO : see if we can use the gameEnd event to display a game over screen
-      // and buttons to play again or change game mode
+      this.resetBall();
     }
   }
 
-  // Method to reset the ball to the center after scoring or at the start of the game
-  private resetBall(): void {
+  // resets and launches the ball after a goal or at the start of the game
+  resetBall(): void {
     this.ballX = this.gameWidth / 2;
     this.ballY = this.gameHeight / 2;
-    this.ballSpeedX = this.gameConfiguration.ballSpeed; 
+    this.ballSpeedX = this.gameConfiguration.ballSpeed;
     this.ballSpeedY = this.gameConfiguration.ballSpeed;
-    this.ballSpeedXDirection = Math.random() > 0.5 ? 1 : -1; // Randomize the initial X-direction
-    this.ballSpeedYDirection = Math.random() > 0.5 ? 1 : -1; // Randomize the initial Y-direction
+    this.ballSpeedXDirection = Math.random() > 0.5 ? 1 : -1;
+    this.ballSpeedYDirection = Math.random() > 0.5 ? 1 : -1;
   }
 }
 
-// Define an interface for the game state data that will be sent to the clients.
+// Interface definition for the game state data that will be sent to clients.
 export interface GameState {
-  player1: Socket;
-  player2: Socket;
   paddle1Y: number;
   paddle2Y: number;
   ballX: number;

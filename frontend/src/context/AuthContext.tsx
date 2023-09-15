@@ -5,7 +5,9 @@ import { useEffect } from 'react';
 export const useAuth = () => useContext(AuthContext);
 
 export interface User {
+	id: number
 	username: string
+	twoFactorAuthActive: boolean
 }
 
 export interface AuthContextData {
@@ -16,18 +18,19 @@ export interface AuthContextData {
 	logout: () => void;
 	refreshFetch: (address: any, params?: any) => any;
 }
+
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
 	
 	const [user, setUser] = useState<User | null>(null);
-	const [accessToken, setAccessToken] = useState<string | null>(null);
+	const [accessToken, setAccessToken] = useState<string | null>(sessionStorage.getItem('access_token'));
 
-	useEffect(() => {
-		const token = sessionStorage.getItem('access_token');
-		if (token)
-			setAccessToken(token);
-	}, [])
+	// useEffect(() => {
+	// 	const token = sessionStorage.getItem('access_token');
+	// 	if (token)
+	// 		setAccessToken(token);
+	// }, [])
 
 	useEffect(() => {
 		const getCurrentUser = async () => {
@@ -42,7 +45,6 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 			return ;
 		getCurrentUser();
 	}, [accessToken])
-
 
 	const refreshFetch = async (address: any, params?: any) => {
 		let response = await fetch(address, params);
@@ -68,11 +70,15 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 	}
 
 	const logout = async () => {
-		refreshFetch('http://localhost:3333/auth/logout', {
-			method: 'POST',
-			headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` },
-			credentials: 'include',
-		});
+		try {
+			await refreshFetch('http://localhost:3333/auth/logout', {
+				method: 'POST',
+				headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` },
+				credentials: 'include',
+			});
+		} catch {
+			console.log("error")
+		}
 		setUser(null);
 		setAccessToken(null);
 		sessionStorage.removeItem("access_token");

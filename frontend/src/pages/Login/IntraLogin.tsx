@@ -27,8 +27,15 @@ function IntraLogin() {
 			})
 			if (response.status !== 201)
 				return ;
-			sessionStorage.setItem("access_token",(await response.json()).access_token);
-			setAccessToken(sessionStorage.getItem("access_token"));
+			const responseJson = await response.json();
+			if (responseJson.user2fa) {
+				sessionStorage.setItem('2faToken', responseJson.access_token);
+				navigate('/login2fa');
+			}
+			else {
+				sessionStorage.setItem('access_token', responseJson.access_token);
+				setAccessToken(sessionStorage.getItem('access_token'));
+			}
 			return ;
 		};
 		if (run.current !== 0)

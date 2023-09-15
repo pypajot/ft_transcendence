@@ -4,7 +4,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
+  width: 600px;
+  height: 30px;
 }
 
 .score {
@@ -12,13 +13,13 @@
   color: #fff; /* Text color */
 }
 
-.container {
-    position: relative;
-    width: 100%; /* 100% of the container's width */
-    padding-top: 75%; /* 75% of the container's width to set the aspect ratio (adjust as needed) */
-    border: 3px solid whitesmoke;
-    overflow: hidden;
-  }
+.game-board {
+  position: relative;
+  width: 600px;
+  height: 450px;
+  border: 3px solid whitesmoke;
+  overflow: hidden;
+}
   
   .ball {
     position: absolute;
@@ -49,7 +50,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 3rem;
+    font-size: 2rem;
     z-index: 10;
   }
 
