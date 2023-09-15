@@ -34,8 +34,8 @@ export class GameService {
   public player2Score: number;
 
   // Properties for the game physics
-  private readonly gameWidth: number = 400;
-  private readonly gameHeight: number = 300;
+  private readonly gameWidth: number = 600;
+  private readonly gameHeight: number = 450;
   private readonly ballSize: number = 10;
   private ballSpeedXDirection: number = 0; // Ball movement direction along the X-axis (1 or -1)
   private ballSpeedYDirection: number = 0; // Ball movement direction along the Y-axis (1 or -1)
@@ -87,32 +87,25 @@ export class GameService {
     };
   }
 
-  // Methods to move the paddles up and down, and to stop them.
+  // Methods to move the paddles up and down
   movePaddleUp(clientId: string): void {
     if (clientId === this.player1.id) {
-      if (this.paddle1Y >= 25) // prevents paddle from going off screen
+      if (this.paddle1Y >= this.paddleMoveSpeed + (this.gameHeight / 50)) // prevents paddle from going off screen
         this.paddle1Y -= this.paddleMoveSpeed;
     }
     else if (clientId === this.player2.id) {
-      if (this.paddle2Y >= 25)
+      if (this.paddle2Y >= this.paddleMoveSpeed + (this.gameHeight / 50))
         this.paddle2Y -= this.paddleMoveSpeed;
     }
   }
   movePaddleDown(clientId: string): void {
     if (clientId === this.player1.id) {
-      if (this.paddle1Y <= this.gameHeight - this.paddleHeight - (this.gameHeight / 50))
+      if (this.paddle1Y <= (this.gameHeight - this.paddleMoveSpeed - this.paddleHeight))
         this.paddle1Y += this.paddleMoveSpeed;
     } 
     else if (clientId === this.player2.id) {
-      if (this.paddle2Y <= this.gameHeight - this.paddleHeight - (this.gameHeight / 50))
+      if (this.paddle2Y <= (this.gameHeight - this.paddleMoveSpeed - this.paddleHeight))
         this.paddle2Y += this.paddleMoveSpeed;
-    }
-  }
-  stopPaddle(clientId: string): void {
-    if (clientId === this.player1.id) {
-      this.paddle1Y = this.paddle1Y;
-    } else if (clientId === this.player2.id) {
-      this.paddle2Y = this.paddle2Y;
     }
   }
   // Method to update the game state based on physics and user input
@@ -124,14 +117,14 @@ export class GameService {
     if (this.ballY - this.ballSize / 2 <= 0 || this.ballY + this.ballSize / 2 >= this.gameHeight) {
       this.ballSpeedYDirection *= -1; // Reverse the Y-direction when the ball hits the top or bottom wall
     }
+    const collisionPaddle1 = this.ballX - this.ballSize / 2 <= this.paddleWidth && this.ballY >= this.paddle1Y && this.ballY <= this.paddle1Y + this.paddleHeight;
+    const collisionPaddle2 = this.ballX + this.ballSize / 2 >= this.gameWidth - this.paddleWidth - (this.gameWidth / 100) && this.ballY >= this.paddle2Y && this.ballY <= this.paddle2Y + this.paddleHeight;
     // Check for collisions with the paddles
-    if (
-      (this.ballX - this.ballSize / 2 <= this.paddleWidth && this.ballY >= this.paddle1Y && this.ballY <= this.paddle1Y + this.paddleHeight) ||
-      (this.ballX + this.ballSize / 2 >= this.gameWidth - this.paddleWidth - this.gameWidth/100 && this.ballY >= this.paddle2Y && this.ballY <= this.paddle2Y + this.paddleHeight)
-    ) {
+    if (collisionPaddle1 || collisionPaddle2) {
       // Reverse the X-direction and increase the ball speed after hitting a paddle
       this.ballSpeedXDirection *= -1;
       this.ballSpeedX *= this.ballSpeedIncreaseFactor;
+      this.ballSpeedY *= this.ballSpeedIncreaseFactor;
     }
     // Check for scoring when the ball crosses the left or right boundary
     if (this.ballX - this.ballSize / 2 <= 0) {
@@ -148,10 +141,10 @@ export class GameService {
   resetBall(): void {
     this.ballX = this.gameWidth / 2;
     this.ballY = this.gameHeight / 2;
-    this.ballSpeedX = this.gameConfiguration.ballSpeed; 
+    this.ballSpeedX = this.gameConfiguration.ballSpeed;
     this.ballSpeedY = this.gameConfiguration.ballSpeed;
     this.ballSpeedXDirection = Math.random() > 0.5 ? 1 : -1;
-    this.ballSpeedYDirection = Math.random() > 0.5 ? 1 : -1; 
+    this.ballSpeedYDirection = Math.random() > 0.5 ? 1 : -1;
   }
 }
 

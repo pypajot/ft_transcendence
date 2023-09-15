@@ -60,9 +60,10 @@ const PongGame : React.FC = () => {
 
   const handleKeyPress = (event: any) => {
     // Handle user input (e.g., arrow keys) for moving paddles
-    const direction = event.key === 'ArrowUp' ? 'up' : event.key === 'ArrowDown' ? 'down' : 'stop';
+    const direction = event.key === 'ArrowUp' ? 'up' : event.key === 'ArrowDown' ? 'down' : null;
     // Emit paddle movements to the server via WebSocket
-    socket?.emit('movePaddle', { direction, lobbyId});
+    if (!gameEnd)
+      socket?.emit('movePaddle', { direction, lobbyId});
   };
 
   useEffect(() => {
@@ -76,7 +77,7 @@ const PongGame : React.FC = () => {
       window.removeEventListener('keydown', handleKeyPress);
       window.removeEventListener('keyup', handleKeyPress);
     };
-  }, [lobbyId]);
+  }, [lobbyId, gameEnd]);
 
   return (
     <div className="game">

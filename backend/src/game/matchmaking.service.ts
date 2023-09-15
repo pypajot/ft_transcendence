@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 
 const classicGameConfig: GameConfiguration = {
 	mode: GameMode.Classic,
-	ballSpeed: 2,
+	ballSpeed: 3,
 	ballSpeedIncreaseFactor: 1.1,
 	paddleWidth: 10,
 	paddleHeight: 100,
@@ -14,7 +14,7 @@ const classicGameConfig: GameConfiguration = {
 
 const partyGameConfig: GameConfiguration = {
 	mode: GameMode.Party,
-	ballSpeed: 2,
+	ballSpeed: 3,
 	ballSpeedIncreaseFactor: 1.1,
 	paddleWidth: 10,
 	paddleHeight: 100,
@@ -24,7 +24,7 @@ const partyGameConfig: GameConfiguration = {
 
 const hardcoreGameConfig: GameConfiguration = {
 	mode: GameMode.Hardcore,
-	ballSpeed: 3,
+	ballSpeed: 5,
 	ballSpeedIncreaseFactor: 1.3,
 	paddleWidth: 10,
 	paddleHeight: 50,

@@ -4,7 +4,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 400px;
+  width: 600px;
   height: 30px;
 }
 
@@ -15,8 +15,8 @@
 
 .game-board {
   position: relative;
-  width: 400px; /* 100% of the container's width */
-  padding-top: 300px; /* 75% of the container's width to set the aspect ratio (adjust as needed) */
+  width: 600px;
+  height: 450px;
   border: 3px solid whitesmoke;
   overflow: hidden;
 }
