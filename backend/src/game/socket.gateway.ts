@@ -44,7 +44,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('launchBall')
   handleLaunchGame(client: Socket, data: {lobbyId: string}): void {
     const { lobbyId } = data;
-    this.matchmakingService.gameService[lobbyId].launchBall();
+    this.matchmakingService.gameService[lobbyId].resetBall();
   }
 
   @SubscribeMessage('movePaddle')

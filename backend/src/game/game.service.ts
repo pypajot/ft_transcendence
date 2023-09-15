@@ -73,10 +73,6 @@ export class GameService {
     this.goalLimit = gameConfiguration.goalLimit;
   }
 
-  launchBall(): void {
-    this.ballSpeedXDirection = 1;
-    this.ballSpeedYDirection = 1;
-  }
   // Add a method to get the current game state, which will be sent to the clients via WebSocket.
   getGameState(): GameState {
     return {
@@ -140,26 +136,26 @@ export class GameService {
     // Check for scoring when the ball crosses the left or right boundary
     if (this.ballX - this.ballSize / 2 <= 0) {
       this.player2Score++;
-      this.resetBall(); // Reset the ball to the center
+      this.resetBall();
     }
     else if (this.ballX + this.ballSize / 2 >= this.gameWidth) {
       this.player1Score++;
-      this.resetBall(); // Reset the ball to the center
+      this.resetBall();
     }
   }
 
-  // Method to reset the ball to the center after scoring or at the start of the game
-  private resetBall(): void {
+  // resets and launches the ball after a goal or at the start of the game
+  resetBall(): void {
     this.ballX = this.gameWidth / 2;
     this.ballY = this.gameHeight / 2;
     this.ballSpeedX = this.gameConfiguration.ballSpeed; 
     this.ballSpeedY = this.gameConfiguration.ballSpeed;
-    this.ballSpeedXDirection = Math.random() > 0.5 ? 1 : -1; // Randomize the initial X-direction
-    this.ballSpeedYDirection = Math.random() > 0.5 ? 1 : -1; // Randomize the initial Y-direction
+    this.ballSpeedXDirection = Math.random() > 0.5 ? 1 : -1;
+    this.ballSpeedYDirection = Math.random() > 0.5 ? 1 : -1; 
   }
 }
 
-// Define an interface for the game state data that will be sent to the clients.
+// Interface definition for the game state data that will be sent to clients.
 export interface GameState {
   paddle1Y: number;
   paddle2Y: number;
