@@ -9,24 +9,23 @@ import { channelInfo } from 'src/types/channelInfo.entity';
 export class ChatControllerService {
   prisma = new PrismaClient();
 
-async findIdFromSocketId(socket_id:string){
-  try{
-    const user = await this.prisma.user.findMany({
-      where: {
-        socketId: socket_id
+  async findIdFromSocketId(socket_id: string) {
+    try {
+      const user = await this.prisma.user.findMany({
+        where: {
+          socketId: socket_id,
+        },
+      });
+      if (user) {
+        user.map((value) => {
+          return value.id;
+        });
       }
-    })
-    if (user){
-      user.map((value) => {
-        return (value.id)
-      })
+      return -1;
+    } catch (error) {
+      console.log(error);
     }
-    return (-1);
   }
-  catch(error){
-    console.log(error);
-  }
-}
   //Receive an event asking for messages
 
   async getFriendsList(user_name: string) {
@@ -76,8 +75,8 @@ async findIdFromSocketId(socket_id:string){
       console.log(`${sender.id}, ${receiver.id}`);
       const messages = await this.prisma.message.findMany({
         where: {
-          authorId: await this.findIdFromSocketId(sender.socketId),
-          targetId: await this.findIdFromSocketId(receiver.socketId),
+          authorId: (await this.findIdFromSocketId(sender.socketId))[0],
+          targetId: (await this.findIdFromSocketId(receiver.socketId))[0],
         },
       });
       return JSON.stringify(messages);
@@ -91,25 +90,41 @@ async findIdFromSocketId(socket_id:string){
 export class ChatGatewayService {
   private readonly logger = new Logger(ChatGatewayService.name);
 
-  async findIdFromSocketId(socket_id:string){
-    try{
+  prisma = new PrismaClient();
+
+  async findIdFromSocketId(socket_id: string) {
+    try {
+      console.log(` socket : ${socket_id} `);
       const user = await this.prisma.user.findMany({
         where: {
-          socketId: socket_id
-        }
-      })
-      if (user){
-        user.map((value) => {
-          return (value.id)
-        })
+          socketId: socket_id,
+        },
+      });
+      if (user) {
+        return user.map((value) => {
+          return value.id;
+        });
       }
-      return (-1);
-    }
-    catch(error){
+      return -1;
+    } catch (error) {
       console.log(error);
     }
   }
-  prisma = new PrismaClient();
+  async getSocketIdFromId(id: number) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: id,
+        },
+      });
+      if (user) {
+        return user.socketId;
+      }
+      return '';
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   findUserById(
     client_id: string,
@@ -146,15 +161,16 @@ export class ChatGatewayService {
           username: target,
         },
       });
-      console.log(await targetUser);
       const msg = await this.prisma.message.create({
         data: {
           content: message,
           author: {
-            connect: { id: await this.findIdFromSocketId(socket_id)},
+            connect: { id: (await this.findIdFromSocketId(socket_id))[0] },
           },
           target: {
-            connect: { id: await this.findIdFromSocketId(targetUser.socketId)},
+            connect: {
+              id: (await this.findIdFromSocketId(targetUser.socketId))[0],
+            },
           },
         },
       });
@@ -204,7 +220,7 @@ export class ChatGatewayService {
       });
       const user = await this.prisma.user.findUnique({
         where: {
-          id: await this.findIdFromSocketId(client_id),
+          id: (await this.findIdFromSocketId(client_id))[0],
         },
       });
       if (existingChannel) {
@@ -273,15 +289,18 @@ export class ChatGatewayService {
       console.log(`test : ${message.content}`);
       const msgRes: Message = await {
         id: message.id,
-        authorSocketId: message.authorSocketId,
-        targetSocketId: message.targetSocketId,
+        authorId: message.authorId,
+        targetId: message.targetId,
         sent: true,
         content: message.content,
         createdAt: message.createdAt,
       };
       io.to(socket_id).emit('messageSent', msgRes);
       msgRes.sent = false;
-      io.to(message.targetSocketId).emit('messageRcv', msgRes);
+      io.to(await this.getSocketIdFromId(message.targetId)).emit(
+        'messageRcv',
+        msgRes,
+      );
       this.logger.log(`Sent ${message.content}`);
     } catch (error) {
       console.log(error);
@@ -304,7 +323,7 @@ export class ChatGatewayService {
         data: {
           content: message,
           author: {
-            connect: { id: await this.findIdFromSocketId(socket_id) },
+            connect: { id: (await this.findIdFromSocketId(socket_id))[0] },
           },
           Channel: {
             connect: { id: existingChannel.id },

@@ -26,6 +26,7 @@ model User {
   twoFactorAuthActive Boolean @default(false)
   twoFactorAuthSecret String?
 
+  @@unique(id)
   @@map("users")
 }
 
