@@ -1,12 +1,9 @@
-import React from 'react';
-import logo from './logo.svg';
+import Navbar from '../../components/Navbar';
 
 const Home = () => {
 	return (
 		<>
-		<div className="App">
-
-		</div>
+		<Navbar/>
 		</>
 	);
 	

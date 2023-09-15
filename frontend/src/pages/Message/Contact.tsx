@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSocketContext } from "../../Context/socket-context";
+import { useSocketContext } from "../../context/WebSocketContext";
 import {
   Box,
   Button,
@@ -16,6 +16,7 @@ import {
 import { User } from "../../../public/Types/user.entity";
 import { ContactElement } from "./ContactElement";
 import { getFriendsList } from "./Hooks/GetFriendsList";
+import { useAuth } from "../../context/AuthContext";
 
 //Possible to have channel Or People
 
@@ -34,12 +35,13 @@ interface ContactProps {
 
 export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
   const [friends, setFriends] = useState<User[]>();
+
+    const {user} = useAuth();
   const getName = () => {
-    const name = localStorage.getItem("username");
-    if (!name) {
+    if (!user) {
       return "";
     } else {
-      return name;
+      return user.username;
     }
   };
 

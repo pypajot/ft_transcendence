@@ -1,0 +1,74 @@
+/* Game.css */
+
+.scores-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.score {
+  font-size: 20px; /* Adjust the font size as needed */
+  color: #fff; /* Text color */
+}
+
+.container {
+    position: relative;
+    width: 100%; /* 100% of the container's width */
+    padding-top: 75%; /* 75% of the container's width to set the aspect ratio (adjust as needed) */
+    border: 3px solid whitesmoke;
+    overflow: hidden;
+  }
+  
+  .ball {
+    position: absolute;
+    width: 2%;
+    height: 2%;
+    background-color: whitesmoke;
+    border-radius: 50%;
+  }
+  
+  .paddle {
+    position: absolute;
+    width: 1%;
+    height: 12%;
+  }
+  
+  .paddle1 {
+    left: 1%; /* Adjust paddle position as needed */
+    background-color: whitesmoke;
+  }
+  
+  .paddle2 {
+    right: 1%; /* Adjust paddle position as needed */
+    background-color: whitesmoke;
+  }
+
+  .gameEnd {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    z-index: 10;
+  }
+
+  .countdown, .go-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 5rem;
+    z-index: 10;
+    animation: fadeOut 3s forwards;
+  }
+  
+  .go-message {
+    animation: fadeOut 1s forwards;
+  }
+  
+  @keyframes fadeOut {
+    to {
+      opacity: 0;
+    }
+  }

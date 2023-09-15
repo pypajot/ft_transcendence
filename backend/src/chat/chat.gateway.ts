@@ -12,7 +12,7 @@ import { ServerToClientEvents } from 'src/types/events';
 import { ChatGatewayService } from './chat.service';
 import { channelInfo } from 'src/types/channelInfo.entity';
 
-@WebSocketGateway({ cors: '*', namespace: 'chat' })
+@WebSocketGateway({ cors: '*' })
 class ChatGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {

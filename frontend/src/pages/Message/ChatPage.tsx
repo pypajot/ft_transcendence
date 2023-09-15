@@ -3,7 +3,6 @@ import MessageInput from "./MessageInput";
 import Messages from "./Messages";
 import LittleMessage from "./LittleMessage";
 import MessageTarget from "./MessageTarget";
-import { useSocketContext } from "../../Context/socket-context";
 import { ChannelComponent } from "./ChannelComponent";
 import { Conversation } from "./Conversation";
 import {
@@ -20,6 +19,7 @@ import { Contact } from "./Contact";
 import Popup from "reactjs-popup";
 import { TopbarMenu } from "./TopMenu";
 import { MoreIcon } from "@twilio-paste/icons/esm/MoreIcon";
+import { useSocketContext } from "../../context/WebSocketContext";
 
 //Access Username by global cookies or something ?
 

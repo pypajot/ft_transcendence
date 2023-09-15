@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
@@ -12,30 +9,36 @@ datasource db {
 }
 
 model User {
-  username        String
+  username        String    @unique
   id              Int       @id @default(autoincrement())
-  password        String
-  friends         Number[]
-  socketId        String
+  hash            String?
+  intralogin      String?   @unique
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  friends         Int[]
+  socketId        String?
   channels        Channel[] @relation("Memberships")
   messagesSent    Message[] @relation("Author")
   messageReceived Message[] @relation("Target")
 
-  @@unique([username])
-  @@unique([socketId])
-  @@unique([id])
+  tokens UserToken[]
+
+  twoFactorAuthActive Boolean @default(false)
+  twoFactorAuthSecret String?
+
+  @@map("users")
 }
 
 model Message {
-  id             Int      @id @default(autoincrement())
-  content        String
-  author         User     @relation("Author", fields: [authorSocketId], references: [socketId])
-  target         User?    @relation("Target", fields: [targetSocketId], references: [socketId])
-  createdAt      DateTime @default(now())
-  targetSocketId String?
-  authorSocketId String
-  Channel        Channel? @relation(fields: [channelId], references: [id])
-  channelId      Int?
+  id        Int      @id @default(autoincrement())
+  content   String
+  author    User     @relation("Author", fields: [authorId], references: [id])
+  target    User?    @relation("Target", fields: [targetId], references: [id])
+  createdAt DateTime @default(now())
+  targetId  Int?
+  authorId  Int
+  Channel   Channel? @relation(fields: [channelId], references: [id])
+  channelId Int?
 }
 
 model Channel {
@@ -51,4 +54,15 @@ model Channel {
   @@unique([id])
 }
 
-//@@map("") to rename the model
+model UserToken {
+  id String @id @default(uuid())
+
+  user   User @relation(fields: [UserId], references: [id], onDelete: Cascade)
+  UserId Int
+
+  refreshToken String
+  family       String   @unique
+  createdAt    DateTime @default(now())
+
+  @@map("usertokens")
+}

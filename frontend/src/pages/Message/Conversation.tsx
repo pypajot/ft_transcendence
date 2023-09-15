@@ -11,7 +11,8 @@ import getMesageReceived from "./Hooks/GetUserMessageReceived";
 import getMessageSent from "./Hooks/GetUserMessageSent";
 import { Message } from "../../../public/Types/message.entity";
 import { BasicInMessage, BasicOutMessage } from "./BasicMessage";
-import { useSocketContext } from "../../Context/socket-context";
+import { useSocketContext } from "../../context/WebSocketContext";
+import { useAuth } from "../../context/AuthContext";
 
 const sortByDate = () => {
   return function (a: any, b: any) {
@@ -26,17 +27,26 @@ const sortByDate = () => {
 
 export const Conversation = ({ contact }: { contact: string }) => {
   const [content, setContent] = useState<string>("A basic chat composer");
-  const user = localStorage.getItem("username");
+  const {user} = useAuth();
   const [sentMessage, setSentMessage] = useState<Message[]>();
   const [receivedMessage, setReceivedMessage] = useState<Message[]>();
   const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
 
   //Make a component to get the previous messsage
   const socket = useSocketContext();
+
+  const getName = () => {
+    if (!user) {
+      return "";
+    } else {
+      return user.username;
+    }
+  };
+
   useEffect(() => {
     console.log(`Helllo ${contact}`);
     if (contact) {
-      getMesageReceived({ sender: contact, receiver: user }).then((res) => {
+      getMesageReceived({ sender: contact, receiver: getName() }).then((res) => {
         setReceivedMessage(res);
       });
     }
@@ -44,7 +54,7 @@ export const Conversation = ({ contact }: { contact: string }) => {
 
   useEffect(() => {
     if (contact) {
-      getMessageSent({ sender: user, receiver: contact }).then((res) => {
+      getMessageSent({ sender: getName(), receiver: contact }).then((res) => {
         setSentMessage(res);
       });
     }

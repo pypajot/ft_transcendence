@@ -14,7 +14,7 @@ import {
   StatusBadge,
 } from "@twilio-paste/core";
 import { useEffect, useState } from "react";
-import { useSocketContext } from "../../Context/socket-context";
+import { useSocketContext } from "../../context/WebSocketContext";
 
 const getChannelType: any = (type: string | undefined) => {
   if (type) {

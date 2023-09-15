@@ -9,13 +9,15 @@ import {
   useUserDialogListState,
 } from "@twilio-paste/core";
 import { CreateNewConversation } from "./CreateNewConversation";
+import { useAuth } from "../../context/AuthContext";
 
 export const TopbarMenu = () => {
   const userDialogList = useUserDialogListState();
+
+  const {user} = useAuth();
   const getName = () => {
-    const tmp = localStorage.getItem("username");
-    if (tmp) {
-      return tmp;
+    if (user) {
+      return user.username;
     } else {
       return "dude";
     }
