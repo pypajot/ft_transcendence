@@ -31,8 +31,6 @@ const PongGame : React.FC = () => {
 
     // Set up WebSocket event listener to receive the game state from the server
     socket?.on('gameState', (data) => {
-      // convert the game state to a JS object
-      data = JSON.parse(data);
       // update the game state
       setGameState(data);
     },);
@@ -43,6 +41,7 @@ const PongGame : React.FC = () => {
       setShowBall(false);
       if (data === socket?.id) {
         setGameEndMessage('You win!');
+        console.log('LobbyId: ', lobbyId);
         setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
       }
       else {
@@ -55,7 +54,7 @@ const PongGame : React.FC = () => {
       socket?.off('gameState');
       socket?.off('gameEnd');
     };
-  }, []);
+  }, [lobbyId]);
 
   // Other game logic and rendering based on the received gameState
 

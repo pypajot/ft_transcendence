@@ -32,11 +32,10 @@ export class GameService {
   private ballSpeedY: number; // Ball movement speed along the Y-axis
   public player1Score: number;
   public player2Score: number;
-  private winner: string = '';
 
   // Properties for the game physics
-  private readonly gameWidth: number = 800;
-  private readonly gameHeight: number = 600;
+  private readonly gameWidth: number = 400;
+  private readonly gameHeight: number = 300;
   private readonly ballSize: number = 10;
   private ballSpeedXDirection: number = 0; // Ball movement direction along the X-axis (1 or -1)
   private ballSpeedYDirection: number = 0; // Ball movement direction along the Y-axis (1 or -1)
@@ -59,10 +58,10 @@ export class GameService {
     this.gameConfiguration = gameConfiguration;
     this.player1 = Player1;
     this.player2 = Player2;
-    this.paddle1Y = 250; // Set initial Y position for paddle 1 (Player 1)
-    this.paddle2Y = 250; // Set initial Y position for paddle 2 (Player 2)
-    this.ballX = 400; // Set initial X position for the ball
-    this.ballY = 300; // Set initial Y position for the ball
+    this.paddle1Y = this.gameHeight / 2; // Set initial Y position for paddle 1 (Player 1)
+    this.paddle2Y = this.gameHeight / 2; // Set initial Y position for paddle 2 (Player 2)
+    this.ballX = this.gameWidth / 2; // Set initial X position for the ball
+    this.ballY = this.gameHeight / 2; // Set initial Y position for the ball
     this.ballSpeedX = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the X-axis
     this.ballSpeedY = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the Y-axis
     this.ballSpeedIncreaseFactor = gameConfiguration.ballSpeedIncreaseFactor;
@@ -81,8 +80,6 @@ export class GameService {
   // Add a method to get the current game state, which will be sent to the clients via WebSocket.
   getGameState(): GameState {
     return {
-      player1: this.player1,
-      player2: this.player2,
       paddle1Y: this.paddle1Y,
       paddle2Y: this.paddle2Y,
       ballX: this.ballX,
@@ -107,11 +104,11 @@ export class GameService {
   }
   movePaddleDown(clientId: string): void {
     if (clientId === this.player1.id) {
-      if (this.paddle1Y <= this.gameHeight - this.paddleHeight - 10)
+      if (this.paddle1Y <= this.gameHeight - this.paddleHeight - (this.gameHeight / 50))
         this.paddle1Y += this.paddleMoveSpeed;
     } 
     else if (clientId === this.player2.id) {
-      if (this.paddle2Y <= this.gameHeight - this.paddleHeight - 10)
+      if (this.paddle2Y <= this.gameHeight - this.paddleHeight - (this.gameHeight / 50))
         this.paddle2Y += this.paddleMoveSpeed;
     }
   }
@@ -164,8 +161,6 @@ export class GameService {
 
 // Define an interface for the game state data that will be sent to the clients.
 export interface GameState {
-  player1: Socket;
-  player2: Socket;
   paddle1Y: number;
   paddle2Y: number;
   ballX: number;

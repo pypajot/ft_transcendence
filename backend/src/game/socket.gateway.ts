@@ -73,20 +73,18 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         gameState = this.matchmakingService.gameService[lobbyId]?.getGameState(); // Get the updated game state
         // check for game end
         if (this.matchmakingService.gameService[lobbyId]?.player1Score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
-          console.log('IF player' + this.matchmakingService.gameService[lobbyId]?.player1.id + ' wins');
+          //console.log('IF player' + this.matchmakingService.gameService[lobbyId]?.player1.id + ' wins');
           client.emit('gameEnd', this.matchmakingService.gameService[lobbyId]?.player1.id);
           // stop the loop
           clearInterval(interval);
         }
         else if (this.matchmakingService.gameService[lobbyId]?.player2Score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
-          console.log('ELSEIF player' + this.matchmakingService.gameService[lobbyId]?.player1.id + ' wins');
+          //console.log('ELSEIF player' + this.matchmakingService.gameService[lobbyId]?.player1.id + ' wins');
           client.emit('gameEnd', this.matchmakingService.gameService[lobbyId]?.player2.id);
           clearInterval(interval);
         }
-        // convert the gameState to a string
-        const gameStateString = jsonc.stringify(gameState);
         // Send the game state to the client
-        client.emit('gameState', gameStateString);
+        client.emit('gameState', gameState);
       }, 50);
     }
   }
