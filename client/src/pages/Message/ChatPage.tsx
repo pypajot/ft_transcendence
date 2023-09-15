@@ -60,7 +60,7 @@ const ChatComponent = () => {
             padding="space40"
             width="100%"
           >
-            <Contact setConversation={setContact} contact={contact} />
+            <Contact setConversation={setContact} />
           </Box>
         </Flex>
         <Flex grow>

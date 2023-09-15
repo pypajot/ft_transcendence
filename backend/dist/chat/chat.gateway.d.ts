@@ -2,6 +2,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs
 import { Server } from 'socket.io';
 import { ServerToClientEvents } from 'src/types/events';
 import { ChatGatewayService } from './chat.service';
+import { channelInfo } from 'src/types/channelInfo.entity';
 declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     private readonly chatService;
     id: number;
@@ -16,5 +17,6 @@ declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, O
     handleEvent(client: any, data: string[]): Promise<void>;
     handleChannelJoining(client: any, data: string): void;
     handleChannelMessage(client: any, data: string[]): void;
+    handleChannelCreation(client: any, data: channelInfo): void;
 }
 export default ChatGateway;

@@ -139,41 +139,39 @@ let ChatGatewayService = exports.ChatGatewayService = ChatGatewayService_1 = cla
     sendMessage(io, message) {
         io.emit('message', message);
     }
-    async newMember(client, channelName) {
-        const socket_id = client.id;
+    async channelCreation(io, data_chan, client_id, client) {
         try {
+            let public_chan = false;
+            if (data_chan.type == 'public') {
+                public_chan = true;
+            }
             const existingChannel = await this.prisma.channel.findUnique({
                 where: {
-                    name: channelName,
+                    name: data_chan.name,
                 },
             });
             const user = await this.prisma.user.findUnique({
                 where: {
-                    socketId: socket_id,
+                    socketId: client_id,
                 },
             });
             if (existingChannel) {
-                const newUserChannel = await this.prisma.channel.update({
-                    where: {
-                        name: channelName,
-                    },
-                    data: {
-                        members: { connect: { id: user.id } },
-                    },
-                });
-                client.join(channelName);
+                io.to(client_id).emit('channelNameTaken');
+                return;
             }
             else {
                 const newchannel = await this.prisma.channel.create({
                     data: {
-                        name: channelName,
+                        name: data_chan.name,
                         creator: user.username,
                         members: {
                             connect: { id: user.id },
                         },
+                        public: public_chan,
+                        password: data_chan.pwd,
                     },
                 });
-                client.join(channelName);
+                client.join(data_chan.name);
             }
         }
         catch (error) {

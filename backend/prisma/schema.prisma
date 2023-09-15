@@ -13,13 +13,13 @@ datasource db {
 
 model User {
   username        String
-  id              Int           @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
   password        String
-  friends         String[]
+  friends         Number[]
   socketId        String
-  channels        Channel[]     @relation("Memberships")
-  messagesSent    Message[]     @relation("Author")
-  messageReceived Message[]     @relation("Target")
+  channels        Channel[] @relation("Memberships")
+  messagesSent    Message[] @relation("Author")
+  messageReceived Message[] @relation("Target")
 
   @@unique([username])
   @@unique([socketId])
@@ -30,7 +30,7 @@ model Message {
   id             Int      @id @default(autoincrement())
   content        String
   author         User     @relation("Author", fields: [authorSocketId], references: [socketId])
-  target         User?   @relation("Target", fields: [targetSocketId], references: [socketId])
+  target         User?    @relation("Target", fields: [targetSocketId], references: [socketId])
   createdAt      DateTime @default(now())
   targetSocketId String?
   authorSocketId String
@@ -39,11 +39,13 @@ model Message {
 }
 
 model Channel {
-  id          Int           @id @default(autoincrement())
-  name        String
-  messages    Message[]
-  members     User[]        @relation("Memberships")
-  creator     String
+  id       Int       @id @default(autoincrement())
+  name     String
+  public   Boolean
+  password String?
+  messages Message[]
+  members  User[]    @relation("Memberships")
+  creator  String
 
   @@unique([name])
   @@unique([id])

@@ -30,13 +30,9 @@ import { getFriendsList } from "./Hooks/GetFriendsList";
 
 interface ContactProps {
   setConversation: (val: string) => void;
-  contact: string;
 }
 
-export const Contact: React.FC<ContactProps> = ({
-  setConversation,
-  contact,
-}) => {
+export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
   const [friends, setFriends] = useState<User[]>();
   const getName = () => {
     const name = localStorage.getItem("username");
@@ -46,6 +42,11 @@ export const Contact: React.FC<ContactProps> = ({
       return name;
     }
   };
+
+  //Request the back (Should Get all Message from a certain User)
+  //Then check on all message to list all conversation / Channel Or nOt
+  //If not channel then link to the user
+  //Return a list of string Channel And User
 
   useEffect(() => {
     getFriendsList(getName()).then((res: User[]) => {

@@ -3,6 +3,7 @@ import { Message } from 'src/types/message.entity';
 import { Server } from 'socket.io';
 import { Client_elem } from 'src/types/client.entity';
 import { PrismaClient } from '@prisma/client';
+import { channelInfo } from 'src/types/channelInfo.entity';
 
 @Injectable()
 export class ChatControllerService {
@@ -147,6 +148,49 @@ export class ChatGatewayService {
     io.emit('message', message);
   }
 
+  async channelCreation(
+    io: Server,
+    data_chan: channelInfo,
+    client_id: string,
+    client: any,
+  ) {
+    try {
+      let public_chan = false;
+      if (data_chan.type == 'public') {
+        public_chan = true;
+      }
+      const existingChannel = await this.prisma.channel.findUnique({
+        where: {
+          name: data_chan.name,
+        },
+      });
+      const user = await this.prisma.user.findUnique({
+        where: {
+          socketId: client_id,
+        },
+      });
+      if (existingChannel) {
+        io.to(client_id).emit('channelNameTaken');
+        return;
+      } else {
+        const newchannel = await this.prisma.channel.create({
+          data: {
+            name: data_chan.name,
+            creator: user.username,
+            members: {
+              connect: { id: user.id },
+            },
+            public: public_chan,
+            password: data_chan.pwd,
+          },
+        });
+        client.join(data_chan.name);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  /*
   async newMember(client: any, channelName: string) {
     const socket_id = client.id;
     try {
@@ -185,7 +229,7 @@ export class ChatGatewayService {
     } catch (error) {
       console.log(error);
     }
-  }
+  }*/
   async sendTo(io: Server, message: any, socket_id: string) {
     try {
       console.log(`test : ${message.content}`);

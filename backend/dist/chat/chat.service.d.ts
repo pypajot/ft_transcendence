@@ -2,6 +2,7 @@ import { Message } from 'src/types/message.entity';
 import { Server } from 'socket.io';
 import { Client_elem } from 'src/types/client.entity';
 import { PrismaClient } from '@prisma/client';
+import { channelInfo } from 'src/types/channelInfo.entity';
 export declare class ChatControllerService {
     prisma: PrismaClient<import(".prisma/client").Prisma.PrismaClientOptions, never, import("@prisma/client/runtime/library").DefaultArgs>;
     getFriendsList(user_name: string): Promise<{
@@ -29,7 +30,7 @@ export declare class ChatGatewayService {
     }>;
     new_cli(client: any, name: string): Promise<void>;
     sendMessage(io: Server, message: Message): void;
-    newMember(client: any, channelName: string): Promise<void>;
+    channelCreation(io: Server, data_chan: channelInfo, client_id: string, client: any): Promise<void>;
     sendTo(io: Server, message: any, socket_id: string): Promise<void>;
     sendToChannel(io: Server, channel: string, message: string, socket_id: string): Promise<void>;
 }

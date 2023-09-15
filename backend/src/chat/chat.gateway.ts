@@ -10,6 +10,7 @@ import {
 import { Server } from 'socket.io';
 import { ServerToClientEvents } from 'src/types/events';
 import { ChatGatewayService } from './chat.service';
+import { channelInfo } from 'src/types/channelInfo.entity';
 
 @WebSocketGateway({ cors: '*', namespace: 'chat' })
 class ChatGateway
@@ -48,13 +49,17 @@ class ChatGateway
 
   @SubscribeMessage('JoinChannel')
   handleChannelJoining(client: any, data: string): void {
-    this.chatService.newMember(client, data);
+    //   this.chatService.newMember(client, data);
   }
 
   @SubscribeMessage('ChannelMessage')
   handleChannelMessage(client: any, data: string[]): void {
     console.log(`${data[0]}, ${data[1]}`);
     this.chatService.sendToChannel(this.io, data[0], data[1], client.id);
+  }
+  @SubscribeMessage('ChannelCreation')
+  handleChannelCreation(client: any, data: channelInfo): void {
+    this.chatService.channelCreation(this.io, data, client.id, client);
   }
 }
 
