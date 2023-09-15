@@ -8,7 +8,7 @@ import { Player } from './Player';
 @WebSocketGateway({
 	cors: true,
 })
-export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly matchmakingService: MatchmakingService) {}
 
   handleConnection(client: Socket, ...args: any[]): void {

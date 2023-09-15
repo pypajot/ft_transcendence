@@ -1,19 +1,9 @@
+import { useAuth } from '../../context/AuthContext';
 import './Signup.css';
 
 const Signup = () => {
 
-	// const [user, setUser] = useState<UserDTO>();
-
-
-	// useEffect(() => {
-	// 	async function FetchUser() {
-	// 		const response = await UserAPI.getUser();
-	// 		console.log(response);
-	// 		setUser(response);
-	// 	}
-
-	// 	FetchUser();
-	// }, []);
+	const { setAccessToken } = useAuth();
 
 	async function HandleSubmit(e: any)
 	{
@@ -27,12 +17,16 @@ const Signup = () => {
 				"password": formData.get('password')
 		}
 		const body = JSON.stringify(formBody);
-		// alert(JSON.stringify(formBody));
-		await fetch('http://localhost:3333/auth/signup', {
+		const response = await fetch('http://localhost:3333/auth/signup', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: body,
-		})
+			credentials: 'include',
+		});
+		if (response.status !== 201)
+			return ;
+		sessionStorage.setItem('access_token', (await response.json()).access_token);
+		setAccessToken(sessionStorage.getItem('access_token'));
 	}
 
 	return (
@@ -49,7 +43,7 @@ const Signup = () => {
 					</div>
 					<div>
 						<label>
-							Password: <input type="text" name="password" />
+							Password: <input type="password" name="password" />
 						</label>
 					</div>
 					<div>
