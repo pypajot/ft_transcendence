@@ -36,7 +36,7 @@ export class GameService {
   // Properties for the game physics
   private readonly gameWidth: number = 600;
   private readonly gameHeight: number = 450;
-  private readonly ballSize: number = 10;
+  private readonly ballSize: number = 12;
   private ballSpeedXDirection: number = 0; // Ball movement direction along the X-axis (1 or -1)
   private ballSpeedYDirection: number = 0; // Ball movement direction along the Y-axis (1 or -1)
   private ballSpeedIncreaseFactor: number;
@@ -58,8 +58,10 @@ export class GameService {
     this.gameConfiguration = gameConfiguration;
     this.player1 = Player1;
     this.player2 = Player2;
-    this.paddle1Y = this.gameHeight / 2; // Set initial Y position for paddle 1 (Player 1)
-    this.paddle2Y = this.gameHeight / 2; // Set initial Y position for paddle 2 (Player 2)
+    this.paddleWidth = gameConfiguration.paddleWidth;
+    this.paddleHeight = gameConfiguration.paddleHeight;
+    this.paddle1Y = (this.gameHeight / 2) - (this.paddleHeight / 2); // Set initial Y position for paddle 1 (Player 1)
+    this.paddle2Y = (this.gameHeight / 2) - (this.paddleHeight / 2); // Set initial Y position for paddle 2 (Player 2)
     this.ballX = this.gameWidth / 2; // Set initial X position for the ball
     this.ballY = this.gameHeight / 2; // Set initial Y position for the ball
     this.ballSpeedX = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the X-axis
@@ -67,8 +69,6 @@ export class GameService {
     this.ballSpeedIncreaseFactor = gameConfiguration.ballSpeedIncreaseFactor;
     this.player1Score = 0;
     this.player2Score = 0;
-    this.paddleWidth = gameConfiguration.paddleWidth;
-    this.paddleHeight = gameConfiguration.paddleHeight;
     this.paddleMoveSpeed = gameConfiguration.paddleMoveSpeed;
     this.goalLimit = gameConfiguration.goalLimit;
   }
@@ -90,21 +90,21 @@ export class GameService {
   // Methods to move the paddles up and down
   movePaddleUp(clientId: string): void {
     if (clientId === this.player1.id) {
-      if (this.paddle1Y >= this.paddleMoveSpeed + (this.gameHeight / 50)) // prevents paddle from going off screen
+      if (this.paddle1Y >= this.paddleMoveSpeed) // prevents paddle from going off screen
         this.paddle1Y -= this.paddleMoveSpeed;
     }
     else if (clientId === this.player2.id) {
-      if (this.paddle2Y >= this.paddleMoveSpeed + (this.gameHeight / 50))
+      if (this.paddle2Y >= this.paddleMoveSpeed)
         this.paddle2Y -= this.paddleMoveSpeed;
     }
   }
   movePaddleDown(clientId: string): void {
     if (clientId === this.player1.id) {
-      if (this.paddle1Y <= (this.gameHeight - this.paddleMoveSpeed - this.paddleHeight))
+      if (this.paddle1Y <= (this.gameHeight - this.paddleHeight - this.paddleMoveSpeed))
         this.paddle1Y += this.paddleMoveSpeed;
     } 
     else if (clientId === this.player2.id) {
-      if (this.paddle2Y <= (this.gameHeight - this.paddleMoveSpeed - this.paddleHeight))
+      if (this.paddle2Y <= (this.gameHeight - this.paddleHeight - this.paddleMoveSpeed))
         this.paddle2Y += this.paddleMoveSpeed;
     }
   }
@@ -124,14 +124,13 @@ export class GameService {
       // Reverse the X-direction and increase the ball speed after hitting a paddle
       this.ballSpeedXDirection *= -1;
       this.ballSpeedX *= this.ballSpeedIncreaseFactor;
-      this.ballSpeedY *= this.ballSpeedIncreaseFactor;
     }
     // Check for scoring when the ball crosses the left or right boundary
-    if (this.ballX - this.ballSize / 2 <= 0) {
+    if (this.ballX <= 0) {
       this.player2Score++;
       this.resetBall();
     }
-    else if (this.ballX + this.ballSize / 2 >= this.gameWidth) {
+    else if (this.ballX + this.ballSize >= this.gameWidth) {
       this.player1Score++;
       this.resetBall();
     }

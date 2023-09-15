@@ -7,7 +7,7 @@ const classicGameConfig: GameConfiguration = {
 	ballSpeed: 3,
 	ballSpeedIncreaseFactor: 1.1,
 	paddleWidth: 10,
-	paddleHeight: 100,
+	paddleHeight: 50,
 	paddleMoveSpeed: 15,
 	goalLimit: 5,
 };
@@ -17,7 +17,7 @@ const partyGameConfig: GameConfiguration = {
 	ballSpeed: 3,
 	ballSpeedIncreaseFactor: 1.1,
 	paddleWidth: 10,
-	paddleHeight: 100,
+	paddleHeight: 50,
 	paddleMoveSpeed: 20,
 	goalLimit: 5,
 };
