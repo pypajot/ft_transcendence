@@ -35,8 +35,10 @@ interface ContactProps {
 
 export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
   const [friends, setFriends] = useState<User[]>();
+  const [username, setUsername] = useState<string>("");
 
-    const {user} = useAuth();
+  const { user } = useAuth();
+
   const getName = () => {
     if (!user) {
       return "";
@@ -45,21 +47,32 @@ export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
     }
   };
 
+  useEffect(() => {
+    const res = getName();
+
+    if (res == "") {
+      return;
+    } else {
+      setUsername(res);
+    }
+  }, [user]);
+
   //Request the back (Should Get all Message from a certain User)
   //Then check on all message to list all conversation / Channel Or nOt
   //If not channel then link to the user
   //Return a list of string Channel And User
 
   useEffect(() => {
-    getFriendsList(getName()).then((res: User[]) => {
+    getFriendsList(username).then((res: User[]) => {
       console.log(res);
       setFriends(res);
     });
-  }, []);
+  }, [username]);
   //Ask the back for the userList
   return (
     <>
-      {friends != undefined &&
+      {username &&
+        friends != undefined &&
         friends.map(function (user, i) {
           return (
             <div key={i}>

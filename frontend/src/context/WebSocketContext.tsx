@@ -7,7 +7,6 @@ type WebContext = {
   io: Socket;
 };
 
-console.log(newSocket.io.connected);
 type SocketContextProviderProps = {
   children: React.ReactNode;
 };
@@ -18,9 +17,6 @@ export default function SocketContextProvider(
   props: SocketContextProviderProps
 ) {
   const [socket, setSocket] = useState<WebContext>({} as WebContext);
-  const { user } = useAuth();
-
-  const [socket, setSocket] = useState<WebContext>({} as WebContext);
   const { user, logout } = useAuth();
 
   useEffect(() => {
@@ -30,6 +26,7 @@ export default function SocketContextProvider(
           reconnectionAttempts: 1,
           query: {
             token: sessionStorage.getItem("access_token"),
+            username: user?.username,
           },
         }),
       };
@@ -72,7 +69,8 @@ export default function SocketContextProvider(
     };
     if (!user) return;
     refreshSocket();
-  }, [user && user.id]);
+  }, [user]);
+  const value = useMemo(() => socket, [socket]);
 
   return (
     <SocketContext.Provider value={value}>

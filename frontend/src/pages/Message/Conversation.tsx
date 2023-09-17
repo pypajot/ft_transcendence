@@ -27,7 +27,7 @@ const sortByDate = () => {
 
 export const Conversation = ({ contact }: { contact: string }) => {
   const [content, setContent] = useState<string>("A basic chat composer");
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [sentMessage, setSentMessage] = useState<Message[]>();
   const [receivedMessage, setReceivedMessage] = useState<Message[]>();
   const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
@@ -46,9 +46,11 @@ export const Conversation = ({ contact }: { contact: string }) => {
   useEffect(() => {
     console.log(`Helllo ${contact}`);
     if (contact) {
-      getMesageReceived({ sender: contact, receiver: getName() }).then((res) => {
-        setReceivedMessage(res);
-      });
+      getMesageReceived({ sender: contact, receiver: getName() }).then(
+        (res) => {
+          setReceivedMessage(res);
+        }
+      );
     }
   }, [contact]);
 
@@ -88,6 +90,9 @@ export const Conversation = ({ contact }: { contact: string }) => {
 
   const messageListener = (message: Message) => {
     console.log(message);
+    if (message.senderName != contact) {
+      return;
+    }
     setConversationMsg([...conversationMsg, message]);
   };
 

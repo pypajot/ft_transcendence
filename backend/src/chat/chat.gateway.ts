@@ -26,7 +26,7 @@ class ChatGateway
     this.logger.log('Websocket Initialized\n');
   }
   async handleConnection(client: any, ...args: any[]) {
-    console.log(`New Connection Sokcet" ${client.handshake.query.username}`);
+    console.log(`New Connection Socket" ${client.handshake.query.username}`);
     if (client.handshake.query.username !== 'null') {
       this.username = client.handshake.query.username;
       this.chatService.new_cli(client, client.handshake.query.username);
@@ -34,10 +34,12 @@ class ChatGateway
     this.logger.log(
       `Client ${client.id} ${client.handshake.query.username} arrived`,
     );
+    client.emit('connection');
   }
   handleDisconnect(client: any) {
     //Remove the client.id and the username
     this.logger.log(`Client ${client.id} left`);
+    client.emit('disconnection');
   }
   @SubscribeMessage('message')
   async handleEvent(client: any, data: string[]): Promise<void> {

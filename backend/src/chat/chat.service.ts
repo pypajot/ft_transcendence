@@ -29,6 +29,7 @@ export class ChatControllerService {
   //Receive an event asking for messages
 
   async getFriendsList(user_name: string) {
+    console.log(user_name);
     try {
       const friendsList = await this.prisma.user.findMany({
         where: {
@@ -72,11 +73,11 @@ export class ChatControllerService {
 
   async getMessages(sender: any, receiver: any) {
     try {
-      console.log(`${sender.id}, ${receiver.id}`);
+      console.log(`Hello ${sender.id}, ${receiver.id}`);
       const messages = await this.prisma.message.findMany({
         where: {
-          authorId: (await this.findIdFromSocketId(sender.socketId))[0],
-          targetId: (await this.findIdFromSocketId(receiver.socketId))[0],
+          authorId: sender.id,
+          targetId: receiver.id,
         },
       });
       return JSON.stringify(messages);
@@ -287,10 +288,16 @@ export class ChatGatewayService {
   async sendTo(io: Server, message: any, socket_id: string) {
     try {
       console.log(`test : ${message.content}`);
+      const sender = await this.prisma.user.findUnique({
+        where: {
+          id: (await this.findIdFromSocketId(socket_id))[0],
+        },
+      });
       const msgRes: Message = await {
         id: message.id,
         authorId: message.authorId,
         targetId: message.targetId,
+        senderName: sender.username,
         sent: true,
         content: message.content,
         createdAt: message.createdAt,

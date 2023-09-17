@@ -4,5 +4,6 @@ export interface Message {
   createdAt: Date;
   authorId: string;
   targetId: string;
+  senderName: string;
   sent: boolean;
 }
