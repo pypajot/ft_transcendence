@@ -6,7 +6,7 @@ function Landing() {
 	return (
 		<>
 			<div className="logo-home">
-			<a><img src="https://i.imgur.com/4tQ09J4.gif" title="source: imgur.com" /></a>
+			<a><img src="https://i.imgur.com/4tQ09J4.gif"/></a>
 			</div>
 			<div className="log">
 				<div className="display-button1">

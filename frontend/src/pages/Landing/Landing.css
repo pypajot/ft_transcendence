@@ -13,7 +13,7 @@
 .button1{
     font-size: 18px;
     color: white;
-    border: 4px solid #775d85;
+    border: 3px solid #775d85;
     border-radius:30px;
     padding: 5px 20px;
     cursor: pointer;
@@ -31,7 +31,7 @@
 .button2{
     font-size: 18px;
     color: white;
-    border: 4px solid #775d85;
+    border: 3px solid #775d85;
     border-radius:30px;
     padding: 5px 20px;
     cursor: pointer;

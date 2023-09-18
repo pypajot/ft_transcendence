@@ -43,33 +43,35 @@ function Login() {
 
 	return (
 		<>
-			<div>
-				<h1>Login Form</h1>
+			<div className='login-form'>
+				<a><img src="https://i.imgur.com/t5Ytt5L.png"/></a>
 			</div>
 			<div>
 				<form onSubmit={HandleSubmit}>
 					<div>
-						<label>
-							Username: <input type="text" name="username" />
-						</label>
+						<div className='username'>
+							<label>
+								<input type="text" name="username" className='user-input' placeholder="Username"/>
+							</label>
+						</div>
+						<div>
+							<label>
+								<input type="password" name="password" className='user-input' placeholder="Password"/>
+							</label>
+						</div>
 					</div>
-					<div>
-						<label>
-							Password: <input type="password" name="password" />
-						</label>
-					</div>
-					<div>
-						<button type="submit">
+					<div className='submit'>
+						<button type="submit" className="submit-button">
 							Submit
 						</button>
 					</div>
 				</form>
 			</div>
-			<div>
+			<div className='register'>
 				Don't have an account ?
 			</div>
 			<Link to='/signup'>
-				<button>
+				<button className='register-button'>
 					Register here
 				</button>
 			</Link>
