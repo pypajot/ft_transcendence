@@ -1,16 +1,11 @@
 .login-form{
 	padding-bottom: 6%;
+    display: flex;
+    justify-content: center;
 }
 
 .username{
 	padding-bottom: 2%;
-}
-
-.user-title{
-	display: flex;
-	justify-content: center;
-	margin-right: 90px;
-	margin-bottom: -10px;
 }
 
 .user-input{
@@ -23,7 +18,7 @@
 }
 
 .submit{
-	padding-top: 3%;
+	padding-top: 5%;
 }
 
 .submit-button{

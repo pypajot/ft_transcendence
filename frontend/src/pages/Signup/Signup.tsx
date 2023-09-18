@@ -31,23 +31,25 @@ const Signup = () => {
 
 	return (
 		<>
-			<div>
-				<h1>Signup Form</h1>
+			<div className='signup-form'>
+				<a><img src="https://i.imgur.com/5zfcg9C.png"/></a>
 			</div>
 			<div>
 				<form onSubmit={HandleSubmit}>
 					<div>
-						<label>
-							Username: <input type="text" name="username" />
-						</label>
+						<div className='username'>
+							<label>
+								<input type="text" name="username" className='user-input' placeholder="username"/>
+							</label>
+						</div>
+						<div>
+							<label>
+								<input type="password" name="password" className='user-input' placeholder="password"/>
+							</label>
+						</div>
 					</div>
-					<div>
-						<label>
-							Password: <input type="password" name="password" />
-						</label>
-					</div>
-					<div>
-						<button type="submit">
+					<div className='submit'>
+						<button type="submit" className="submit-button">
 							Submit
 						</button>
 					</div>

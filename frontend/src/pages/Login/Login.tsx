@@ -44,19 +44,19 @@ function Login() {
 	return (
 		<>
 			<div className='login-form'>
-				<a><img src="https://i.imgur.com/t5Ytt5L.png"/></a>
+				<a><img src="https://i.imgur.com/ca0eJ1A.png"/></a>
 			</div>
 			<div>
 				<form onSubmit={HandleSubmit}>
 					<div>
 						<div className='username'>
 							<label>
-								<input type="text" name="username" className='user-input' placeholder="Username"/>
+								<input type="text" name="username" className='user-input' placeholder="username"/>
 							</label>
 						</div>
 						<div>
 							<label>
-								<input type="password" name="password" className='user-input' placeholder="Password"/>
+								<input type="password" name="password" className='user-input' placeholder="password"/>
 							</label>
 						</div>
 					</div>
