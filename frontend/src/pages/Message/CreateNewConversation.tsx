@@ -15,6 +15,7 @@ import {
 } from "@twilio-paste/core";
 import { useEffect, useState } from "react";
 import { useSocketContext } from "../../context/WebSocketContext";
+import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
 
 const getChannelType: any = (type: string | undefined) => {
   if (type) {
@@ -24,7 +25,13 @@ const getChannelType: any = (type: string | undefined) => {
   }
 };
 
-export const CreateNewConversation = () => {
+interface CreateNewConversationProps {
+  setConversation: (val: ConversationInformation) => void;
+}
+
+export const CreateNewConversation: React.FC<CreateNewConversationProps> = ({
+  setConversation,
+}) => {
   const [channelType, setChannelType] = useState("");
   const [channelName, setChannelName] = useState("");
   const [channelPassword, setchannelPassword] = useState("");
@@ -60,6 +67,7 @@ export const CreateNewConversation = () => {
         </div>
       );
     }
+    setConversation(channelName);
   };
 
   //Checker si le channel name est pas pris

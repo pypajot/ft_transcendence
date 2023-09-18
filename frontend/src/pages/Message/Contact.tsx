@@ -17,6 +17,8 @@ import { User } from "../../../public/Types/user.entity";
 import { ContactElement } from "./ContactElement";
 import { getFriendsList } from "./Hooks/GetFriendsList";
 import { useAuth } from "../../context/AuthContext";
+import { ContactType } from "../../../public/Types/contact.entity";
+import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
 
 //Possible to have channel Or People
 
@@ -30,11 +32,11 @@ import { useAuth } from "../../context/AuthContext";
 //For the moment i will just display all user
 
 interface ContactProps {
-  setConversation: (val: string) => void;
+  setConversation: (val: ConversationInformation) => void;
 }
 
 export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
-  const [friends, setFriends] = useState<User[]>();
+  const [friends, setFriends] = useState<ContactType[]>();
   const [username, setUsername] = useState<string>("");
 
   const { user } = useAuth();
@@ -63,7 +65,7 @@ export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
   //Return a list of string Channel And User
 
   useEffect(() => {
-    getFriendsList(username).then((res: User[]) => {
+    getFriendsList(username).then((res: ContactType[]) => {
       console.log(res);
       setFriends(res);
     });
@@ -77,7 +79,7 @@ export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
           return (
             <div key={i}>
               <ContactElement
-                content={user.username}
+                content={user}
                 setConversation={setConversation}
               ></ContactElement>
             </div>

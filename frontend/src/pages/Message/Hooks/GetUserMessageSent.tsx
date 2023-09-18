@@ -1,4 +1,8 @@
-const getMessageSent = async (obj: { sender: string; receiver: string }) => {
+const getMessageSent = async (obj: {
+  sender: string;
+  receiver: string;
+  isUser: boolean;
+}) => {
   const url = "http://localhost:3333/chat/getMessageSent";
 
   try {
@@ -10,6 +14,7 @@ const getMessageSent = async (obj: { sender: string; receiver: string }) => {
       body: JSON.stringify({
         sender: obj.sender,
         receiver: obj.receiver,
+        isUser: obj.isUser,
       }),
     });
 

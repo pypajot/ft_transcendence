@@ -2,8 +2,8 @@ export interface Message {
   id: number;
   content: string;
   createdAt: Date;
-  authorId: string;
-  targetId: string;
+  authorId: number;
+  targetId?: number;
   senderName: string;
   sent: boolean;
 }

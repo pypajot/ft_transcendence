@@ -16,12 +16,24 @@ export class ChatController {
   constructor(private chatService: ChatControllerService) {}
 
   @Post('getMessageSent')
-  getLogsSender(@Body() dto: PrivMsgLogsDto): any {
-    return this.chatService.getLogs(dto.sender, dto.receiver);
+  async getLogsSender(@Body() dto: PrivMsgLogsDto): any {
+    if (dto.isUser) {
+      return this.chatService.getLogsUserToUser(dto.sender, dto.receiver);
+    } else {
+      console.log(
+        await this.chatService.getLogsUserToChannel(dto.sender, dto.receiver),
+      );
+      return this.chatService.getLogsUserToChannel(dto.sender, dto.receiver);
+    }
   }
   @Post('getMessageReceived')
   getLogsReceiver(@Body() dto: PrivMsgLogsDto): any {
-    return this.chatService.getLogs(dto.sender, dto.receiver);
+    console.log(dto);
+    if (dto.isUser) {
+      return this.chatService.getLogsUserToUser(dto.sender, dto.receiver);
+    } else {
+      return this.chatService.getChannelLogsToUser(dto.sender, dto.receiver);
+    }
   }
   @Get('getFriendsList')
   getFriends(@Query('username') username: any) {
