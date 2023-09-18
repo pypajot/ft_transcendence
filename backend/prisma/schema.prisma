@@ -16,6 +16,7 @@ model User {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   friends         Int[]
+  friendsRequest  Int[]
   socketId        String?
   channels        Channel[] @relation("Memberships")
   messagesSent    Message[] @relation("Author")

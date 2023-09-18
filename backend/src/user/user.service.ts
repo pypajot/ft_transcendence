@@ -48,4 +48,14 @@ export class UserService {
 			});
 		}
 	}
+
+	addFriend(friendName: string) {
+		const friend = await this.prisma.user.findUnique({
+			where: {
+				username: friendName,
+			},
+		});
+		if (!friend)
+			throw new Error("User not found");
+		if (friend.f)
 }
