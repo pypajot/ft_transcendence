@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserDTO } from './dto/user.dto';
+import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class UserService {
@@ -49,24 +50,35 @@ export class UserService {
 		}
 	}
 
-	async addFriend(friendName: string, userId: number) {
+	async addFriend(content: {friendName: string, userId: number}, server: any) {
+		console.log(content.userId);
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				username: friendName,
+				username: content.friendName,
 			},
 		});
 		if (!friend)
-			throw new ForbiddenException("Friend request already sent");
-		if (friend.friendsRequest.includes(userId))
-			throw new ForbiddenException("Friend request already sent");
+			throw new WsException("User does not exist");
+		if (friend.friendsRequest.includes(content.userId))
+			throw new WsException("Friend request already sent");
 		const user = await this.prisma.user.findUnique({
 			where: {
-				id: userId,
+				id: content.userId,
 			},
 		});
 		if (user && user.friendsRequest.includes(friend.id))
-			throw new ForbiddenException("Friend request already sent");
-		friend.friendsRequest.push(userId);
+			throw new WsException("Friend request already sent");
+		console.log("request ok");
+		// friend.friendsRequest.push(content.userId);
+		await this.prisma.user.update({
+			where: { id: friend.id },
+			data: {
+				friendsRequest: {
+					push: content.userId
+				}
+			}
+		});
+		server.to(friend.socketId).emit("friendRequestFrom", {username: user.username, userId: content.userId});
 	}
 
 	async respondFriendRequest(friendId: number, userId: number, accept: boolean) {

@@ -3,10 +3,11 @@ import { useAuth } from '../../context/AuthContext';
 import Navbar, { Navbar2 } from '../../components/Navbar';
 import { Button, Checkbox } from '@twilio-paste/core';
 import { User } from '../../context/AuthContext';
-import { useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { isAbsolute } from 'path';
 import { useSocketContext } from '../../context/WebSocketContext';
+import { ProfileContext } from '../../context/ProfileContext';
 
 const Profile = () => {
 
@@ -30,23 +31,11 @@ const Profile = () => {
 		};
 	}
 
-	async function SendFriendRequest(e: any) {
-		e.preventDefault();
-		const response = await refreshFetch('http://localhost:3333/user/friend/request', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
-			},
-			body: JSON.stringify({friendName: e.target.username.value, userId: user?.id})
-		});
-		console.log(response);
-	}
-
+	
 	function QrDisplay() {
 		if (imagePath)
-			return (
-				<>
+		return (
+	<>
 					<div>
 						<img src={imagePath}/>
 					</div>
@@ -66,14 +55,19 @@ const Profile = () => {
 					</div>
 				</>
 			)
-		return (
+			return (
 			<div />
-		)
-	}
+			)
+		}
 
-	function FriendRequestForm() {
-		return (
-			<>
+		async function SendFriendRequest(e: any) {
+			e.preventDefault();
+			socket.emit("addFriend", {friendName: e.target.username.value, userId: user?.id});
+		}
+		
+		function FriendRequestForm() {
+			return (
+				<>
 				<form onSubmit={SendFriendRequest}>
 					<div>
 						<label>
@@ -115,35 +109,8 @@ const Profile = () => {
 	}
 
 	function FriendRequestList() {
-		const run = useRef(0);
-		const [friendRequestList, setFriendRequestList] = useState<User[] | null>(() => {
-			const response = await refreshFetch('http://localhost:3333/user/friend/request', {
-					headers: {
-						'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`,
-						'Content-Type': 'application/json'
-					}
-				});
-				if (response.status === 200
-					&& response.json())
-					return await response.json();
-				response.status === 200 && setFriendRequestList(await response.json());
-			return null;
-		});
-
-		useEffect(() => {
-			const getFriendRequestList = async () => {
-				const response = await refreshFetch('http://localhost:3333/user/friend/request', {
-					headers: {
-						'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`,
-						'Content-Type': 'application/json'
-					}
-				});
-				response.status === 200 && setFriendRequestList(await response.json());
-			}
-			if (run.current === 0)
-				getFriendRequestList();
-			run.current++;
-		}, []);
+		const {friendRequestList} = useContext(ProfileContext)
+		console.log("Profile", friendRequestList);
 		const list = friendRequestList?.map((user: any) => FriendRequestElement(user.id, user.username));
 
 		return (

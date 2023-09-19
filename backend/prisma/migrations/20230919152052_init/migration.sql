@@ -7,6 +7,7 @@ CREATE TABLE "users" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "friends" INTEGER[],
+    "friendsRequest" INTEGER[],
     "socketId" TEXT,
     "twoFactorAuthActive" BOOLEAN NOT NULL DEFAULT false,
     "twoFactorAuthSecret" TEXT,
