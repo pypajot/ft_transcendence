@@ -67,7 +67,13 @@ export const CreateNewConversation: React.FC<CreateNewConversationProps> = ({
         </div>
       );
     }
-    setConversation(channelName);
+    const conversationInfo = {
+      ischannel: true,
+      isUser: false,
+      name: channelName,
+    };
+    console.log("new");
+    setConversation(conversationInfo);
   };
 
   //Checker si le channel name est pas pris

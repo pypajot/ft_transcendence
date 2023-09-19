@@ -16,7 +16,7 @@ export class ChatController {
   constructor(private chatService: ChatControllerService) {}
 
   @Post('getMessageSent')
-  async getLogsSender(@Body() dto: PrivMsgLogsDto): any {
+  async getLogsSender(@Body() dto: PrivMsgLogsDto): Promise<string> {
     if (dto.isUser) {
       return this.chatService.getLogsUserToUser(dto.sender, dto.receiver);
     } else {
@@ -27,7 +27,7 @@ export class ChatController {
     }
   }
   @Post('getMessageReceived')
-  getLogsReceiver(@Body() dto: PrivMsgLogsDto): any {
+  getLogsReceiver(@Body() dto: PrivMsgLogsDto): Promise<string> {
     console.log(dto);
     if (dto.isUser) {
       return this.chatService.getLogsUserToUser(dto.sender, dto.receiver);

@@ -21,8 +21,7 @@ const getMessageReceived = async (obj: {
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
-
-    return await response.json();
+    return response.json();
   } catch (error) {
     console.error("There was an error fetching the data", error);
   }

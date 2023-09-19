@@ -19,6 +19,7 @@ import { getFriendsList } from "./Hooks/GetFriendsList";
 import { useAuth } from "../../context/AuthContext";
 import { ContactType } from "../../../public/Types/contact.entity";
 import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
+import { setFips } from "crypto";
 
 //Possible to have channel Or People
 
@@ -38,6 +39,7 @@ interface ContactProps {
 export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
   const [friends, setFriends] = useState<ContactType[]>();
   const [username, setUsername] = useState<string>("");
+  const [newFriend, setnewFriend] = useState<boolean>(false);
 
   const { user } = useAuth();
 
@@ -57,7 +59,7 @@ export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
     } else {
       setUsername(res);
     }
-  }, [user]);
+  }, [user, setFriends]);
 
   //Request the back (Should Get all Message from a certain User)
   //Then check on all message to list all conversation / Channel Or nOt
@@ -65,11 +67,12 @@ export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
   //Return a list of string Channel And User
 
   useEffect(() => {
+    console.log("bkl");
+    if (username === "") return;
     getFriendsList(username).then((res: ContactType[]) => {
-      console.log(res);
       setFriends(res);
     });
-  }, [username]);
+  }, [newFriend, username]);
   //Ask the back for the userList
   return (
     <>

@@ -23,7 +23,6 @@ import { useSocketContext } from "../../context/WebSocketContext";
 import { useAuth } from "../../context/AuthContext";
 import { MoreIcon } from "@twilio-paste/icons/esm/MoreIcon";
 import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
-import { SocketAddress } from "net";
 
 const sortByDate = () => {
   return function (a: any, b: any) {
@@ -85,12 +84,17 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
         receiver: info.name,
         isUser: info.isUser,
       }).then((res) => {
+        console.log(res);
         setSentMessage(res);
       });
     }
   }, [info, user, username]);
 
   useEffect(() => {
+    //if (info && info.ischannel) {
+    // setRenderConversation(false);
+    //return;
+    // }
     if (receivedMessage) {
       receivedMessage.forEach(function (obj) {
         obj.sent = false;
@@ -107,7 +111,7 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
       );
       console.log(conversationMsg);
     }
-  }, [sentMessage, receivedMessage]);
+  }, [sentMessage, receivedMessage, info]);
 
   const handleComposerChange = (editorState: EditorState): void => {
     editorState.read(() => {
@@ -117,10 +121,15 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
     });
   };
 
-  const messageListener = (message: Message) => {
-    if (message.senderName == info.name) {
-      return;
+  const channelMessage = (message: Message) => {
+    if (user && message.senderName != user.username) {
+      message.sent = false;
     }
+    setConversationMsg([...conversationMsg, message]);
+  };
+
+  const messageListener = (message: Message) => {
+    console.log(message);
     setConversationMsg([...conversationMsg, message]);
   };
 
@@ -134,12 +143,21 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
       socket?.emit("message", message_content);
     }
   };
+
   useEffect(() => {
-    socket?.on("messageChannel", messageListener);
+    socket?.on("messageChannel", channelMessage);
     return () => {
-      socket?.off("messageChannel", messageListener);
+      socket?.off("messageChannel", channelMessage);
     };
   }, [socket, messageListener]);
+
+  useEffect(() => {
+    socket?.on("messageChannelSent", messageListener);
+    return () => {
+      socket?.off("messageChannelSent", messageListener);
+    };
+  }, [socket, messageListener]);
+
   useEffect(() => {
     socket?.on("messageSent", messageListener);
     return () => {
@@ -176,13 +194,13 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
           if (message.sent) {
             return (
               <div key={i}>
-                <BasicOutMessage content={message.content}></BasicOutMessage>
+                <BasicOutMessage message={message}></BasicOutMessage>
               </div>
             );
           } else {
             return (
               <div key={i}>
-                <BasicInMessage content={message.content}></BasicInMessage>
+                <BasicInMessage message={message}></BasicInMessage>
               </div>
             );
           }

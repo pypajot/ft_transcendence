@@ -48,6 +48,7 @@ class ChatGateway
     if (data.ToUser) {
       this.chatService.sendToUser(this.io, await newMsg, client.id);
     } else {
+      client.join(data.target);
       this.chatService.sendToChannel(
         this.io,
         await newMsg,
