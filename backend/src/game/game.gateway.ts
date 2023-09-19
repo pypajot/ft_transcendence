@@ -42,7 +42,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-  async handleUpdateDB(winner: Player, loser: Player) {
+  async handleUpdateDB(winner: Player, loser: Player, gameId: number) {
     try{
       await this.prisma.user.update({
         where: {
@@ -51,17 +51,44 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         data: {
           wins: {
             increment: 1
+          },
+          gamesWon: {
+            connect: [{ id: gameId }]
+          },
+          gamesPlayed: {
+            connect: [{ id: gameId }]
           }
         }
       })
       await this.prisma.user.update({
         where: {
-          id: await loser.user_id
+          id: loser.user_id
         },
         data: {
           losses: {
             increment: 1
+          },
+          gamesLost: {
+            connect: [{ id: gameId }]
+          },
+          gamesPlayed: {
+            connect: [{ id: gameId }]
           }
+        }
+      })
+      await this.prisma.game.update({
+        where: {
+          id: gameId
+        },
+        data: {
+          winner: {
+            connect: { id: winner.user_id }
+          },
+          loser: {
+            connect: { id: loser.user_id }
+          },
+          winnerScore: winner.score,
+          loserScore: loser.score
         }
       })
     }
@@ -126,6 +153,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     let gameState = this.matchmakingService.gameService[lobbyId]?.getGameState();
     const player1 = this.matchmakingService.gameService[lobbyId]?.player1;
     const player2 = this.matchmakingService.gameService[lobbyId]?.player2;
+    const gameId = this.matchmakingService.gameService[lobbyId]?.gameId;
     // create a loop with a delay of 50ms
     let interval = setInterval(async () => {
       this.matchmakingService.gameService[lobbyId]?.updateGameState(); // Update the game state
@@ -134,14 +162,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (this.matchmakingService.gameService[lobbyId]?.player1.score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
         //console.log('IF player' + this.matchmakingService.gameService[lobbyId]?.player1.id + ' wins');
         if (client.id === player1.socket.id)
-          this.handleUpdateDB(player1, player2);
+          this.handleUpdateDB(player1, player2, gameId);
         client.emit('gameEnd', player1.socket.id);
         clearInterval(interval);
       }
       else if (this.matchmakingService.gameService[lobbyId]?.player2.score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
         //console.log('ELSEIF player' + this.matchmakingService.gameService[lobbyId]?.player1.id + ' wins');
         if (client.id === player1.socket.id)
-          this.handleUpdateDB(player2, player1);
+          this.handleUpdateDB(player2, player1, gameId);
         client.emit('gameEnd', this.matchmakingService.gameService[lobbyId]?.player2.socket.id);
         clearInterval(interval);
       }

@@ -23,7 +23,7 @@ export interface GameConfiguration {
 export class GameService {
 
   // Properties for the game state
-  public lobbyId: number;
+  public gameId: number;
   public player1: Player;
   public player2: Player;
   private paddle1Y: number; // Position of paddle 1 (Player 1)
@@ -63,7 +63,7 @@ export class GameService {
         mode: gameConfiguration.mode,
       },
     });
-    this.lobbyId = game.id;
+    this.gameId = game.id;
     console.log('Init game');
     this.gameConfiguration = gameConfiguration;
     this.player1 = Player1;
@@ -166,4 +166,3 @@ export interface GameState {
   gameWidth: number;
   gameHeight: number;
 }
-
