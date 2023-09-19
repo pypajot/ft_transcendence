@@ -68,7 +68,20 @@ export default function SocketContextProvider(props: SocketContextProviderProps)
 		}
 		if (!user)
 			return ;
-		refreshSocket();
+		const newSocket:WebContext = { io:io("http://localhost:3333/", {
+			reconnectionAttempts: 1,
+			query: {
+				token: sessionStorage.getItem("access_token"),
+			},
+		})};
+		newSocket.io.on("connect_error", () => {
+			logout();
+		})
+		setSocket(newSocket);
+		console.log(newSocket.io.connected);
+		return () => {
+			newSocket.io.disconnect();
+		}
     }, [user && user.id]);
 
     const value = useMemo(() => socket, [socket]);
