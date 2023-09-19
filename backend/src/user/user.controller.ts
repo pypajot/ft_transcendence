@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards, Req, Headers } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Req, Headers, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -18,5 +18,26 @@ export class UserController {
 	getMe(@Headers('Authorization') token: string) {
 		const payload = this.jwt.decode(token.split(' ')[1]);
 		return this.userservice.getMe(payload.sub);
+	}
+
+	@Post('friend/request')
+	@UseGuards(JwtAuthGuard)
+	addFriend(@Req() req: any, @Headers('Authorization') token: string) {
+		const payload = this.jwt.decode(token.split(' ')[1]);
+		return this.userservice.addFriend(req.body.friendName, payload.sub);
+	}
+
+	@Get('friend/request')
+	@UseGuards(JwtAuthGuard)
+	getFriendRequest(@Headers('Authorization') token: string) {
+		const payload = this.jwt.decode(token.split(' ')[1]);
+		return this.userservice.getFriendRequest(payload.sub);
+	}
+
+	@Post('friend/request/respond')
+	@UseGuards(JwtAuthGuard)
+	respondFriendRequest(@Req() req: any, @Headers('Authorization') token: string) {
+		const payload = this.jwt.decode(token.split(' ')[1]);
+		return this.userservice.respondFriendRequest(req.body.friendId, payload.sub, req.body.accept);
 	}
 }

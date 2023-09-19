@@ -1,16 +1,18 @@
 import './Profile.css';
 import { useAuth } from '../../context/AuthContext';
 import Navbar, { Navbar2 } from '../../components/Navbar';
-import { Checkbox } from '@twilio-paste/core';
+import { Button, Checkbox } from '@twilio-paste/core';
 import { User } from '../../context/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { isAbsolute } from 'path';
+import { useSocketContext } from '../../context/WebSocketContext';
 
 const Profile = () => {
 
 	const { user, setUser, refreshFetch } = useAuth();
 	const [imagePath, setImagePath] = useState<string | null>(null);
+	const socket = useSocketContext();
 
 	async function HandleSubmit(e: any) {
 		e.preventDefault();
@@ -26,6 +28,19 @@ const Profile = () => {
 			setImagePath(null);
 			user && setUser({...user, twoFactorAuthActive: true})
 		};
+	}
+
+	async function SendFriendRequest(e: any) {
+		e.preventDefault();
+		const response = await refreshFetch('http://localhost:3333/user/friend/request', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
+			},
+			body: JSON.stringify({friendName: e.target.username.value, userId: user?.id})
+		});
+		console.log(response);
 	}
 
 	function QrDisplay() {
@@ -53,6 +68,88 @@ const Profile = () => {
 			)
 		return (
 			<div />
+		)
+	}
+
+	function FriendRequestForm() {
+		return (
+			<>
+				<form onSubmit={SendFriendRequest}>
+					<div>
+						<label>
+							Username: <input type="text" name="username" />
+						</label>
+					</div>
+					<div>
+						<button type="submit">
+							Send friend request
+						</button>
+					</div>
+				</form>
+			</>
+		)
+	}
+
+	function FriendRequestElement(id: number, username: string) {
+		const AcceptFriendRequest = async (accept: boolean) => {
+			await refreshFetch('http://localhost:3333/user/friend/request', {
+				method: 'POST',
+				headers: {
+					'Autorization': `Bearer ${sessionStorage.getItem("access_token")}`,
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({friendId: id, accept: accept})
+			});
+
+		return (
+			<>
+				<div>
+					{username} wants to be your friend !
+				</div>
+				<div>
+					<Button variant="primary" onClick={() => AcceptFriendRequest(true)}>Accept</Button>
+					<Button variant="secondary" onClick={() => AcceptFriendRequest(false)}>Decline</Button>
+				</div>
+			</>
+		)}
+	}
+
+	function FriendRequestList() {
+		const run = useRef(0);
+		const [friendRequestList, setFriendRequestList] = useState<User[] | null>(() => {
+			const response = await refreshFetch('http://localhost:3333/user/friend/request', {
+					headers: {
+						'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`,
+						'Content-Type': 'application/json'
+					}
+				});
+				if (response.status === 200
+					&& response.json())
+					return await response.json();
+				response.status === 200 && setFriendRequestList(await response.json());
+			return null;
+		});
+
+		useEffect(() => {
+			const getFriendRequestList = async () => {
+				const response = await refreshFetch('http://localhost:3333/user/friend/request', {
+					headers: {
+						'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`,
+						'Content-Type': 'application/json'
+					}
+				});
+				response.status === 200 && setFriendRequestList(await response.json());
+			}
+			if (run.current === 0)
+				getFriendRequestList();
+			run.current++;
+		}, []);
+		const list = friendRequestList?.map((user: any) => FriendRequestElement(user.id, user.username));
+
+		return (
+			<>
+				{list}
+			</>
 		)
 	}
 
@@ -99,6 +196,17 @@ const Profile = () => {
 				</p>
 				<QrDisplay />
 			</div>
+			<div>
+				<FriendRequestForm />
+			</div>
+			
+			<div>
+				Friend requests:
+			</div>
+			<div>
+				<FriendRequestList />
+			</div>
+			
 		</>
 	);
 };
