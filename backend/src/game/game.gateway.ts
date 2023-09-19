@@ -112,8 +112,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (lobbyId !== undefined) {
       // wait for 1/2 second before emitting the createLobby event
       setTimeout(() => {
-      client.emit('createLobby', lobbyId);
-      this.matchmakingService.gameService[lobbyId].player1.socket.emit('createLobby', lobbyId);
+      const username1 = this.matchmakingService.gameService[lobbyId].player1.username;
+      const username2 = this.matchmakingService.gameService[lobbyId].player2.username;
+      client.emit('createLobby', lobbyId, username1, username2);
+      this.matchmakingService.gameService[lobbyId].player1.socket.emit('createLobby', lobbyId, username1, username2);
       console.log(`Lobby ${lobbyId} created`);
       }, 500);
     }

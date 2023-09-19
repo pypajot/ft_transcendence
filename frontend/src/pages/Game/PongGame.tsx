@@ -16,11 +16,15 @@ const PongGame : React.FC = () => {
   const [showBall, setShowBall] = useState(true);
   const [gameEnd, setGameEnd] = useState(false);
   const [gameEndMessage, setGameEndMessage] = useState('');
+  const [userName1, setUserName1] = useState<string>('');
+  const [userName2, setUserName2] = useState<string>('');
 
   useEffect(() => {
     // Send custom event to request game state from the server
-    socket?.on('createLobby', (lobbyId: string) => {
+    socket?.on('createLobby', (lobbyId: string, userName1: string, userName2, string) => {
       setLobbyId(lobbyId);
+      setUserName1(userName1);
+      setUserName2(userName2);
       socket?.emit('getGameState', { lobbyId });
       setCountdown(3);
       setTimeout(() => { setCountdown(2)}, 1000);
@@ -56,6 +60,7 @@ const PongGame : React.FC = () => {
     };
   }, [lobbyId]);
 
+  // get the username from the context
   // Other game logic and rendering based on the received gameState
 
   const handleKeyPress = (event: any) => {
@@ -85,8 +90,8 @@ const PongGame : React.FC = () => {
           {/* Render scores */}
           {gameState && (
             <>
-              <div className="score">Player 1: {gameState.player1Score}</div>
-              <div className="score">Player 2: {gameState.player2Score}</div>
+              <div className="score">{userName1}: {gameState.player1Score}</div>
+              <div className="score">{userName2}: {gameState.player2Score}</div>
             </>
           )}
         </div>
