@@ -67,14 +67,6 @@ function Login() {
 					</div>
 				</form>
 			</div>
-			<div className='register'>
-				Don't have an account ?
-			</div>
-			<Link to='/signup'>
-				<button className='register-button'>
-					Register here
-				</button>
-			</Link>
 		</>
 	);
 };

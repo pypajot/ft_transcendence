@@ -51,7 +51,7 @@ const Signup = () => {
 					<div className='submit'>
 						<button type="submit" className="submit-button">
 							Submit
-						</button>
+						</button> 
 					</div>
 				</form>
 			</div>
