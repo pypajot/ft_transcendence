@@ -27,7 +27,7 @@ export class UserController {
 		return this.userservice.getFriendRequest(payload.sub);
 	}
 
-	@Post('friend/request/respond')
+	@Post('friend/respond')
 	@UseGuards(JwtAuthGuard)
 	respondFriendRequest(@Req() req: any, @Headers('Authorization') token: string) {
 		const payload = this.jwt.decode(token.split(' ')[1]);

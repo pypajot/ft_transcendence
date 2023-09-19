@@ -85,7 +85,7 @@ const Profile = () => {
 	}
 
 	function FriendRequestElement(id: number, username: string) {
-		const AcceptFriendRequest = async (accept: boolean) => {
+		const AcceptFriendRequest = async (id: number, accept: boolean) => {
 			await refreshFetch('http://localhost:3333/user/friend/request', {
 				method: 'POST',
 				headers: {
@@ -101,18 +101,39 @@ const Profile = () => {
 					{username} wants to be your friend !
 				</div>
 				<div>
-					<Button variant="primary" onClick={() => AcceptFriendRequest(true)}>Accept</Button>
-					<Button variant="secondary" onClick={() => AcceptFriendRequest(false)}>Decline</Button>
+					<Button variant="primary" onClick={() => AcceptFriendRequest(id, true)}>Accept</Button>
+					<Button variant="secondary" onClick={() => AcceptFriendRequest(id, false)}>Decline</Button>
 				</div>
 			</>
 		)}
 	}
 
 	function FriendRequestList() {
-		const {friendRequestList} = useContext(ProfileContext)
-		console.log("Profile", friendRequestList);
-		const list = friendRequestList?.map((user: any) => FriendRequestElement(user.id, user.username));
-
+		const {friendRequestList, setFriendRequestList} = useContext(ProfileContext)
+		const AcceptFriendRequest = async (id: number, accept: boolean) => {
+			const response = await refreshFetch('http://localhost:3333/user/friend/respond', {
+				method: 'POST',
+				headers: {
+					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`,
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({friendId: id, accept: accept})
+			});
+			if (response.status === 201)
+				setFriendRequestList(current => [...current]);
+		}
+		const list = friendRequestList?.map((user: any) => (
+			<>
+				<div>
+					{user.username} wants to be your friend !
+				</div>
+				<div>
+					<Button variant="primary" onClick={() => AcceptFriendRequest(user.id, true)}>Accept</Button>
+					<Button variant="secondary" onClick={() => AcceptFriendRequest(user.id, false)}>Decline</Button>
+				</div>
+			</>
+		));
+		// console.log(list);
 		return (
 			<>
 				{list}

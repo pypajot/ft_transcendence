@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserDTO } from './dto/user.dto';
 import { WsException } from '@nestjs/websockets';
@@ -88,21 +88,37 @@ export class UserService {
 			},
 		});
 		if (!friend)
-			throw new Error("User not found");
+			throw new BadRequestException("User not found");
 		const user = await this.prisma.user.findUnique({
 			where: {
 				id: userId,
 			},
 		});
 		if (!user)
-			throw new Error("User not found");
+			throw new BadRequestException("User not found");
 		if (!user.friendsRequest.includes(friend.id))
-			throw new Error("No friend request found");
+			throw new BadRequestException("No friend request found");
 		user.friendsRequest.splice(user.friendsRequest.indexOf(friend.id), 1);
+		await this.prisma.user.update({
+			where: { id: userId },
+			data: {
+				friendsRequest: user.friendsRequest
+			}
+		})
 		if (!accept)
 			return ;
-		user.friends.push(friend.id);
-		friend.friends.push(userId);
+		await this.prisma.user.update({
+			where: { id: userId },
+			data: {
+				friendsRequest: { push: friend.id}
+			}
+		})
+		await this.prisma.user.update({
+			where: { id: friend.id },
+			data: {
+				friendsRequest: { push: userId}
+			}
+		})
 	}
 
 	async getFriendRequest(userId: number) {

@@ -4,7 +4,8 @@ import { useEffect, createContext, useMemo, useState } from "react";
 
 
 export interface ProfileContextData {
-	friendRequestList: User[],
+	friendRequestList: User[];
+	setFriendRequestList: (list: User[]) => void;
 }
 
 export const ProfileContext = createContext<ProfileContextData>({} as ProfileContextData);
@@ -48,8 +49,9 @@ export const ProfileProvider: React.FC<{children: React.ReactNode}> = ({ childre
 	}, [user && user.twoFactorAuthActive]);
 
 	const value = useMemo(() => ({
-		friendRequestList
-	}),[friendRequestList]);
+		friendRequestList,
+		setFriendRequestList
+	}),[friendRequestList, setFriendRequestList]);
 
 	return (
         <ProfileContext.Provider value={value}>
