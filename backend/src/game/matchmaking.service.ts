@@ -44,7 +44,11 @@ export class MatchmakingService {
   	// Add a player to the matchmaking queue
 	enqueue(player: Player): void {
 		const mode = player.gameMode;
-    	// Add the player to the appropriate queue based on selected mode.
+		// check if a player with the same user_id is already in the queue and remove it
+		this.classicQueue = this.classicQueue.filter((p) => p.user_id !== player.user_id);
+		this.partyQueue = this.partyQueue.filter((p) => p.user_id !== player.user_id);
+		this.hardcoreQueue = this.hardcoreQueue.filter((p) => p.user_id !== player.user_id);
+		// Add the player to the appropriate queue based on selected mode.
 		if (mode === GameMode.Classic) {
 			this.classicQueue.push(player);
 		  }

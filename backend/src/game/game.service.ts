@@ -63,6 +63,22 @@ export class GameService {
         mode: gameConfiguration.mode,
       },
     });
+    await this.prisma.user.update({
+      where: {
+        id: Player1.user_id
+      },
+      data: {
+        status: 'ingame',
+      }
+    })
+    await this.prisma.user.update({
+      where: {
+        id: Player2.user_id
+      },
+      data: {
+        status: 'ingame',
+      }
+    })
     this.gameId = game.id;
     console.log('Init game');
     this.gameConfiguration = gameConfiguration;
