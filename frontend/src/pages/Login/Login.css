@@ -9,7 +9,7 @@
 }
 
 .login-game-pong{
-    margin-top: -25px;
+    margin-top: -27px;
     width: 400px;
     padding-bottom: 10%;
 }
@@ -32,7 +32,7 @@
 }
 
 .submit-button{
-    font-size: 15px;
+    font-size: 16px;
     color: white;
     border: 2px solid #775d85;
     border-radius:30px;
@@ -50,30 +50,36 @@
 }
 
 .other-options{
-    padding-top: 10%;
+    padding-top: 12%;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    margin-left: 25%;
-    margin-right: 25%;
+    margin-left: 27%;
+    margin-right: 27%;
 }
 
 .button42{
     font-size: 14px;
     color: white;
-    border: 3px solid #775d85;
+    border: 2px solid #775d85;
     border-radius:30px;
     padding: 5px 20px;
     cursor: pointer;
     filter: drop-shadow(0 0 15px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
     transition: .5s;
     background: transparent;
+}
+
+.button42:hover {
+    color: white;
+    background-color: #775d85;
+    filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
 }
 
 .login-register-button{
 	font-size: 14px;
     color: white;
-    border: 3px solid #775d85;
+    border: 2px solid #775d85;
     border-radius:30px;
     padding: 5px 20px;
     cursor: pointer;
@@ -82,7 +88,7 @@
     background: transparent;
 }
 
-.register-button:hover {
+.login-register-button:hover {
     color: white;
     background-color: #775d85;
     filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
