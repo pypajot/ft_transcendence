@@ -1,7 +1,17 @@
 .login-form{
-	padding-bottom: 6%;
     display: flex;
     justify-content: center;
+}
+
+.login-game{
+    display: flex;
+    justify-content: center;
+}
+
+.login-game-pong{
+    margin-top: -25px;
+    width: 400px;
+    padding-bottom: 10%;
 }
 
 .username{
@@ -18,7 +28,7 @@
 }
 
 .submit{
-	padding-top: 5%;
+	padding-top: 3%;
 }
 
 .submit-button{
@@ -34,6 +44,45 @@
 }
 
 .submit-button:hover {
+    color: white;
+    background-color: #775d85;
+    filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
+}
+
+.other-options{
+    padding-top: 10%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-left: 25%;
+    margin-right: 25%;
+}
+
+.button42{
+    font-size: 14px;
+    color: white;
+    border: 3px solid #775d85;
+    border-radius:30px;
+    padding: 5px 20px;
+    cursor: pointer;
+    filter: drop-shadow(0 0 15px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
+    transition: .5s;
+    background: transparent;
+}
+
+.login-register-button{
+	font-size: 14px;
+    color: white;
+    border: 3px solid #775d85;
+    border-radius:30px;
+    padding: 5px 20px;
+    cursor: pointer;
+    filter: drop-shadow(0 0 15px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
+    transition: .5s;
+    background: transparent;
+}
+
+.register-button:hover {
     color: white;
     background-color: #775d85;
     filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);

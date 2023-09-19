@@ -46,6 +46,9 @@ function Login() {
 			<div className='login-form'>
 				<a><img src="https://i.imgur.com/ca0eJ1A.png"/></a>
 			</div>
+			<div className="login-game">
+				<a><img src="https://i.imgur.com/vm7Rs68.gif" className="login-game-pong"/></a>
+			</div>
 			<div>
 				<form onSubmit={HandleSubmit}>
 					<div>
@@ -66,6 +69,22 @@ function Login() {
 						</button>
 					</div>
 				</form>
+			</div>
+			<div className='other-options'>
+				<div className='login42'>
+					<a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3aaed99808e42f414bc3012769d17d2df75acba4efc662238fb0e9ad81b91339&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fintralogin&response_type=code">
+							<button className="button42">
+									42 login
+							</button>
+					</a>
+				</div>
+				<div>
+					<Link to='/signup'>
+						<button className='login-register-button'>
+							Register
+						</button>
+					</Link>
+				</div>
 			</div>
 		</>
 	);

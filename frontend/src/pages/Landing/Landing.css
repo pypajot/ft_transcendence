@@ -3,7 +3,6 @@
     justify-content: center;
     align-items: center;
     opacity: 90%;
-
 }
 
 .game{
@@ -12,11 +11,12 @@
 }
 
 .game-pong{
-    width: 580px;
+    width: 530px;
+    margin-top: -10px;
 }
 
 .log{
-    padding-top: 6%;
+    padding-top: 5%;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -65,7 +65,7 @@
 }
 
 .account{
-    padding-top: 6%;
+    padding-top: 9%;
 	padding-bottom: 8px;
 }
 
