@@ -61,6 +61,8 @@ export class UserService {
 			throw new WsException("User does not exist");
 		if (friend.friendsRequest.includes(content.userId))
 			throw new WsException("Friend request already sent");
+		if (friend.friends.includes(content.userId))
+			throw new WsException("Already friends");
 		const user = await this.prisma.user.findUnique({
 			where: {
 				id: content.userId,
@@ -78,7 +80,8 @@ export class UserService {
 				}
 			}
 		});
-		server.to(friend.socketId).emit("friendRequestFrom", {username: user.username, userId: content.userId});
+		console.log("friend socket id: ", friend.socketId);
+		server.to(friend.socketId).emit("friendRequestFrom", {username: user.username, id: content.userId});
 	}
 
 	async respondFriendRequest(friendId: number, userId: number, accept: boolean) {
@@ -110,13 +113,13 @@ export class UserService {
 		await this.prisma.user.update({
 			where: { id: userId },
 			data: {
-				friendsRequest: { push: friend.id}
+				friends: { push: friend.id}
 			}
 		})
 		await this.prisma.user.update({
 			where: { id: friend.id },
 			data: {
-				friendsRequest: { push: userId}
+				friends: { push: userId}
 			}
 		})
 	}
@@ -139,5 +142,18 @@ export class UserService {
 			friendRequest.push({id: friend.id, username: friend.username});
 		}
 		return friendRequest;
+	}
+
+	async getFriendList(id: number) {
+		const user = await this.prisma.user.findUnique({
+			where: { id: id },
+		})
+		const list = await this.prisma.user.findMany({
+			where: {
+				id: { in: user.friends }
+			}
+		})
+		console.log(list);
+		return list;
 	}
 }

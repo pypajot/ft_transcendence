@@ -256,7 +256,7 @@ export class AuthService {
 
 	async logout(res: any, refresh_token?: any) {
 		if (!refresh_token)
-			throw new UnauthorizedException('No refresh token');
+			throw new ForbiddenException('No refresh token');
 		const payload = await this.jwt.verifyAsync(refresh_token, {
 			secret: process.env.REFRESH_SECRET,
 		});

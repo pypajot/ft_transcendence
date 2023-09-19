@@ -120,7 +120,9 @@ const Profile = () => {
 				body: JSON.stringify({friendId: id, accept: accept})
 			});
 			if (response.status === 201)
-				setFriendRequestList(current => [...current]);
+				setFriendRequestList(current => current.filter(
+					value => (value.id !== id)
+			));
 		}
 		const list = friendRequestList?.map((user: any) => (
 			<>

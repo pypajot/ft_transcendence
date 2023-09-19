@@ -2,6 +2,7 @@ import { createContext, useState, useContext, useMemo } from 'react';
 import * as React from 'react';
 import { useEffect } from 'react';
 import { useRef } from 'react';
+import { Socket } from 'socket.io-client';
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -52,14 +53,14 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 
 	const refreshFetch = async (address: any, params?: any) => {
 		let response = await fetch(address, params);
-		if (response.status === 200)
+		if (response.status !== 401)
 			return response;
 		response = await fetch('http://localhost:3333/auth/refresh', {
 			method: 'GET',
 			headers: { 'Content-Type': 'application/json' },
 			credentials: 'include',
 		});
-		if (response.status !== 200)
+		if (response.status !== 200 && response.status !== 201)
 		{
 			setUser(null);
 			setAccessToken(null);
@@ -86,6 +87,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 		setUser(null);
 		setAccessToken(null);
 		sessionStorage.removeItem("access_token");
+		run.current = false;
 	}
 
 	const value = useMemo(() => ({

@@ -20,12 +20,16 @@ export default function SocketContextProvider(
   const { user, logout } = useAuth();
 
 	useEffect(() => {
+		if (!socket)
+			console.log("test empty");
+		console.log("socket context: socket = ", socket);
 		if (!user)
 			return ;
 		const newSocket:WebContext = { io:io("http://localhost:3333/", {
 			reconnectionAttempts: 1,
 			query: {
 				token: sessionStorage.getItem("access_token"),
+				username: user.username
 			},
 		})};
 		newSocket.io.on("connect_error", () => {

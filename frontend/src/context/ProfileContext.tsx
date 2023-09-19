@@ -5,7 +5,7 @@ import { useEffect, createContext, useMemo, useState } from "react";
 
 export interface ProfileContextData {
 	friendRequestList: User[];
-	setFriendRequestList: (list: User[]) => void;
+	setFriendRequestList: React.Dispatch<React.SetStateAction<User[]>>;
 }
 
 export const ProfileContext = createContext<ProfileContextData>({} as ProfileContextData);
@@ -28,7 +28,7 @@ export const ProfileProvider: React.FC<{children: React.ReactNode}> = ({ childre
 			setFriendRequestList(await response.json());
 			console.log("context", friendRequestList);
 		}
-		console.log("user: context", user);
+		console.log("context: user socket", user, socket);
 		if (!socket)
 			return ;
 		if (!user) {
@@ -37,6 +37,7 @@ export const ProfileProvider: React.FC<{children: React.ReactNode}> = ({ childre
 		}
 		getFriendRequests();
 		socket.on("friendRequestFrom", (user: any) => {
+			console.log("test socket profile", user)
 			const newRequest: User = {id: user.id, username: user.username}
 			setFriendRequestList(current => [...current, newRequest])
 		})
