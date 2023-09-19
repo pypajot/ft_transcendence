@@ -61,10 +61,6 @@ export class GameService {
           { id: Player2.user_id }],
         },
         mode: gameConfiguration.mode,
-        winnerId: null,
-        loserId: null,
-        winnerScore: null,
-        loserScore: null,
       },
     });
     this.lobbyId = game.id;

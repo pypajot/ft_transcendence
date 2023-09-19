@@ -23,23 +23,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async createPlayer(socket: Socket, mode: string): Promise<Player> {
-		try{
+		try {
 		  const user = await this.prisma.user.findMany({
-			where: {
-			  socketId: socket.id
-			}
+        where: {
+          socketId: socket.id
+        }
 		  })
-		  if (user){
-			user.map((value) => {
-			  return (new Player(socket, mode, value.username, value.id));
-			})
+		  if (user) {
+        const player = user.map((value) => {
+          return (new Player(socket, mode, value.username, value.id));
+        })
+        return (player[0]);
 		  }
 		  return (null);
 		}
-		catch(error){
+		catch(error) {
 		  console.log(error);
 		}
-	  }
+	}
 
   async handleUpdateDB(winner: Player, loser: Player) {
     try{
@@ -77,7 +78,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('selectGameMode') // Listen for the selectGameMode event
   async handleSelectGameMode(client: Socket, mode: string): Promise<void> {
     const player = await this.createPlayer(client, mode);
-    console.log(`Player ${client.id} selected ${mode} mode`);
+    console.log(`Player ${client.id} selected ${player.gameMode} mode`);
     // place the player in the appropriate queue based on selected mode.
     this.matchmakingService.enqueue(player);
     const lobbyId = this.matchmakingService.tryMatchPlayers(mode);
@@ -132,13 +133,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // check for game end
       if (this.matchmakingService.gameService[lobbyId]?.player1.score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
         //console.log('IF player' + this.matchmakingService.gameService[lobbyId]?.player1.id + ' wins');
-        this.handleUpdateDB(player1, player2);
+        if (client.id === player1.socket.id)
+          this.handleUpdateDB(player1, player2);
         client.emit('gameEnd', player1.socket.id);
         clearInterval(interval);
       }
       else if (this.matchmakingService.gameService[lobbyId]?.player2.score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
         //console.log('ELSEIF player' + this.matchmakingService.gameService[lobbyId]?.player1.id + ' wins');
-        this.handleUpdateDB(player2, player1);
+        if (client.id === player1.socket.id)
+          this.handleUpdateDB(player2, player1);
         client.emit('gameEnd', this.matchmakingService.gameService[lobbyId]?.player2.socket.id);
         clearInterval(interval);
       }

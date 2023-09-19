@@ -32,7 +32,6 @@ model User {
   twoFactorAuthActive Boolean @default(false)
   twoFactorAuthSecret String?
 
-
   @@map("users")
 }
 
@@ -79,10 +78,10 @@ model Game {
   createdAt   DateTime @default(now())
   mode        String
   players     User[]   @relation("Players")
-  winner      User     @relation("Winner", fields: [winnerId], references: [id])
-  loser       User     @relation("Loser", fields: [loserId], references: [id])
-  winnerId    Int
-  loserId     Int
-  winnerScore Int
-  loserScore  Int
+  winner      User?    @relation("Winner", fields: [winnerId], references: [id])
+  loser       User?    @relation("Loser", fields: [loserId], references: [id])
+  winnerId    Int?
+  loserId     Int?
+  winnerScore Int?
+  loserScore  Int?
 }
