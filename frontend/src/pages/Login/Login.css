@@ -49,7 +49,7 @@
     filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
 }
 
-.other-options{
+.login-other-options{
     padding-top: 12%;
     display: flex;
     justify-content: space-around;
@@ -58,7 +58,7 @@
     margin-right: 27%;
 }
 
-.button42{
+.login-button42{
     font-size: 14px;
     color: white;
     border: 2px solid #775d85;
@@ -70,7 +70,7 @@
     background: transparent;
 }
 
-.button42:hover {
+.login-button42:hover {
     color: white;
     background-color: #775d85;
     filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);

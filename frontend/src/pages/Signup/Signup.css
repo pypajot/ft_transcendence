@@ -1,7 +1,17 @@
 .signup-form{
-	padding-bottom: 9%;
     display: flex;
     justify-content: center;
+}
+
+.signup-game{
+    display: flex;
+    justify-content: center;
+}
+
+.signup-game-pong{
+    margin-top: -27px;
+    width: 400px;
+    padding-bottom: 10%;
 }
 
 .username{
@@ -18,11 +28,11 @@
 }
 
 .submit{
-	padding-top: 4%;
+	padding-top: 3%;
 }
 
 .submit-button{
-    font-size: 15px;
+    font-size: 16px;
     color: white;
     border: 2px solid #775d85;
     border-radius:30px;
@@ -34,6 +44,51 @@
 }
 
 .submit-button:hover {
+    color: white;
+    background-color: #775d85;
+    filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
+}
+
+.signup-other-options{
+    padding-top: 12%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-left: 24%;
+    margin-right: 24%;
+}
+
+.signup-button42{
+    font-size: 14px;
+    color: white;
+    border: 2px solid #775d85;
+    border-radius:30px;
+    padding: 5px 20px;
+    cursor: pointer;
+    filter: drop-shadow(0 0 15px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
+    transition: .5s;
+    background: transparent;
+}
+
+.signup-button42:hover {
+    color: white;
+    background-color: #775d85;
+    filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
+}
+
+.signup-button-classic{
+	font-size: 14px;
+    color: white;
+    border: 2px solid #775d85;
+    border-radius:30px;
+    padding: 5px 20px;
+    cursor: pointer;
+    filter: drop-shadow(0 0 15px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
+    transition: .5s;
+    background: transparent;
+}
+
+.signup-button-classic:hover {
     color: white;
     background-color: #775d85;
     filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);

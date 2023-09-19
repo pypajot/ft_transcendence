@@ -1,4 +1,5 @@
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 import './Signup.css';
 
 const Signup = () => {
@@ -34,6 +35,9 @@ const Signup = () => {
 			<div className='signup-form'>
 				<a><img src="https://i.imgur.com/5zfcg9C.png"/></a>
 			</div>
+			<div className="signup-game">
+				<a><img src="https://i.imgur.com/vm7Rs68.gif" className="signup-game-pong"/></a>
+			</div>
 			<div>
 				<form onSubmit={HandleSubmit}>
 					<div>
@@ -54,6 +58,22 @@ const Signup = () => {
 						</button> 
 					</div>
 				</form>
+			</div>
+			<div className='signup-other-options'>
+				<div>
+					<Link to='/login'>
+						<button className="signup-button-classic">
+							Classic login
+						</button>
+					</Link>
+				</div>
+				<div className='login42'>
+					<a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3aaed99808e42f414bc3012769d17d2df75acba4efc662238fb0e9ad81b91339&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fintralogin&response_type=code">
+							<button className="signup-button42">
+									42 login
+							</button>
+					</a>
+				</div>
 			</div>
 		</>
 	);
