@@ -26,6 +26,7 @@ export default function SocketContextProvider(props: SocketContextProviderProps)
 					reconnectionAttempts: 1,
 					query: {
 						token: sessionStorage.getItem("access_token"),
+						username: user?.username,
 					},
 				})};
 				newSocket.io.on("connect_error", async () => {
