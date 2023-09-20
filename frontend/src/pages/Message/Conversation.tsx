@@ -122,6 +122,7 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
   };
 
   const channelMessage = (message: Message) => {
+    console.log(message);
     if (user && message.senderName != user.username) {
       message.sent = false;
     }
@@ -145,22 +146,12 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
   };
 
   useEffect(() => {
-    socket?.on("messageChannel", channelMessage);
-    return () => {
-      socket?.off("messageChannel", channelMessage);
-    };
-  }, [socket, messageListener]);
-
-  useEffect(() => {
     socket?.on("messageSent", messageListener);
-    return () => {
-      socket?.off("messageSent", messageListener);
-    };
-  }, [messageListener, socket]);
-
-  useEffect(() => {
+    socket?.on("messageChannel", channelMessage);
     socket?.on("messageRcv", messageListener);
     return () => {
+      socket?.off("messageSent", messageListener);
+      socket?.off("messageChannel", channelMessage);
       socket?.off("messageRcv", messageListener);
     };
   }, [messageListener, socket]);

@@ -22,7 +22,6 @@ export const ContactElement: React.FC<ContactElementProps> = ({
   content,
   setConversation,
 }) => {
-  const socket = useSocketContext();
   const handleContact = (content: ContactType) => {
     const conversationInfo: ConversationInformation = {
       ischannel: content.channel,
@@ -30,7 +29,6 @@ export const ContactElement: React.FC<ContactElementProps> = ({
       name: content.name,
     };
 
-    socket?.emit("JoinChannel", content.name);
     setConversation(conversationInfo);
   };
 

@@ -11,7 +11,7 @@ import {
 import { CreateNewConversation } from "./CreateNewConversation";
 import { useAuth } from "../../context/AuthContext";
 import { AddFriends } from "./AddFriends";
-import { JoinChanel } from "../JoinChannel";
+import { JoinChanel } from "./JoinChannel";
 import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
 
 interface TopbarProps {

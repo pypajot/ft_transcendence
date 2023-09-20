@@ -8,7 +8,7 @@ import {
   StatusBadge,
 } from "@twilio-paste/core";
 import { useContext, useEffect, useState } from "react";
-import { useSocketContext } from "../context/WebSocketContext";
+import { useSocketContext } from "../../context/WebSocketContext";
 import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
 
 interface JoinChannelProps {
