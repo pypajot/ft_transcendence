@@ -172,16 +172,11 @@ export class ChatGatewayService {
         where: {
           username: name,
         },
-        include: {
-          channels: true,
-        },
         data: {
           socketId: client.id,
         },
       });
-      for (let i = 0; i < chatUser.channels.length; i++) {
-        client.join(chatUser.channels[i].name);
-      }
+      console.log(chatUser.socketId);
     } catch (error) {
       console.log(error);
     }

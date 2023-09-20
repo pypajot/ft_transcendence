@@ -7,7 +7,7 @@ const classicGameConfig: GameConfiguration = {
 	ballSpeed: 3,
 	ballSpeedIncreaseFactor: 1.2,
 	paddleWidth: 10,
-	paddleHeight: 100,
+	paddleHeight: 50,
 	paddleMoveSpeed: 15,
 	goalLimit: 5,
 };
@@ -17,7 +17,7 @@ const partyGameConfig: GameConfiguration = {
 	ballSpeed: 3,
 	ballSpeedIncreaseFactor: 1.2,
 	paddleWidth: 10,
-	paddleHeight: 100,
+	paddleHeight: 50,
 	paddleMoveSpeed: 20,
 	goalLimit: 5,
 };
@@ -104,7 +104,7 @@ export class MatchmakingService {
 		// Initialize a new game session with these players
 			gameId = player1.socket.id + player2.socket.id;
 			this.gameService[gameId] = new GameService();
-			this.gameService[gameId].initGame(gameConfiguration, player1.socket, player2.socket, gameId);
+			this.gameService[gameId].initGame(gameConfiguration, player1, player2, gameId);
 			return gameId;
 		}
 		return undefined;

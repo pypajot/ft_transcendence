@@ -86,15 +86,6 @@ export const Conversation = ({ contact }: { contact: string }) => {
     });
   };
 
-  const channelMessage = (message: Message) => {
-    console.log(message);
-    if (user && message.senderName != user.username) {
-      message.sent = false;
-    }
-    setConversationMsg([...conversationMsg, message]);
-  };
-
-
   const messageListener = (message: Message) => {
     console.log(message);
     setConversationMsg([...conversationMsg, message]);
@@ -106,14 +97,16 @@ export const Conversation = ({ contact }: { contact: string }) => {
       socket?.emit("message", message_content);
     }
   };
-
   useEffect(() => {
     socket?.on("messageSent", messageListener);
-    socket?.on("messageChannel", channelMessage);
-    socket?.on("messageRcv", messageListener);
     return () => {
       socket?.off("messageSent", messageListener);
-      socket?.off("messageChannel", channelMessage);
+    };
+  }, [messageListener]);
+
+  useEffect(() => {
+    socket?.on("messageRcv", messageListener);
+    return () => {
       socket?.off("messageRcv", messageListener);
     };
   }, [messageListener]);
