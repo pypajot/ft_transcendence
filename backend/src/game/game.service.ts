@@ -135,17 +135,19 @@ export class GameService {
   }
   // Method to update the game state based on physics and user input
   updateGameState(): void {
-    // Move the ball based on its current speed and direction
     const ballXVelocity = this.ballSpeedX * this.ballSpeedXDirection;
     const ballYVelocity = this.ballSpeedY * this.ballSpeedYDirection;
+    // Move the ball based on its current speed and direction
     this.ballX += ballXVelocity;
     this.ballY += ballYVelocity;
     // Check for collisions with top and bottom walls
     if (this.ballY - this.ballSize / 2 <= 0 || this.ballY + this.ballSize / 2 >= this.gameHeight) {
       this.ballSpeedYDirection *= -1; // Reverse the Y-direction when the ball hits the top or bottom wall
     }
-    const collisionPaddle1 = this.ballX - this.ballSize / 2 + ballXVelocity <= this.paddleWidth && this.ballY + ballYVelocity >= this.paddle1Y && this.ballY + ballYVelocity <= this.paddle1Y + this.paddleHeight;
-    const collisionPaddle2 = this.ballX + this.ballSize / 2 + ballXVelocity >= this.gameWidth - this.paddleWidth - (this.gameWidth / 100) && this.ballY + ballYVelocity >= this.paddle2Y && this.ballY + ballYVelocity <= this.paddle2Y + this.paddleHeight;
+    const collisionPaddle1 = this.ballX - this.ballSize / 2 + ballXVelocity <= this.paddleWidth
+      && this.ballY + ballYVelocity >= this.paddle1Y && this.ballY + ballYVelocity <= this.paddle1Y + this.paddleHeight;
+    const collisionPaddle2 = this.ballX + this.ballSize / 2 + ballXVelocity >= this.gameWidth - this.paddleWidth - (this.gameWidth / 100)
+      && this.ballY + ballYVelocity >= this.paddle2Y && this.ballY + ballYVelocity <= this.paddle2Y + this.paddleHeight;
     // Check for collisions with the paddles
     if (collisionPaddle1 || collisionPaddle2) {
       // Reverse the X-direction and increase the ball speed after hitting a paddle
