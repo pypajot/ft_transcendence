@@ -152,24 +152,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (lobbyId === undefined) {
       return;
     }
-    let gameState = this.matchmakingService.gameService[lobbyId]?.getGameState();
-    const player1 = this.matchmakingService.gameService[lobbyId]?.player1;
-    const player2 = this.matchmakingService.gameService[lobbyId]?.player2;
-    const gameId = this.matchmakingService.gameService[lobbyId]?.gameId;
+    let gameState = this.matchmakingService.gameService[lobbyId].getGameState();
+    const player1 = this.matchmakingService.gameService[lobbyId].player1;
+    const player2 = this.matchmakingService.gameService[lobbyId].player2;
+    const gameId = this.matchmakingService.gameService[lobbyId].gameId;
     // create a loop with a delay of 50ms
     let interval = setInterval(async () => {
-      this.matchmakingService.gameService[lobbyId]?.updateGameState(); // Update the game state
-      gameState = this.matchmakingService.gameService[lobbyId]?.getGameState(); // Get the updated game state
+      this.matchmakingService.gameService[lobbyId].updateGameState(); // Update the game state
+      gameState = this.matchmakingService.gameService[lobbyId].getGameState(); // Get the updated game state
       // check for game end
-      if (this.matchmakingService.gameService[lobbyId]?.player1.score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
-        //console.log('IF player' + this.matchmakingService.gameService[lobbyId]?.player1.id + ' wins');
+      if (this.matchmakingService.gameService[lobbyId].player1.score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
         if (client.id === player1.socket.id)
           this.handleUpdateDB(player1, player2, gameId);
         client.emit('gameEnd', player1.socket.id);
         clearInterval(interval);
       }
-      else if (this.matchmakingService.gameService[lobbyId]?.player2.score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
-        //console.log('ELSEIF player' + this.matchmakingService.gameService[lobbyId]?.player1.id + ' wins');
+      else if (this.matchmakingService.gameService[lobbyId].player2.score === this.matchmakingService.gameService[lobbyId]?.goalLimit) {
         if (client.id === player1.socket.id)
           this.handleUpdateDB(player2, player1, gameId);
         client.emit('gameEnd', this.matchmakingService.gameService[lobbyId]?.player2.socket.id);
@@ -179,6 +177,29 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.emit('gameState', gameState);
     }, 50);
   }
+
+  // Event to end the game if one of the players disconnects
+  // @SubscribeMessage('forfait')
+  // async handleForfait(client: any, id: {lobbyId: string}): Promise<void> {
+  //   const lobbyId = id.lobbyId;
+  //   if (lobbyId === undefined) {
+  //     return;
+  //   }
+  //   const player1 = this.matchmakingService.gameService[lobbyId]?.player1;
+  //   const player2 = this.matchmakingService.gameService[lobbyId]?.player2;
+  //   const gameId = this.matchmakingService.gameService[lobbyId]?.gameId;
+  //   if (client.id === player1.socket.id) {
+  //     this.handleUpdateDB(player2, player1, gameId);
+  //     client.emit('gameEnd', player1.socket.id);
+  //     this.matchmakingService.gameService[lobbyId].player2.socket.emit('gameEnd', player1.socket.id);
+  //   }
+  //   else if (client.id === player2.socket.id) {
+  //     this.handleUpdateDB(player1, player2, gameId);
+  //     client.emit('gameEnd', player2.socket.id);
+  //     this.matchmakingService.gameService[lobbyId].player1.socket.emit('gameEnd', player2.socket.id);
+  //   }
+  // }
+
 
   @SubscribeMessage('destroyLobby')
   handleDestroyLobby(client: Socket, id: {lobbyId: string}): void {

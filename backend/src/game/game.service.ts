@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { Player } from './Player';
 import { PrismaClient } from '@prisma/client';
+import { interval } from 'rxjs';
 
 export enum GameMode {
   Classic = 'Classic',
@@ -23,7 +24,7 @@ export interface GameConfiguration {
 export class GameService {
 
   // Properties for the game state
-  public gameId: number;
+  public gameId: number; // Unique ID for the game
   public player1: Player;
   public player2: Player;
   private paddle1Y: number; // Position of paddle 1 (Player 1)
@@ -135,14 +136,16 @@ export class GameService {
   // Method to update the game state based on physics and user input
   updateGameState(): void {
     // Move the ball based on its current speed and direction
-    this.ballX += this.ballSpeedX * this.ballSpeedXDirection;
-    this.ballY += this.ballSpeedY * this.ballSpeedYDirection;
+    const ballXVelocity = this.ballSpeedX * this.ballSpeedXDirection;
+    const ballYVelocity = this.ballSpeedY * this.ballSpeedYDirection;
+    this.ballX += ballXVelocity;
+    this.ballY += ballYVelocity;
     // Check for collisions with top and bottom walls
     if (this.ballY - this.ballSize / 2 <= 0 || this.ballY + this.ballSize / 2 >= this.gameHeight) {
       this.ballSpeedYDirection *= -1; // Reverse the Y-direction when the ball hits the top or bottom wall
     }
-    const collisionPaddle1 = this.ballX - this.ballSize / 2 <= this.paddleWidth && this.ballY >= this.paddle1Y && this.ballY <= this.paddle1Y + this.paddleHeight;
-    const collisionPaddle2 = this.ballX + this.ballSize / 2 >= this.gameWidth - this.paddleWidth - (this.gameWidth / 100) && this.ballY >= this.paddle2Y && this.ballY <= this.paddle2Y + this.paddleHeight;
+    const collisionPaddle1 = this.ballX - this.ballSize / 2 + ballXVelocity <= this.paddleWidth && this.ballY + ballYVelocity >= this.paddle1Y && this.ballY + ballYVelocity <= this.paddle1Y + this.paddleHeight;
+    const collisionPaddle2 = this.ballX + this.ballSize / 2 + ballXVelocity >= this.gameWidth - this.paddleWidth - (this.gameWidth / 100) && this.ballY + ballYVelocity >= this.paddle2Y && this.ballY + ballYVelocity <= this.paddle2Y + this.paddleHeight;
     // Check for collisions with the paddles
     if (collisionPaddle1 || collisionPaddle2) {
       // Reverse the X-direction and increase the ball speed after hitting a paddle
