@@ -36,6 +36,7 @@ CREATE TABLE "Channel" (
     "public" BOOLEAN NOT NULL,
     "password" TEXT,
     "creator" TEXT NOT NULL,
+    "invited" INTEGER[],
 
     CONSTRAINT "Channel_pkey" PRIMARY KEY ("id")
 );

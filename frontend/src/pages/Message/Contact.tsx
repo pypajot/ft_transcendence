@@ -17,6 +17,8 @@ import { User } from "../../../public/Types/user.entity";
 import { ContactElement } from "./ContactElement";
 import { getFriendsList } from "./Hooks/GetFriendsList";
 import { useAuth } from "../../context/AuthContext";
+import { ContactType } from "../../../public/Types/contact.entity";
+import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
 
 //Possible to have channel Or People
 
@@ -30,13 +32,16 @@ import { useAuth } from "../../context/AuthContext";
 //For the moment i will just display all user
 
 interface ContactProps {
-  setConversation: (val: string) => void;
+  setConversation: (val: ConversationInformation) => void;
 }
 
 export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
-  const [friends, setFriends] = useState<User[]>();
+  const [friends, setFriends] = useState<ContactType[]>();
+  const [username, setUsername] = useState<string>("");
+  const [newFriend, setnewFriend] = useState<boolean>(false);
 
-    const {user} = useAuth();
+  const { user } = useAuth();
+
   const getName = () => {
     if (!user) {
       return "";
@@ -45,26 +50,38 @@ export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
     }
   };
 
+  useEffect(() => {
+    const res = getName();
+
+    if (res == "") {
+      return;
+    } else {
+      setUsername(res);
+    }
+  }, [user, setFriends]);
+
   //Request the back (Should Get all Message from a certain User)
   //Then check on all message to list all conversation / Channel Or nOt
   //If not channel then link to the user
   //Return a list of string Channel And User
 
   useEffect(() => {
-    getFriendsList(getName()).then((res: User[]) => {
-      console.log(res);
+    if (username === "") return;
+    getFriendsList(username).then((res: ContactType[]) => {
       setFriends(res);
+      console.log(res);
     });
-  }, []);
+  }, [newFriend, username]);
   //Ask the back for the userList
   return (
     <>
-      {friends != undefined &&
+      {username &&
+        friends != undefined &&
         friends.map(function (user, i) {
           return (
             <div key={i}>
               <ContactElement
-                content={user.username}
+                content={user}
                 setConversation={setConversation}
               ></ContactElement>
             </div>

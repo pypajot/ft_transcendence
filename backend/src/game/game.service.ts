@@ -22,7 +22,6 @@ export interface GameConfiguration {
 
 @Injectable()
 export class GameService {
-
   // Properties for the game state
   public gameId: number; // Unique ID for the game
   public player1: Player;
@@ -38,8 +37,8 @@ export class GameService {
   private readonly gameWidth: number = 600;
   private readonly gameHeight: number = 450;
   private readonly ballSize: number = 12;
-  private ballSpeedXDirection: number = 0; // Ball movement direction along the X-axis (1 or -1)
-  private ballSpeedYDirection: number = 0; // Ball movement direction along the Y-axis (1 or -1)
+  private ballSpeedXDirection = 0; // Ball movement direction along the X-axis (1 or -1)
+  private ballSpeedYDirection = 0; // Ball movement direction along the Y-axis (1 or -1)
   private ballSpeedIncreaseFactor: number;
   private paddleWidth: number;
   private paddleHeight: number;
@@ -53,33 +52,37 @@ export class GameService {
 
   constructor() {}
 
-  async initGame(gameConfiguration: GameConfiguration, Player1: Player, Player2: Player, lobbyId: string): Promise<void> {
+  async initGame(
+    gameConfiguration: GameConfiguration,
+    Player1: Player,
+    Player2: Player,
+    lobbyId: string,
+  ): Promise<void> {
     // Initialize the game state depending on the game mode
     const game = await this.prisma.game.create({
       data: {
         players: {
-          connect: [{ id: Player1.user_id },
-          { id: Player2.user_id }],
+          connect: [{ id: Player1.user_id }, { id: Player2.user_id }],
         },
         mode: gameConfiguration.mode,
       },
     });
     await this.prisma.user.update({
       where: {
-        id: Player1.user_id
+        id: Player1.user_id,
       },
       data: {
         status: 'ingame',
-      }
-    })
+      },
+    });
     await this.prisma.user.update({
       where: {
-        id: Player2.user_id
+        id: Player2.user_id,
       },
       data: {
         status: 'ingame',
-      }
-    })
+      },
+    });
     this.gameId = game.id;
     console.log('Init game');
     this.gameConfiguration = gameConfiguration;
@@ -87,8 +90,8 @@ export class GameService {
     this.player2 = Player2;
     this.paddleWidth = gameConfiguration.paddleWidth;
     this.paddleHeight = gameConfiguration.paddleHeight;
-    this.paddle1Y = (this.gameHeight / 2) - (this.paddleHeight / 2); // Set initial Y position for paddle 1 (Player 1)
-    this.paddle2Y = (this.gameHeight / 2) - (this.paddleHeight / 2); // Set initial Y position for paddle 2 (Player 2)
+    this.paddle1Y = this.gameHeight / 2 - this.paddleHeight / 2; // Set initial Y position for paddle 1 (Player 1)
+    this.paddle2Y = this.gameHeight / 2 - this.paddleHeight / 2; // Set initial Y position for paddle 2 (Player 2)
     this.ballX = this.gameWidth / 2; // Set initial X position for the ball
     this.ballY = this.gameHeight / 2; // Set initial Y position for the ball
     this.ballSpeedX = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the X-axis
@@ -115,21 +118,26 @@ export class GameService {
   // Methods to move the paddles up and down
   movePaddleUp(clientId: string): void {
     if (clientId === this.player1.socket.id) {
-      if (this.paddle1Y >= this.paddleMoveSpeed) // prevents paddle from going off screen
+      if (this.paddle1Y >= this.paddleMoveSpeed)
+        // prevents paddle from going off screen
         this.paddle1Y -= this.paddleMoveSpeed;
-    }
-    else if (clientId === this.player2.socket.id) {
+    } else if (clientId === this.player2.socket.id) {
       if (this.paddle2Y >= this.paddleMoveSpeed)
         this.paddle2Y -= this.paddleMoveSpeed;
     }
   }
   movePaddleDown(clientId: string): void {
     if (clientId === this.player1.socket.id) {
-      if (this.paddle1Y <= (this.gameHeight - this.paddleHeight - this.paddleMoveSpeed))
+      if (
+        this.paddle1Y <=
+        this.gameHeight - this.paddleHeight - this.paddleMoveSpeed
+      )
         this.paddle1Y += this.paddleMoveSpeed;
-    } 
-    else if (clientId === this.player2.socket.id) {
-      if (this.paddle2Y <= (this.gameHeight - this.paddleHeight - this.paddleMoveSpeed))
+    } else if (clientId === this.player2.socket.id) {
+      if (
+        this.paddle2Y <=
+        this.gameHeight - this.paddleHeight - this.paddleMoveSpeed
+      )
         this.paddle2Y += this.paddleMoveSpeed;
     }
   }
@@ -141,13 +149,21 @@ export class GameService {
     this.ballX += ballXVelocity;
     this.ballY += ballYVelocity;
     // Check for collisions with top and bottom walls
-    if (this.ballY - this.ballSize / 2 <= 0 || this.ballY + this.ballSize / 2 >= this.gameHeight) {
+    if (
+      this.ballY - this.ballSize / 2 <= 0 ||
+      this.ballY + this.ballSize / 2 >= this.gameHeight
+    ) {
       this.ballSpeedYDirection *= -1; // Reverse the Y-direction when the ball hits the top or bottom wall
     }
-    const collisionPaddle1 = this.ballX - this.ballSize / 2 + ballXVelocity <= this.paddleWidth
-      && this.ballY + ballYVelocity >= this.paddle1Y && this.ballY + ballYVelocity <= this.paddle1Y + this.paddleHeight;
-    const collisionPaddle2 = this.ballX + this.ballSize / 2 + ballXVelocity >= this.gameWidth - this.paddleWidth - (this.gameWidth / 100)
-      && this.ballY + ballYVelocity >= this.paddle2Y && this.ballY + ballYVelocity <= this.paddle2Y + this.paddleHeight;
+    const collisionPaddle1 =
+      this.ballX - this.ballSize / 2 + ballXVelocity <= this.paddleWidth &&
+      this.ballY + ballYVelocity >= this.paddle1Y &&
+      this.ballY + ballYVelocity <= this.paddle1Y + this.paddleHeight;
+    const collisionPaddle2 =
+      this.ballX + this.ballSize / 2 + ballXVelocity >=
+        this.gameWidth - this.paddleWidth - this.gameWidth / 100 &&
+      this.ballY + ballYVelocity >= this.paddle2Y &&
+      this.ballY + ballYVelocity <= this.paddle2Y + this.paddleHeight;
     // Check for collisions with the paddles
     if (collisionPaddle1 || collisionPaddle2) {
       // Reverse the X-direction and increase the ball speed after hitting a paddle
@@ -158,8 +174,7 @@ export class GameService {
     if (this.ballX <= 0) {
       this.player2.score++;
       this.resetBall();
-    }
-    else if (this.ballX + this.ballSize >= this.gameWidth) {
+    } else if (this.ballX + this.ballSize >= this.gameWidth) {
       this.player1.score++;
       this.resetBall();
     }
