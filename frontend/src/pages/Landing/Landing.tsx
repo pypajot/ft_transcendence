@@ -5,11 +5,11 @@ function Landing() {
 
 	return (
 		<>
-			<div className="logo-home">
+			<div className="logo-landing">
 				<a><img src="https://i.imgur.com/4tQ09J4.gif"/></a>
 			</div>
-			<div className="game">
-				<a><img src="https://i.imgur.com/vm7Rs68.gif" className="game-pong"/></a>
+			<div className="game-landing">
+				<a><img src="https://i.imgur.com/vm7Rs68.gif" className="game-pong-landing"/></a>
 			</div>
 			<div className="log">
 					<Link to='/login'>

@@ -1,16 +1,16 @@
-.logo-home{
+.logo-landing{
     display: flex;
     justify-content: center;
     align-items: center;
     opacity: 90%;
 }
 
-.game{
+.game-landing{
     display: flex;
     justify-content: center;
 }
 
-.game-pong{
+.game-pong-landing{
     width: 530px;
     margin-top: -10px;
 }
