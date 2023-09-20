@@ -1,31 +1,25 @@
-import {
-  ChatBubble,
-  ChatLog,
-  ChatMessage,
-  ChatMessageMeta,
-  ChatMessageMetaItem,
-} from "@twilio-paste/core";
-import { Message } from "../../../public/message.entity";
+import { ChatBubble, ChatLog, ChatMessage } from "@twilio-paste/core";
 
-export const BasicOutMessage = ({ message }: { message: Message }) => {
-  return (
-    <ChatLog>
-      <ChatMessage variant="outbound">
-        <ChatBubble>{message.content}</ChatBubble>
-      </ChatMessage>
-    </ChatLog>
-  );
+export const BasicOutMessage = ({ content }: { content: string }) => {
+    return (
+      <ChatLog>
+        <ChatMessage variant='outbound'>
+          <ChatBubble>
+            {content}
+          </ChatBubble>
+        </ChatMessage>
+      </ChatLog>
+    );
 };
 
-export const BasicInMessage = ({ message }: { message: Message }) => {
-  return (
-    <ChatLog>
-      <ChatMessage variant="inbound">
-        <ChatMessageMeta aria-label="info">
-          <ChatMessageMetaItem>{message.senderName}</ChatMessageMetaItem>
-        </ChatMessageMeta>
-        <ChatBubble>{message.content}</ChatBubble>
-      </ChatMessage>
-    </ChatLog>
-  );
+export const BasicInMessage = ({content}: {content: string}) => {
+    return (
+      <ChatLog>
+        <ChatMessage variant='inbound'>
+          <ChatBubble>
+            {content}
+          </ChatBubble>
+        </ChatMessage>
+      </ChatLog>
+    );
 };

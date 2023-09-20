@@ -7,35 +7,21 @@ import {
   SidebarBody,
   useMenuState,
 } from "@twilio-paste/core";
-import React, { useEffect } from "react";
+import React from "react";
 import { MoreIcon } from "@twilio-paste/icons/esm/MoreIcon";
-import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
-import { ContactType } from "../../../public/Types/contact.entity";
-import { useSocketContext } from "../../context/WebSocketContext";
 
 type ContactElementProps = {
-  content: ContactType;
-  setConversation: (user: ConversationInformation) => void;
+  content: string;
+  setConversation: (user: string) => void;
 };
 
 export const ContactElement: React.FC<ContactElementProps> = ({
   content,
   setConversation,
 }) => {
-  const socket = useSocketContext();
-  const handleContact = (content: ContactType) => {
-    const conversationInfo: ConversationInformation = {
-      ischannel: content.channel,
-      isUser: content.user,
-      name: content.name,
-    };
-
-    socket?.emit("JoinChannel", content.name);
-    setConversation(conversationInfo);
-  };
-
+  const menu = useMenuState();
   return (
-    <div onClick={() => handleContact(content)}>
+    <div onClick={() => setConversation(content)}>
       <Box
         borderStyle="solid"
         borderWidth="borderWidth0"
@@ -48,7 +34,7 @@ export const ContactElement: React.FC<ContactElementProps> = ({
         paddingTop="space50"
       >
         <SidebarBody>
-          <h1 color="white">{content.name}</h1>
+          <h1 color="white">{content}</h1>
         </SidebarBody>
       </Box>
     </div>
