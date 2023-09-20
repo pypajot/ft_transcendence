@@ -1,19 +1,16 @@
 import { Socket } from 'socket.io';
-import { PrismaClient } from '@prisma/client';
 //create a player class that will be used to create new players
 
 export class Player {
-	username: string;
-	user_id: number;
 	socket: Socket;
+	paddleX: number;
 	score: number;
 	gameMode: string;
 	lobby: string;
 
-	constructor(socket: Socket, gameMode: string, username: string, user_id: number) {
-		this.username = username;
-		this.user_id = user_id;
+	constructor(socket: Socket, paddleX: number, gameMode: string) {
 		this.socket = socket;
+		this.paddleX = paddleX;
 		this.score = 0;
 		this.gameMode = gameMode;
 		this.lobby = '';

@@ -15,17 +15,11 @@ model User {
   intralogin      String?   @unique
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  status          String    @default("offline")
   friends         Int[]
   socketId        String?
   channels        Channel[] @relation("Memberships")
   messagesSent    Message[] @relation("Author")
   messageReceived Message[] @relation("Target")
-  gamesWon        Game[]    @relation("Winner")
-  gamesLost       Game[]    @relation("Loser")
-  gamesPlayed     Game[]    @relation("Players")
-  wins            Int       @default(0)
-  losses          Int       @default(0)
 
   tokens UserToken[]
 
@@ -73,17 +67,4 @@ model UserToken {
   createdAt    DateTime @default(now())
 
   @@map("usertokens")
-}
-
-model Game {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  mode        String
-  players     User[]   @relation("Players")
-  winner      User?    @relation("Winner", fields: [winnerId], references: [id])
-  loser       User?    @relation("Loser", fields: [loserId], references: [id])
-  winnerId    Int?
-  loserId     Int?
-  winnerScore Int?
-  loserScore  Int?
 }
