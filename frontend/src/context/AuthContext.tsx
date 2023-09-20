@@ -64,6 +64,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 			setUser(null);
 			setAccessToken(null);
 			sessionStorage.removeItem("access_token");
+			run.current = false;
 			return response;
 		}
 		const token = (await response.json()).access_token;
@@ -86,6 +87,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 		setUser(null);
 		setAccessToken(null);
 		sessionStorage.removeItem("access_token");
+		run.current = false;
 	}
 
 	const value = useMemo(() => ({
