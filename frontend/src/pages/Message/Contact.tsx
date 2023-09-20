@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useSocketContext } from "../../context/WebSocketContext";
 import {
   Box,
@@ -17,6 +17,7 @@ import { User } from "../../../public/Types/user.entity";
 import { ContactElement } from "./ContactElement";
 import { getFriendsList } from "./Hooks/GetFriendsList";
 import { useAuth } from "../../context/AuthContext";
+import { ProfileContext } from "../../context/ProfileContext";
 
 //Possible to have channel Or People
 
@@ -34,7 +35,7 @@ interface ContactProps {
 }
 
 export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
-  const [friends, setFriends] = useState<User[]>();
+  const { friendList } = useContext(ProfileContext);
   const [username, setUsername] = useState<string>("");
 
   const { user } = useAuth();
@@ -62,27 +63,26 @@ export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
   //If not channel then link to the user
   //Return a list of string Channel And User
 
-  useEffect(() => {
-    getFriendsList(username).then((res: User[]) => {
-      console.log(res);
-      setFriends(res);
-    });
-  }, [username]);
+//   useEffect(() => {
+//     getFriendsList(username).then((res: User[]) => {
+//       console.log(res);
+//       setFriends(res);
+//     });
+//   }, [username]);
   //Ask the back for the userList
+  const contactList = friendList?.map(function (user, i) {
+	return (
+	  <div key={i}>
+		<ContactElement
+		  content={user.username}
+		  setConversation={setConversation}
+		></ContactElement>
+	  </div>
+	);
+  })
   return (
     <>
-      {username &&
-        friends != undefined &&
-        friends.map(function (user, i) {
-          return (
-            <div key={i}>
-              <ContactElement
-                content={user.username}
-                setConversation={setConversation}
-              ></ContactElement>
-            </div>
-          );
-        })}
+     {contactList}
     </>
   );
 };

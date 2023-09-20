@@ -27,13 +27,6 @@ export class UserController {
 		return this.userservice.getFriendRequest(payload.sub);
 	}
 
-	@Post('friend/respond')
-	@UseGuards(JwtAuthGuard)
-	respondFriendRequest(@Req() req: any, @Headers('Authorization') token: string) {
-		const payload = this.jwt.decode(token.split(' ')[1]) as { [key: string] : any};
-		return this.userservice.respondFriendRequest(req.body.friendId, payload.sub, req.body.accept);
-	}
-
 	@Get('friend/list')
 	@UseGuards(JwtAuthGuard)
 	async getFriendList(@Headers('Authorization') token: string) {

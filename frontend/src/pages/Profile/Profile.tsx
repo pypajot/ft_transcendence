@@ -35,113 +35,28 @@ const Profile = () => {
 	function QrDisplay() {
 		if (imagePath)
 		return (
-	<>
-					<div>
-						<img src={imagePath}/>
-					</div>
-					<div>
-						<form onSubmit={HandleSubmit}>
-							<div>
-								<label>
-									Authenticator code: <input type="text" name="code" />
-								</label>
-							</div>
-							<div>
-								<button type="submit">
-									Submit
-								</button>
-							</div>
-						</form>
-					</div>
-				</>
-			)
-			return (
-			<div />
-			)
-		}
-
-		async function SendFriendRequest(e: any) {
-			e.preventDefault();
-			socket.emit("addFriend", {friendName: e.target.username.value, userId: user?.id});
-		}
-		
-		function FriendRequestForm() {
-			return (
-				<>
-				<form onSubmit={SendFriendRequest}>
-					<div>
-						<label>
-							Username: <input type="text" name="username" />
-						</label>
-					</div>
-					<div>
-						<button type="submit">
-							Send friend request
-						</button>
-					</div>
-				</form>
+			<>
+				<div>
+					<img src={imagePath}/>
+				</div>
+				<div>
+					<form onSubmit={HandleSubmit}>
+						<div>
+							<label>
+								Authenticator code: <input type="text" name="code" />
+							</label>
+						</div>
+						<div>
+							<button type="submit">
+								Submit
+							</button>
+						</div>
+					</form>
+				</div>
 			</>
 		)
 	}
 
-	function FriendRequestElement(id: number, username: string) {
-		const AcceptFriendRequest = async (id: number, accept: boolean) => {
-			await refreshFetch('http://localhost:3333/user/friend/request', {
-				method: 'POST',
-				headers: {
-					'Autorization': `Bearer ${sessionStorage.getItem("access_token")}`,
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({friendId: id, accept: accept})
-			});
-
-		return (
-			<>
-				<div>
-					{username} wants to be your friend !
-				</div>
-				<div>
-					<Button variant="primary" onClick={() => AcceptFriendRequest(id, true)}>Accept</Button>
-					<Button variant="secondary" onClick={() => AcceptFriendRequest(id, false)}>Decline</Button>
-				</div>
-			</>
-		)}
-	}
-
-	function FriendRequestList() {
-		const {friendRequestList, setFriendRequestList} = useContext(ProfileContext)
-		const AcceptFriendRequest = async (id: number, accept: boolean) => {
-			const response = await refreshFetch('http://localhost:3333/user/friend/respond', {
-				method: 'POST',
-				headers: {
-					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`,
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({friendId: id, accept: accept})
-			});
-			if (response.status === 201)
-				setFriendRequestList(current => current.filter(
-					value => (value.id !== id)
-			));
-		}
-		const list = friendRequestList?.map((user: any) => (
-			<>
-				<div>
-					{user.username} wants to be your friend !
-				</div>
-				<div>
-					<Button variant="primary" onClick={() => AcceptFriendRequest(user.id, true)}>Accept</Button>
-					<Button variant="secondary" onClick={() => AcceptFriendRequest(user.id, false)}>Decline</Button>
-				</div>
-			</>
-		));
-		// console.log(list);
-		return (
-			<>
-				{list}
-			</>
-		)
-	}
 
 	const activate2FA = async () => {
 		await refreshFetch('http://localhost:3333/auth/2fa/activate', {
@@ -185,16 +100,6 @@ const Profile = () => {
 				</Checkbox>
 				</p>
 				<QrDisplay />
-			</div>
-			<div>
-				<FriendRequestForm />
-			</div>
-			
-			<div>
-				Friend requests:
-			</div>
-			<div>
-				<FriendRequestList />
 			</div>
 			
 		</>

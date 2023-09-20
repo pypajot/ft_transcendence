@@ -84,17 +84,17 @@ export class UserService {
 		server.to(friend.socketId).emit("friendRequestFrom", {username: user.username, id: content.userId});
 	}
 
-	async respondFriendRequest(friendId: number, userId: number, accept: boolean) {
+	async respondFriendRequest(content: {friendId: number, userId: number, accept: boolean}, server: any) {
 		const friend = await this.prisma.user.findUnique({
 			where: {
-				id: friendId,
+				id: content.friendId,
 			},
 		});
 		if (!friend)
 			throw new BadRequestException("User not found");
 		const user = await this.prisma.user.findUnique({
 			where: {
-				id: userId,
+				id: content.userId,
 			},
 		});
 		if (!user)
@@ -103,15 +103,17 @@ export class UserService {
 			throw new BadRequestException("No friend request found");
 		user.friendsRequest.splice(user.friendsRequest.indexOf(friend.id), 1);
 		await this.prisma.user.update({
-			where: { id: userId },
+			where: { id: content.userId },
 			data: {
 				friendsRequest: user.friendsRequest
 			}
 		})
-		if (!accept)
+		if (!content.accept)
 			return ;
+		server.to(friend.socketId).emit("friendAdded", user);
+		server.to(user.socketId).emit("friendAdded", friend);
 		await this.prisma.user.update({
-			where: { id: userId },
+			where: { id: content.userId },
 			data: {
 				friends: { push: friend.id}
 			}
@@ -119,7 +121,7 @@ export class UserService {
 		await this.prisma.user.update({
 			where: { id: friend.id },
 			data: {
-				friends: { push: userId}
+				friends: { push: content.userId}
 			}
 		})
 	}
@@ -155,5 +157,23 @@ export class UserService {
 		})
 		console.log(list);
 		return list;
+	}
+	async blockUser(content: any, server: any) {
+		const target = await this.prisma.user.findUnique({
+			where: { username: content.targetName },
+		});
+		if (!target)
+			throw new WsException("no such user");
+		const user = await this.prisma.user.findUnique({
+			where: { id: content.userId },
+		});
+		if (user.blocked.includes(target.id))
+			throw new WsException("User already blocked");
+		await this.prisma.user.update({
+			where: { id: content.userId },
+			data: {
+				blocked: { push: target.id}
+			}
+		})
 	}
 }

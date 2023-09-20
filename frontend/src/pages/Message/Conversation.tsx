@@ -7,7 +7,6 @@ import {
 } from "@twilio-paste/lexical-library";
 import { Box } from "@twilio-paste/core";
 import SendButton from "./SendButton";
-import getMesageReceived from "./Hooks/GetUserMessageReceived";
 import getMessageSent from "./Hooks/GetUserMessageSent";
 import { Message } from "../../../public/Types/message.entity";
 import { BasicInMessage, BasicOutMessage } from "./BasicMessage";
@@ -27,7 +26,7 @@ const sortByDate = () => {
 
 export const Conversation = ({ contact }: { contact: string }) => {
   const [content, setContent] = useState<string>("A basic chat composer");
-  const { user } = useAuth();
+  const { user, refreshFetch } = useAuth();
   const [sentMessage, setSentMessage] = useState<Message[]>();
   const [receivedMessage, setReceivedMessage] = useState<Message[]>();
   const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
@@ -43,10 +42,39 @@ export const Conversation = ({ contact }: { contact: string }) => {
     }
   };
 
+  const getMessageReceived = async (obj: {
+	sender: string;
+	receiver: string;
+  }) => {
+	const url = "http://localhost:3333/chat/getMessageReceived";
+	
+	try {
+	  const response = await refreshFetch(url, {
+		method: "POST",
+		headers: {
+		  "Content-Type": "application/json",
+		  "Authorization": `Bearer ${sessionStorage.getItem("access_token")}`,
+		},
+		body: JSON.stringify({
+		  sender: obj.sender,
+		  receiver: obj.receiver,
+		}),
+	  });
+  
+	  if (!response.ok) {
+		throw new Error(`HTTP error! Status: ${response.status}`);
+	  }
+  
+	  return await response.json();
+	} catch (error) {
+	  console.error("There was an error fetching the data", error);
+	}
+  };
+
   useEffect(() => {
     console.log(`Helllo ${contact}`);
     if (contact) {
-      getMesageReceived({ sender: contact, receiver: getName() }).then(
+      getMessageReceived({ sender: contact, receiver: getName() }).then(
         (res) => {
           setReceivedMessage(res);
         }

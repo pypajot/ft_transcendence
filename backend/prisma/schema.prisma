@@ -17,6 +17,7 @@ model User {
   updatedAt       DateTime  @updatedAt
   friends         Int[]
   friendsRequest  Int[]
+  blocked         Int[]
   socketId        String?
   channels        Channel[] @relation("Memberships")
   messagesSent    Message[] @relation("Author")

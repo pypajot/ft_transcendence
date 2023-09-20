@@ -10,6 +10,7 @@ export interface User {
 	id: number
 	username: string
 	twoFactorAuthActive?: boolean
+	socketId?: string
 }
 
 export interface AuthContextData {
@@ -65,6 +66,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 			setUser(null);
 			setAccessToken(null);
 			sessionStorage.removeItem("access_token");
+			run.current = false;
 			return response;
 		}
 		const token = (await response.json()).access_token;
