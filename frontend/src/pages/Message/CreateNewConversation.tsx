@@ -32,16 +32,20 @@ interface CreateNewConversationProps {
 export const CreateNewConversation: React.FC<CreateNewConversationProps> = ({
   setConversation,
 }) => {
-  const [channelType, setChannelType] = useState("");
+  const [channelType, setChannelType] = useState("Public");
+  const [_public, setPublic] = useState(true);
   const [channelName, setChannelName] = useState("");
   const [channelPassword, setchannelPassword] = useState("");
   const [errorChannelName, setErrorChannelName] = useState(false);
   const socket = useSocketContext();
 
-  const value = document.getElementById("SelectType");
   useEffect(() => {
-    setChannelType(getChannelType(document.getElementById("SelectType")));
-  }, [value]);
+    if (_public) {
+      setChannelType("Public");
+    } else {
+      setChannelType("Private");
+    }
+  }, [_public]);
 
   const nameTaken = () => {
     setErrorChannelName(true);
@@ -74,6 +78,13 @@ export const CreateNewConversation: React.FC<CreateNewConversationProps> = ({
     };
     console.log("new");
     setConversation(conversationInfo);
+  };
+  const handleSelectChange = () => {
+    if (_public) {
+      setPublic(false);
+    } else {
+      setPublic(true);
+    }
   };
 
   //Checker si le channel name est pas pris
@@ -117,7 +128,11 @@ export const CreateNewConversation: React.FC<CreateNewConversationProps> = ({
                 )}
               </FormControl>
               <FormControl>
-                <Select id="selectType" name="selectType">
+                <Select
+                  id="selectType"
+                  name="selectType"
+                  onChange={handleSelectChange}
+                >
                   <Option value="Public">Public</Option>
                   <Option value="Private">Private</Option>
                 </Select>

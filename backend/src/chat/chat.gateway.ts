@@ -13,6 +13,11 @@ import { ChatGatewayService } from './chat.service';
 import { channelInfo } from 'src/types/channelInfo.entity';
 import { MessageInfo } from 'src/types/message.info';
 
+export interface joinChannelInfo {
+  name: string;
+  pass: string;
+}
+
 @WebSocketGateway({ cors: '*' })
 class ChatGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
@@ -60,7 +65,7 @@ class ChatGateway
   }
 
   @SubscribeMessage('JoinChannel')
-  handleChannelJoining(client: any, data: string): void {
+  handleChannelJoining(client: any, data: joinChannelInfo): void {
     console.log(data);
     this.chatService.newMember(this.io, client, data);
   }

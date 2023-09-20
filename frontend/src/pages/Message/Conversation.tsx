@@ -67,6 +67,9 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
         receiver: username,
         isUser: info.isUser,
       }).then((res) => {
+        //res.forEach((element: Message) => {
+        // element.senderName = info.name;
+        // });
         setReceivedMessage(res);
       });
     } else {
@@ -148,13 +151,6 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
     socket?.on("messageChannel", channelMessage);
     return () => {
       socket?.off("messageChannel", channelMessage);
-    };
-  }, [socket, messageListener]);
-
-  useEffect(() => {
-    socket?.on("messageChannelSent", messageListener);
-    return () => {
-      socket?.off("messageChannelSent", messageListener);
     };
   }, [socket, messageListener]);
 

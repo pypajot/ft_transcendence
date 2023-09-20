@@ -6,6 +6,7 @@ import { PrismaClient } from '@prisma/client';
 import { channelInfo } from 'src/types/channelInfo.entity';
 import { Conversation } from 'src/types/conversation.entity';
 import { MessageInfo } from 'src/types/message.info';
+import { joinChannelInfo } from './chat.gateway';
 
 @Injectable()
 export class ChatControllerService {
@@ -410,7 +411,7 @@ export class ChatGatewayService {
   ) {
     try {
       let public_chan = false;
-      if (data_chan.type == 'public') {
+      if (data_chan.type == 'Public') {
         public_chan = true;
       }
       const existingChannel = await this.prisma.channel.findUnique({
@@ -436,6 +437,7 @@ export class ChatGatewayService {
             },
             public: public_chan,
             password: data_chan.pwd,
+            invited: [],
           },
         });
         client.join(data_chan.name);
@@ -444,32 +446,50 @@ export class ChatGatewayService {
       console.log(error);
     }
   }
-  async newMember(io: Server, client: any, channelName: string) {
-    const socket_id = client.id;
+  async newMember(io: Server, client: any, info: joinChannelInfo) {
     try {
       const existingChannel = await this.prisma.channel.findUnique({
         where: {
-          name: channelName,
+          name: info.name,
         },
       });
       const user = await this.prisma.user.findUnique({
         where: {
-          id: (await this.findIdFromSocketId(socket_id))[0],
+          id: (await this.findIdFromSocketId(client.id))[0],
         },
       });
       //Add check about channel right
       if (existingChannel) {
+        if (!existingChannel.public) {
+          let find = false;
+          for (let i = 0; i < existingChannel.invited.length; i++) {
+            if (existingChannel.invited[i] == user.id) {
+              find = true;
+              break;
+            }
+          }
+          if (!find) {
+            client.emit('wrongPrivileges');
+            return;
+          }
+        } else if (info.pass == '' && existingChannel.password != '') {
+          client.emit('requestPassword');
+          return;
+        } else if (info.pass != existingChannel.password) {
+          client.emit('wrongPassword');
+          return;
+        }
         const newUserChannel = await this.prisma.channel.update({
           where: {
-            name: channelName,
+            name: info.name,
           },
           data: {
             members: { connect: { id: user.id } },
           },
         });
-        client.join(channelName);
+        client.join(info.name);
       } else {
-        io.to(socket_id).emit('badChannelRequest');
+        client.emit('wrongName');
       }
     } catch (error) {
       console.log(error);
@@ -499,10 +519,15 @@ export class ChatGatewayService {
         senderName: sender.username,
         sent: true,
         content: message.content,
-        createdAt: me
+        createdAt: message.createdAt,
+      };
+      io.to(channel_name).emit('messageChannel', msgRes);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-
-        o: Server, message: any, socket_id: string) {
+  async sendToUser(io: Server, message: any, socket_id: string) {
     try {
       console.log(`test : ${message.content}`);
       const sender = await this.prisma.user.findUnique({
