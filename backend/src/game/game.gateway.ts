@@ -4,6 +4,7 @@ import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { MatchmakingService } from './matchmaking.service';
 import { Player } from './Player';
 import { PrismaClient } from '@prisma/client';
+import { subscribe } from 'diagnostics_channel';
 
 @WebSocketGateway({
 	cors: true,
@@ -220,6 +221,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }, 50);
   }
   
+  @SubscribeMessage('forfait')
+  handleForfaitEvent(client: Socket, id: {lobbyId: string}): void {
+    this.handleForfait(client, id);
+  }
+
   @SubscribeMessage('destroyLobby')
   handleDestroyLobby(client: Socket, id: {lobbyId: string}): void {
     const lobbyId = id.lobbyId;

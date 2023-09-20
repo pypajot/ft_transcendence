@@ -81,20 +81,20 @@ const PongGame : React.FC = () => {
     // Add event listener for user input (arrow keys)
     window.addEventListener('keydown', handleKeyPress);
     window.addEventListener('keyup', handleKeyPress);
-    // add event listener to detect if the user leaves the page
-    // window.addEventListener('beforeunload', () => {
-    //   console.log('forfaiting!!!');
-    //   socket?.emit('forfait', { lobbyId });
-    // });
+    //add event listener to detect if the user leaves the page
+    window.addEventListener('beforeunload', () => {
+      console.log('forfaiting!');
+      socket?.emit('forfait', { lobbyId });
+    });
 
 
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
       window.removeEventListener('keyup', handleKeyPress);
-      // window.removeEventListener('unload', () => {
-      //   socket?.emit('forfait', { lobbyId });
-      // });
+      window.removeEventListener('beforeunload', () => {
+        socket?.emit('forfait', { lobbyId });
+      });
     };
   }, [lobbyId, gameEnd]);
 
