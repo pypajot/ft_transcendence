@@ -39,6 +39,7 @@ export default function SocketContextProvider(props: SocketContextProviderProps)
 		}
     }, [user && user.id]);
 
+
     const value = useMemo(() => socket, [socket]);
 
     return (
@@ -47,9 +48,6 @@ export default function SocketContextProvider(props: SocketContextProviderProps)
         </SocketContext.Provider>
     )
 }
-
-
-
 
 export function useSocketContext() {
     const context = useContext(SocketContext);

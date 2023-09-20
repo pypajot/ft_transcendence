@@ -19,7 +19,15 @@ export const ContactElement: React.FC<ContactElementProps> = ({
   content,
   setConversation,
 }) => {
-  const menu = useMenuState();
+  const handleContact = (content: ContactType) => {
+    const conversationInfo: ConversationInformation = {
+      ischannel: content.channel,
+      isUser: content.user,
+      name: content.name,
+    };
+
+    setConversation(conversationInfo);
+  };
   return (
     <div onClick={() => setConversation(content)}>
       <Box
