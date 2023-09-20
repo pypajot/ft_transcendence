@@ -15,6 +15,7 @@ import {
 } from "@twilio-paste/core";
 import { useEffect, useState } from "react";
 import { useSocketContext } from "../../context/WebSocketContext";
+import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
 
 const getChannelType: any = (type: string | undefined) => {
   if (type) {
@@ -24,17 +25,27 @@ const getChannelType: any = (type: string | undefined) => {
   }
 };
 
-export const CreateNewConversation = () => {
-  const [channelType, setChannelType] = useState("");
+interface CreateNewConversationProps {
+  setConversation: (val: ConversationInformation) => void;
+}
+
+export const CreateNewConversation: React.FC<CreateNewConversationProps> = ({
+  setConversation,
+}) => {
+  const [channelType, setChannelType] = useState("Public");
+  const [_public, setPublic] = useState(true);
   const [channelName, setChannelName] = useState("");
   const [channelPassword, setchannelPassword] = useState("");
   const [errorChannelName, setErrorChannelName] = useState(false);
   const socket = useSocketContext();
 
-  const value = document.getElementById("SelectType");
   useEffect(() => {
-    setChannelType(getChannelType(document.getElementById("SelectType")));
-  }, [value]);
+    if (_public) {
+      setChannelType("Public");
+    } else {
+      setChannelType("Private");
+    }
+  }, [_public]);
 
   const nameTaken = () => {
     setErrorChannelName(true);
@@ -59,6 +70,20 @@ export const CreateNewConversation = () => {
           <h1>Channel Name Already Taken</h1>
         </div>
       );
+    }
+    const conversationInfo = {
+      ischannel: true,
+      isUser: false,
+      name: channelName,
+    };
+    console.log("new");
+    setConversation(conversationInfo);
+  };
+  const handleSelectChange = () => {
+    if (_public) {
+      setPublic(false);
+    } else {
+      setPublic(true);
     }
   };
 
@@ -103,7 +128,11 @@ export const CreateNewConversation = () => {
                 )}
               </FormControl>
               <FormControl>
-                <Select id="selectType" name="selectType">
+                <Select
+                  id="selectType"
+                  name="selectType"
+                  onChange={handleSelectChange}
+                >
                   <Option value="Public">Public</Option>
                   <Option value="Private">Private</Option>
                 </Select>

@@ -10,14 +10,14 @@ const Game : React.FC = () => {
 	//const socket = useSocketContext(); // Access the WebSocket context
 	const {gameStart, setGameStart} = useGameContext();
 
-	useEffect(() => {
-		// reset gameStart state when component unmounts
-		return () => {
-			setGameStart(false);
-		};
-	}
-	, []);
-
+	// useEffect(() => {
+	// 	// Set up WebSocket event listener to receive the matched event from the server
+	// 	socket?.on('matched', () => {
+	// 		// redirect to game page
+	// 		setGameStart(true);
+	// 		socket?.off('matched');
+	// 	});
+	// }, []);
 	return (
 		<div>
 			{gameStart ? <PongGame /> : <ModeSelection />}

@@ -1,8 +1,9 @@
-export interface Message{
-    id: number;
-    content: string;
-    createdAt: Date;
-    authorSocketId: string;
-    targetSocketId: string;
-    sent: boolean;
-    }
+export interface Message {
+  id: number;
+  content: string;
+  createdAt: Date;
+  authorId: number;
+  targetId?: number;
+  senderName: string;
+  sent: boolean;
+}
