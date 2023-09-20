@@ -11,6 +11,8 @@ function Login() {
 	async function HandleSubmit(e: any)
 	{
 		e.preventDefault();
+
+		
 		const form = e.target;
 		const formData = new FormData(form);
 		const formBody = {
@@ -39,68 +41,40 @@ function Login() {
 		// .then(response => sessionStorage.setItem("access_token",response.access_token))
 	}
 
-  return (
-    <>
-      <div className="login-form">
-        <a>
-          <img src="https://i.imgur.com/ca0eJ1A.png" />
-        </a>
-      </div>
-      <div className="login-game">
-        <a>
-          <img
-            src="https://i.imgur.com/vm7Rs68.gif"
-            className="login-game-pong"
-          />
-        </a>
-      </div>
-      <div>
-        <form onSubmit={HandleSubmit}>
-          <div>
-            <div className="username">
-              <label>
-                <input
-                  type="text"
-                  name="username"
-                  className="user-input"
-                  placeholder="username"
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                <input
-                  type="password"
-                  name="password"
-                  className="user-input"
-                  placeholder="password"
-                />
-              </label>
-            </div>
-          </div>
-          <div className="submit">
-            <button type="submit" className="submit-button">
-              Submit
-            </button>
-          </div>
-        </form>
-      </div>
-      <div className="login-other-options">
-        <div className="login42">
-          <a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3aaed99808e42f414bc3012769d17d2df75acba4efc662238fb0e9ad81b91339&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fintralogin&response_type=code">
-            <button className="login-button42">42 login</button>
-          </a>
-        </div>
-        <div>
-          <Link to="/signup">
-            <button className="login-register-button">Register</button>
-          </Link>
-        </div>
-      </div>
-    </>
-  );
-
-
+	return (
+		<>
+			<div>
+				<h1>Login Form</h1>
+			</div>
+			<div>
+				<form onSubmit={HandleSubmit}>
+					<div>
+						<label>
+							Username: <input type="text" name="username" />
+						</label>
+					</div>
+					<div>
+						<label>
+							Password: <input type="password" name="password" />
+						</label>
+					</div>
+					<div>
+						<button type="submit">
+							Submit
+						</button>
+					</div>
+				</form>
+			</div>
+			<div>
+				Don't have an account ?
+			</div>
+			<Link to='/signup'>
+				<button>
+					Register here
+				</button>
+			</Link>
+		</>
+	);
 };
 
 
