@@ -19,7 +19,6 @@ import { getFriendsList } from "./Hooks/GetFriendsList";
 import { useAuth } from "../../context/AuthContext";
 import { ContactType } from "../../../public/Types/contact.entity";
 import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
-import { setFips } from "crypto";
 
 //Possible to have channel Or People
 
@@ -67,10 +66,10 @@ export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
   //Return a list of string Channel And User
 
   useEffect(() => {
-    console.log("bkl");
     if (username === "") return;
     getFriendsList(username).then((res: ContactType[]) => {
       setFriends(res);
+      console.log(res);
     });
   }, [newFriend, username]);
   //Ask the back for the userList

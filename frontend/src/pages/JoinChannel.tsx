@@ -22,7 +22,6 @@ interface error {
 }
 
 export const JoinChanel: React.FC<JoinChannelProps> = ({ setConversation }) => {
-  const [info, setInfo] = useState("");
   const [password, setPassword] = useState("");
   const [channelName, setChannelName] = useState("");
   const [requestPassword, setReqPassword] = useState(false);
@@ -39,7 +38,6 @@ export const JoinChanel: React.FC<JoinChannelProps> = ({ setConversation }) => {
   };
 
   const handleWrongName = () => {
-    console.log("whyName");
     setError({
       wrongName: true,
       wrongPriv: error.wrongPriv,
@@ -48,7 +46,6 @@ export const JoinChanel: React.FC<JoinChannelProps> = ({ setConversation }) => {
   };
 
   const handleWrongPrivileges = () => {
-    console.log("whyPriv");
     setError({
       wrongName: error.wrongName,
       wrongPriv: true,
@@ -57,7 +54,6 @@ export const JoinChanel: React.FC<JoinChannelProps> = ({ setConversation }) => {
   };
 
   const handleWrongPassword = () => {
-    console.log("whyWrong");
     setError({
       wrongName: error.wrongName,
       wrongPriv: error.wrongPriv,
@@ -65,7 +61,6 @@ export const JoinChanel: React.FC<JoinChannelProps> = ({ setConversation }) => {
     });
   };
   const handleReqPassword = () => {
-    console.log("whywhy");
     setReqPassword(true);
     setError({
       wrongName: false,
@@ -94,11 +89,7 @@ export const JoinChanel: React.FC<JoinChannelProps> = ({ setConversation }) => {
     <Box display="flex">
       <PopoverContainer baseId="joinChannel">
         <PopoverButton variant="primary">Join a Channel</PopoverButton>
-        <Popover
-          aria-label="FriendRequest"
-          i18nDismissLabel={info}
-          width="size30"
-        >
+        <Popover aria-label="FriendRequest" width="size30">
           <Input
             type="text"
             id={"joinChannelId"}

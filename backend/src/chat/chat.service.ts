@@ -383,7 +383,6 @@ export class ChatGatewayService {
   }
 
   async new_cli(client: any, name: string) {
-    console.log(name);
     try {
       const chatUser = await this.prisma.user.update({
         where: {
@@ -393,7 +392,6 @@ export class ChatGatewayService {
           socketId: client.id,
         },
       });
-      console.log(chatUser.socketId);
     } catch (error) {
       console.log(error);
     }

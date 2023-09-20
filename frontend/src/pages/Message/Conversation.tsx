@@ -67,9 +67,6 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
         receiver: username,
         isUser: info.isUser,
       }).then((res) => {
-        //res.forEach((element: Message) => {
-        // element.senderName = info.name;
-        // });
         setReceivedMessage(res);
       });
     } else {
