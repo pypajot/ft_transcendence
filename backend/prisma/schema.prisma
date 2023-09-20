@@ -32,6 +32,7 @@ model User {
   twoFactorAuthActive Boolean @default(false)
   twoFactorAuthSecret String?
 
+  @@unique(id)
   @@map("users")
 }
 
@@ -55,6 +56,7 @@ model Channel {
   messages Message[]
   members  User[]    @relation("Memberships")
   creator  String
+  invited  Int[]
 
   @@unique([name])
   @@unique([id])

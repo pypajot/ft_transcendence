@@ -11,6 +11,12 @@ import { Server } from 'socket.io';
 import { ServerToClientEvents } from 'src/types/events';
 import { ChatGatewayService } from './chat.service';
 import { channelInfo } from 'src/types/channelInfo.entity';
+import { MessageInfo } from 'src/types/message.info';
+
+export interface joinChannelInfo {
+  name: string;
+  pass: string;
+}
 
 @WebSocketGateway({ cors: '*' })
 class ChatGateway
@@ -26,7 +32,7 @@ class ChatGateway
     this.logger.log('Websocket Initialized\n');
   }
   async handleConnection(client: any, ...args: any[]) {
-    console.log(`New Connection Sokcet" ${client.handshake.query.username}`);
+    console.log(`New Connection Socket" ${client.handshake.query.username}`);
     if (client.handshake.query.username !== 'null') {
       this.username = client.handshake.query.username;
       this.chatService.new_cli(client, client.handshake.query.username);
@@ -34,22 +40,34 @@ class ChatGateway
     this.logger.log(
       `Client ${client.id} ${client.handshake.query.username} arrived`,
     );
+    client.emit('connection');
   }
   handleDisconnect(client: any) {
     //Remove the client.id and the username
     this.logger.log(`Client ${client.id} left`);
+    client.emit('disconnection');
   }
   @SubscribeMessage('message')
-  async handleEvent(client: any, data: string[]): Promise<void> {
-    this.logger.log(`Message : ${data[0]} from : ${client.id} to: ${data[1]}`);
-    const newMsg = this.chatService.createMessage(client.id, data[0], data[1]);
-    this.chatService.sendTo(this.io, await newMsg, client.id);
+  async handleEvent(client: any, data: MessageInfo): Promise<void> {
+    const newMsg = this.chatService.createMessage(client.id, data);
+    if (data.ToUser) {
+      this.chatService.sendToUser(this.io, await newMsg, client.id);
+    } else {
+      client.join(data.target);
+      this.chatService.sendToChannel(
+        this.io,
+        await newMsg,
+        client.id,
+        data.target,
+      );
+    }
     //		this.chatService.sendMessage(this.io, message_obj);
   }
 
   @SubscribeMessage('JoinChannel')
-  handleChannelJoining(client: any, data: string): void {
-    //   this.chatService.newMember(client, data);
+  handleChannelJoining(client: any, data: joinChannelInfo): void {
+    console.log(data);
+    this.chatService.newMember(this.io, client, data);
   }
 
   @SubscribeMessage('ChannelMessage')
@@ -60,6 +78,10 @@ class ChatGateway
   @SubscribeMessage('ChannelCreation')
   handleChannelCreation(client: any, data: channelInfo): void {
     this.chatService.channelCreation(this.io, data, client.id, client);
+  }
+  @SubscribeMessage('friendsRequest')
+  handleFriendsRequest(client: any, target: string): void {
+    this.chatService.requestFriends(this.io, client.id, target);
   }
 }
 

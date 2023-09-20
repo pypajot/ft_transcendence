@@ -10,11 +10,18 @@ import {
 } from "@twilio-paste/core";
 import { CreateNewConversation } from "./CreateNewConversation";
 import { useAuth } from "../../context/AuthContext";
+import { AddFriends } from "./AddFriends";
+import { JoinChanel } from "../JoinChannel";
+import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
 
-export const TopbarMenu = () => {
+interface TopbarProps {
+  setConversation: (val: ConversationInformation) => void;
+}
+
+export const TopbarMenu: React.FC<TopbarProps> = ({ setConversation }) => {
   const userDialogList = useUserDialogListState();
 
-  const {user} = useAuth();
+  const { user } = useAuth();
   const getName = () => {
     if (user) {
       return user.username;
@@ -27,7 +34,9 @@ export const TopbarMenu = () => {
   return (
     <Topbar id="topbar">
       <TopbarActions justify="start">
-        <CreateNewConversation />
+        <CreateNewConversation setConversation={setConversation} />
+        <AddFriends />
+        <JoinChanel setConversation={setConversation} />
       </TopbarActions>
       <TopbarActions justify="end">
         <UserDialogContainer name={name} baseId="i-am-user-dialog">
