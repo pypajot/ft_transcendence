@@ -1,15 +1,18 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { GameService } from './game.service';
 import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { MatchmakingService } from './matchmaking.service';
 import { Player } from './Player';
-import { PrismaClient } from '@prisma/client';
+import { jsonc } from 'jsonc';
+import { GameConfiguration } from './game.service';
 
 @WebSocketGateway({
 	cors: true,
 })
-export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class GameGateway {
   constructor(private readonly matchmakingService: MatchmakingService) {}
+
 
   prisma = new PrismaClient();
 
@@ -96,21 +99,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.log(error);
     }
   }
-
+  
   @WebSocketServer()
   server: Server;
 
   // Other WebSocket event handlers and logic can be implemented here
 
   @SubscribeMessage('selectGameMode') // Listen for the selectGameMode event
-  async handleSelectGameMode(client: Socket, mode: string): Promise<void> {
-    const player = await this.createPlayer(client, mode);
-    console.log(`Player ${client.id} selected ${player.gameMode} mode`);
+  handleSelectGameMode(client: Socket, mode: string): void {
+    const player = new Player(client, 0, mode);
+    console.log(`Player ${client.id} selected ${mode} mode`);
     // place the player in the appropriate queue based on selected mode.
     this.matchmakingService.enqueue(player);
     const lobbyId = this.matchmakingService.tryMatchPlayers(mode);
     if (lobbyId !== undefined) {
-      // wait for 1/2 second before emitting the createLobby event
+      // wait for 1 second before emitting the createLobby event
       setTimeout(() => {
       const username1 = this.matchmakingService.gameService[lobbyId].player1.username;
       const username2 = this.matchmakingService.gameService[lobbyId].player2.username;
@@ -124,24 +127,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('launchBall')
   handleLaunchGame(client: Socket, data: {lobbyId: string}): void {
     const { lobbyId } = data;
-    if (lobbyId === undefined) {
-      return;
-    }
-    this.matchmakingService.gameService[lobbyId].resetBall();
+    this.matchmakingService.gameService[lobbyId].launchBall();
   }
 
   @SubscribeMessage('movePaddle')
   handleMovePaddle(client: Socket, data: {direction: string, lobbyId: string}): void {
     const { direction } = data;
     const { lobbyId } = data;
-    if (lobbyId === undefined) {
-      return;
-    }
     if (direction === 'up') {
       this.matchmakingService.gameService[lobbyId].movePaddleUp(client.id);
     } 
     else if (direction === 'down') {
       this.matchmakingService.gameService[lobbyId].movePaddleDown(client.id);
+    } else if (direction === 'stop') {
+      this.matchmakingService.gameService[lobbyId].stopPaddle(client.id);
     }
   }
 
@@ -206,8 +205,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const lobbyId = id.lobbyId;
     if (lobbyId === undefined) {
       return;
+
     }
-    console.log(`Lobby ${lobbyId} destroyed`);
-    delete this.matchmakingService.gameService[lobbyId];
   }
 }
