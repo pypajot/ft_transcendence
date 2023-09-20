@@ -3,7 +3,6 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Socket, io } from "socket.io-client";
 import { useAuth } from './AuthContext';
 
-
 type WebContext = {
     io: Socket;
 }

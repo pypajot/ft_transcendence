@@ -38,8 +38,8 @@ const PongGame : React.FC = () => {
       setGameState(data);
     });
 
-    socket?.on('gameEnd', (data) => {
-      handleGameEnd(data);
+    socket?.on('gameEnd', (data: any, forfait: boolean) => {
+      handleGameEnd(data, forfait);
     });
 
     return () => {
@@ -60,12 +60,15 @@ const PongGame : React.FC = () => {
       socket?.emit('movePaddle', { direction, lobbyId});
   };
 
-  const handleGameEnd = (data: any) => {
+  const handleGameEnd = (data: any, forfait: boolean) => {
     // display game end message
     setGameEnd(true);
     setShowBall(false);
     if (data === socket?.id) {
-      setGameEndMessage('You win!');
+      if (forfait)
+        setGameEndMessage('You win by forfait!');
+      else
+        setGameEndMessage('You win!');
       console.log('LobbyId: ', lobbyId);
       setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
     }
