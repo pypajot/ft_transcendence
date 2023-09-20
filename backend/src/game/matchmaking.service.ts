@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 const classicGameConfig: GameConfiguration = {
 	mode: GameMode.Classic,
 	ballSpeed: 3,
-	ballSpeedIncreaseFactor: 1.1,
+	ballSpeedIncreaseFactor: 1.2,
 	paddleWidth: 10,
 	paddleHeight: 100,
 	paddleMoveSpeed: 15,
@@ -15,7 +15,7 @@ const classicGameConfig: GameConfiguration = {
 const partyGameConfig: GameConfiguration = {
 	mode: GameMode.Party,
 	ballSpeed: 3,
-	ballSpeedIncreaseFactor: 1.1,
+	ballSpeedIncreaseFactor: 1.2,
 	paddleWidth: 10,
 	paddleHeight: 100,
 	paddleMoveSpeed: 20,
@@ -25,7 +25,7 @@ const partyGameConfig: GameConfiguration = {
 const hardcoreGameConfig: GameConfiguration = {
 	mode: GameMode.Hardcore,
 	ballSpeed: 5,
-	ballSpeedIncreaseFactor: 1.3,
+	ballSpeedIncreaseFactor: 1.4,
 	paddleWidth: 10,
 	paddleHeight: 50,
 	paddleMoveSpeed: 25,
@@ -44,7 +44,11 @@ export class MatchmakingService {
   	// Add a player to the matchmaking queue
 	enqueue(player: Player): void {
 		const mode = player.gameMode;
-    	// Add the player to the appropriate queue based on selected mode.
+		// check if a player with the same user_id is already in the queue and remove it
+		this.classicQueue = this.classicQueue.filter((p) => p.user_id !== player.user_id);
+		this.partyQueue = this.partyQueue.filter((p) => p.user_id !== player.user_id);
+		this.hardcoreQueue = this.hardcoreQueue.filter((p) => p.user_id !== player.user_id);
+		// Add the player to the appropriate queue based on selected mode.
 		if (mode === GameMode.Classic) {
 			this.classicQueue.push(player);
 		  }
@@ -61,13 +65,13 @@ export class MatchmakingService {
 		const mode = player.gameMode;
 		// Remove the player from the appropriate queue based on selected mode.
 		if (mode === GameMode.Classic) {
-			this.classicQueue = this.classicQueue.filter((p) => p.socket.id !== player.socket.id);
+			this.classicQueue = this.classicQueue.filter((p) => p.user_id !== player.user_id);
 		}
 		else if (mode === GameMode.Party) {
-			this.partyQueue = this.partyQueue.filter((p) => p.socket.id !== player.socket.id);
+			this.partyQueue = this.partyQueue.filter((p) => p.user_id !== player.user_id);
 		}
 		else if (mode === GameMode.Hardcore) {
-			this.hardcoreQueue = this.hardcoreQueue.filter((p) => p.socket.id !== player.socket.id);
+			this.hardcoreQueue = this.hardcoreQueue.filter((p) => p.user_id !== player.user_id);
 		}
 	}
 

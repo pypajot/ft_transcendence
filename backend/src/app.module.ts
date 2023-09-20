@@ -13,22 +13,11 @@ import { GameService } from './game/game.service';
 import { MatchmakingService } from './game/matchmaking.service';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    ChatModule,
-    UserModule,
-    AuthModule,
-    PrismaModule,
-  ],
+  imports: [ConfigModule.forRoot({
+	isGlobal: true,
+  }), ChatModule, UserModule, AuthModule, PrismaModule],
   controllers: [AppController],
-  providers: [
-    AppService,
-    PrismaService,
-    GameService,
-    GameGateway,
-    MatchmakingService,
-  ],
+  providers: [AppService, PrismaService, GameService, GameGateway, MatchmakingService],
 })
+
 export class AppModule {}

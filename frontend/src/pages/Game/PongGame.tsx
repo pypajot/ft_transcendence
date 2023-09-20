@@ -16,37 +16,30 @@ const PongGame : React.FC = () => {
   const [showBall, setShowBall] = useState(true);
   const [gameEnd, setGameEnd] = useState(false);
   const [gameEndMessage, setGameEndMessage] = useState('');
+  const [userName1, setUserName1] = useState<string>('');
+  const [userName2, setUserName2] = useState<string>('');
 
   useEffect(() => {
     // Send custom event to request game state from the server
-    socket?.on('createLobby', (lobbyId: string) => {
+    socket?.on('createLobby', (lobbyId: string, userName1: string, userName2: string) => {
       setLobbyId(lobbyId);
+      setUserName1(userName1);
+      setUserName2(userName2);
       socket?.emit('getGameState', { lobbyId });
       setCountdown(3);
       setTimeout(() => { setCountdown(2)}, 1000);
       setTimeout(() => { setCountdown(1)}, 2000);
-      setTimeout(() => { setShowGo(true)}, 3000);
+      setTimeout(() => { setShowGo(true), setCountdown(null)}, 3000);
       setTimeout(() => { socket?.emit('launchBall', { lobbyId })}, 3000);
     },);
 
     // Set up WebSocket event listener to receive the game state from the server
     socket?.on('gameState', (data) => {
-      // update the game state
       setGameState(data);
-    },);
-    //add event listener for game end
+    });
+
     socket?.on('gameEnd', (data) => {
-      // display game end message
-      setGameEnd(true);
-      setShowBall(false);
-      if (data === socket?.id) {
-        setGameEndMessage('You win!');
-        console.log('LobbyId: ', lobbyId);
-        setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
-      }
-      else {
-        setGameEndMessage('You lose!');
-      }
+      handleGameEnd(data);
     });
 
     return () => {
@@ -56,6 +49,7 @@ const PongGame : React.FC = () => {
     };
   }, [lobbyId]);
 
+  // get the username from the context
   // Other game logic and rendering based on the received gameState
 
   const handleKeyPress = (event: any) => {
@@ -66,16 +60,38 @@ const PongGame : React.FC = () => {
       socket?.emit('movePaddle', { direction, lobbyId});
   };
 
+  const handleGameEnd = (data: any) => {
+    // display game end message
+    setGameEnd(true);
+    setShowBall(false);
+    if (data === socket?.id) {
+      setGameEndMessage('You win!');
+      console.log('LobbyId: ', lobbyId);
+      setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
+    }
+    else {
+      setGameEndMessage('You lose!');
+    }
+  }
+
   useEffect(() => {
     // Add event listener for user input (arrow keys)
-
     window.addEventListener('keydown', handleKeyPress);
     window.addEventListener('keyup', handleKeyPress);
+    // add event listener to detect if the user leaves the page
+    // window.addEventListener('beforeunload', () => {
+    //   console.log('forfaiting!!!');
+    //   socket?.emit('forfait', { lobbyId });
+    // });
+
 
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
       window.removeEventListener('keyup', handleKeyPress);
+      // window.removeEventListener('unload', () => {
+      //   socket?.emit('forfait', { lobbyId });
+      // });
     };
   }, [lobbyId, gameEnd]);
 
@@ -85,8 +101,8 @@ const PongGame : React.FC = () => {
           {/* Render scores */}
           {gameState && (
             <>
-              <div className="score">Player 1: {gameState.player1Score}</div>
-              <div className="score">Player 2: {gameState.player2Score}</div>
+              <div className="score">{userName1}: {gameState.player1Score}</div>
+              <div className="score">{userName2}: {gameState.player2Score}</div>
             </>
           )}
         </div>
