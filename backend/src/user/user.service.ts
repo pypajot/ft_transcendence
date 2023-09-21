@@ -80,14 +80,14 @@ export class UserService {
 		if (!user)
 			throw new ForbiddenException('No such user');
 		try {
-			const imageResponse = await cloudinary.uploader.upload("file");
+			const imageResponse = await cloudinary.uploader.upload(file);
 			await this.prisma.user.update({
 				where : {id: id},
 				data: {
-					avatar: imageResponse.url
+					avatar: imageResponse.secure_url
 				}
 			})
-			return { avatar: imageResponse.url }
+			return { avatar: imageResponse.secure_url }
 		} catch (err) {
 			console.log(err);
 		}

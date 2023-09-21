@@ -45,7 +45,7 @@ const Profile = () => {
 				<form onSubmit={HandleChangeAvatar}>
 					<div>
 						<label>
-							<input type="file" name="file" />
+							File Path: <input type="text" name="file" />
 						</label>
 					</div>
 					<div>
@@ -96,7 +96,7 @@ const Profile = () => {
 				<form onSubmit={HandleChangeUsername}>
 					<div>
 						<label>
-							New username: <input type="text" name="username" />
+							New username: <input type="text" name="username"  />
 						</label>
 					</div>
 					<div>
