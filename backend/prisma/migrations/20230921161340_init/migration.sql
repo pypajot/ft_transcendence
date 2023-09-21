@@ -6,6 +6,7 @@ CREATE TABLE "users" (
     "intralogin" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "avatar" TEXT NOT NULL DEFAULT 'https://i.imgur.com/WxNkK7J.png',
     "status" TEXT NOT NULL DEFAULT 'offline',
     "friends" INTEGER[],
     "friendsRequest" INTEGER[],

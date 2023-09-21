@@ -15,23 +15,30 @@ export class UserController {
 
 	@Get('me')
 	@UseGuards(JwtAuthGuard)
-	getMe(@Headers('Authorization') token: string) {
+	async getMe(@Headers('Authorization') token: string) {
 		const payload = this.jwt.decode(token.split(' ')[1]) as { [key: string] : any};
-		return this.userservice.getMe(payload.sub);
+		return await this.userservice.getMe(payload.sub);
 	}
 
 	@Post('username')
 	@UseGuards(JwtAuthGuard)
 	async changeUsername(@Headers('Authorization') token: string, @Req() req: any) {
 		const payload = this.jwt.decode(token.split(' ')[1]) as { [key: string] : any}; 
-		this.userservice.changeUsername(payload.sub, req.body.newName);
+		return await this.userservice.changeUsername(payload.sub, req.body.newName);
+	}
+
+	@Post('avatar')
+	@UseGuards(JwtAuthGuard)
+	async changeAvatar(@Headers('Authorization') token: string, @Req() req: any) {
+		const payload = this.jwt.decode(token.split(' ')[1]) as { [key: string] : any}; 
+		return await this.userservice.changeAvatar(payload.sub, req.body.file);
 	}
 
 	@Get('friend/request')
 	@UseGuards(JwtAuthGuard)
-	getFriendRequest(@Headers('Authorization') token: string) {
+	async getFriendRequest(@Headers('Authorization') token: string) {
 		const payload = this.jwt.decode(token.split(' ')[1]) as { [key: string] : any};
-		return this.userservice.getFriendRequest(payload.sub);
+		return await this.userservice.getFriendRequest(payload.sub);
 	}
 
 	@Get('friend/list')

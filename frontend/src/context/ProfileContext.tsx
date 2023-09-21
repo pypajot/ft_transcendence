@@ -51,11 +51,11 @@ export const ProfileProvider: React.FC<{children: React.ReactNode}> = ({ childre
 		getFriendList();
 		socket.on("friendRequestFrom", (user: any) => {
 			console.log("test socket profile", user)
-			const newRequest: User = {id: user.id, username: user.username}
+			const newRequest: User = user
 			setFriendRequestList(current => [...current, newRequest])
 		})
 		socket.on("friendAdded", (user: any) => {
-			const newFriend: User = {id: user.id, username: user.username, socketId: user.socketId}
+			const newFriend: User = user
 			setFriendList(current => [...current, newFriend])
 		})
 		return (() => {

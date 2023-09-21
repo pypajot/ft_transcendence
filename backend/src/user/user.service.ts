@@ -2,6 +2,14 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import { PrismaService } from '../prisma/prisma.service';
 import { UserDTO } from './dto/user.dto';
 import { WsException } from '@nestjs/websockets';
+import { v2 as cloudinary } from 'cloudinary'
+
+cloudinary.config({ 
+	cloud_name: process.env.CLOUDINARY_CLOUDNAME, 
+	api_key: process.env.CLOUDINARY_API_KEY, 
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+	secure: true
+  });
 
 @Injectable()
 export class UserService {
@@ -23,7 +31,7 @@ export class UserService {
 				id: Number(id),
 			},
 		});
-		return { id: user.id, username: user.username, twoFactorAuthActive: user.twoFactorAuthActive};
+		return { id: user.id, username: user.username, avatar: user.avatar, twoFactorAuthActive: user.twoFactorAuthActive};
 	}
 
 	async updateUser(user: UserDTO) {
@@ -65,6 +73,27 @@ export class UserService {
 		return { username: user.username };
 	}
 
+	async changeAvatar(id: number, file: string) {
+		const user = await this.prisma.user.findUnique({
+			where : {id: id}
+		})
+		if (!user)
+			throw new ForbiddenException('No such user');
+		try {
+			const imageResponse = await cloudinary.uploader.upload("file");
+			await this.prisma.user.update({
+				where : {id: id},
+				data: {
+					avatar: imageResponse.url
+				}
+			})
+			return { avatar: imageResponse.url }
+		} catch (err) {
+			console.log(err);
+		}
+		throw new ForbiddenException('invalid file')
+	}
+
 	async addFriend(content: {friendName: string, userId: number}, server: any) {
 		console.log(content.userId);
 		const friend = await this.prisma.user.findUnique({
@@ -96,7 +125,7 @@ export class UserService {
 			}
 		});
 		console.log("friend socket id: ", friend.socketId);
-		server.to(friend.socketId).emit("friendRequestFrom", {username: user.username, id: content.userId});
+		server.to(friend.socketId).emit("friendRequestFrom", user);
 	}
 
 	async respondFriendRequest(content: {friendId: number, userId: number, accept: boolean}, server: any) {

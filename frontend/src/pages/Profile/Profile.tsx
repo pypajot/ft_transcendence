@@ -9,13 +9,54 @@ import { isAbsolute } from 'path';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { ProfileContext } from '../../context/ProfileContext';
 
+
 const Profile = () => {
 
 	const { user, setUser, refreshFetch } = useAuth();
 	const [imagePath, setImagePath] = useState<string | null>(null);
 	const socket = useSocketContext();
 
+	function DisplayAvatar() {
+		return (
+			<>
+				<div>
+					<img src={user?.avatar} width={150} height={150} />
+				</div>
+			</>
+		)
+	}
 	
+	function ChangeAvatar() {
+		async function HandleChangeAvatar(e: any) {
+			e.preventDefault();
+			const response = await refreshFetch("http://localhost:3333/user/avatar", {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
+				},
+				body: JSON.stringify({file: e.target.file.value})
+			});
+			if (response.status === 201)
+				user && setUser({...user, avatar: (await response.json()).avatar});
+		}
+		return (
+			<>
+				<form onSubmit={HandleChangeAvatar}>
+					<div>
+						<label>
+							<input type="file" name="file" />
+						</label>
+					</div>
+					<div>
+						<button type="submit">
+							Upload
+						</button>
+					</div>
+				</form>
+			</>
+		)
+	}
 
 	async function HandleSubmit(e: any) {
 		e.preventDefault();
@@ -69,7 +110,8 @@ const Profile = () => {
 	}
 	
 	function QrDisplay() {
-		if (imagePath)
+		if (!imagePath)
+			return (<></>)
 		return (
 			<>
 				<div>
@@ -112,6 +154,8 @@ const Profile = () => {
 			<div>
 				<h1>Profile</h1>
 			</div>
+			<DisplayAvatar />
+			<ChangeAvatar />
 			<div>
 				username:
 				<p>

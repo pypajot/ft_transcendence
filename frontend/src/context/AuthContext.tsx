@@ -10,8 +10,9 @@ export const useAuth = () => useContext(AuthContext);
 export interface User {
 	id: number
 	username: string
-	twoFactorAuthActive?: boolean
+	avatar: string
 	socketId?: string
+	twoFactorAuthActive: boolean
 }
 
 export interface AuthContextData {
