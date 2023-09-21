@@ -36,6 +36,7 @@ export default function SocketContextProvider(
     setSocket(newSocket);
     console.log(newSocket.io.connected);
     return () => {
+	  newSocket.io.off("connect_error");
       newSocket.io.disconnect();
     };
   }, [user && user.id]);

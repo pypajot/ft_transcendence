@@ -25,4 +25,19 @@ export class UserGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleUpdateUser(client: Socket, user: UserDTO) {
 		await this.userService.updateUser(user);
 	}
+
+	@SubscribeMessage('addFriend')
+	async handleAddFriend(client: Socket, content: any) {
+		await this.userService.addFriend(content, this.server);
+	}
+
+	@SubscribeMessage('respondFriendRequest')
+	async handleReponsdFriendRequest(client: Socket, content: any) {
+		this.userService.respondFriendRequest(content, this.server);
+	}
+
+	@SubscribeMessage('blockUser')
+	async handleblockUser(client: Socket, content: any) {
+		this.userService.blockUser(content, this.server);
+	}
 }

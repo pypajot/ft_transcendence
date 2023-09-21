@@ -14,7 +14,6 @@ import {
   useMenuState,
 } from "@twilio-paste/core";
 import SendButton from "./SendButton";
-import getMesageReceived from "./Hooks/GetUserMessageReceived";
 import getMessageSent from "./Hooks/GetUserMessageSent";
 import { Message } from "../../../public/Types/message.entity";
 import { MessageInfo } from "../../../public/Types/messageInfo.entity";
@@ -37,7 +36,7 @@ const sortByDate = () => {
 
 export const Conversation = ({ info }: { info: ConversationInformation }) => {
   const [content, setContent] = useState<string>("A basic chat composer");
-  const { user } = useAuth();
+  const { user, refreshFetch } = useAuth();
   const [sentMessage, setSentMessage] = useState<Message[]>();
   const [receivedMessage, setReceivedMessage] = useState<Message[]>();
   const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
@@ -56,17 +55,48 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
     }
   }, [user]);
 
+  const getMessageReceived = async (obj: {
+	sender: string;
+	receiver: string;
+	isUser: boolean;
+  }) => {
+	const url = "http://localhost:3333/chat/getMessageReceived";
+	
+	try {
+	  const response = await refreshFetch(url, {
+		method: "POST",
+		headers: {
+		  "Content-Type": "application/json",
+		  "Authorization": `Bearer ${sessionStorage.getItem("access_token")}`,
+		},
+		body: JSON.stringify({
+		  sender: obj.sender,
+		  receiver: obj.receiver,
+		  isUser: obj.isUser,
+		}),
+	  });
+  
+	  if (!response.ok) {
+		throw new Error(`HTTP error! Status: ${response.status}`);
+	  }
+  
+	  return await response.json();
+	} catch (error) {
+	  console.error("There was an error fetching the data", error);
+	}
+  };
+
   useEffect(() => {
     if (!info) {
       return;
     }
     if (username != "") {
       setRenderConversation(true);
-      getMesageReceived({
+      getMessageReceived({
         sender: info.name,
         receiver: username,
         isUser: info.isUser,
-      }).then((res) => {
+      }).then((res: any) => {
         setReceivedMessage(res);
       });
     } else {

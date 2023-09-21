@@ -1,16 +1,19 @@
 import './Profile.css';
 import { useAuth } from '../../context/AuthContext';
 import Navbar, { Navbar2 } from '../../components/Navbar';
-import { Checkbox } from '@twilio-paste/core';
+import { Button, Checkbox } from '@twilio-paste/core';
 import { User } from '../../context/AuthContext';
-import { useEffect } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { isAbsolute } from 'path';
+import { useSocketContext } from '../../context/WebSocketContext';
+import { ProfileContext } from '../../context/ProfileContext';
 
 const Profile = () => {
 
 	const { user, setUser, refreshFetch } = useAuth();
 	const [imagePath, setImagePath] = useState<string | null>(null);
+	const socket = useSocketContext();
 
 	async function HandleSubmit(e: any) {
 		e.preventDefault();
@@ -28,33 +31,32 @@ const Profile = () => {
 		};
 	}
 
+	
 	function QrDisplay() {
 		if (imagePath)
-			return (
-				<>
-					<div>
-						<img src={imagePath}/>
-					</div>
-					<div>
-						<form onSubmit={HandleSubmit}>
-							<div>
-								<label>
-									Authenticator code: <input type="text" name="code" />
-								</label>
-							</div>
-							<div>
-								<button type="submit">
-									Submit
-								</button>
-							</div>
-						</form>
-					</div>
-				</>
-			)
 		return (
-			<div />
+			<>
+				<div>
+					<img src={imagePath}/>
+				</div>
+				<div>
+					<form onSubmit={HandleSubmit}>
+						<div>
+							<label>
+								Authenticator code: <input type="text" name="code" />
+							</label>
+						</div>
+						<div>
+							<button type="submit">
+								Submit
+							</button>
+						</div>
+					</form>
+				</div>
+			</>
 		)
 	}
+
 
 	const activate2FA = async () => {
 		await refreshFetch('http://localhost:3333/auth/2fa/activate', {
@@ -99,6 +101,7 @@ const Profile = () => {
 				</p>
 				<QrDisplay />
 			</div>
+			
 		</>
 	);
 };

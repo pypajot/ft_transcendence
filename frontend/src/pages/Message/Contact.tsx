@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useSocketContext } from "../../context/WebSocketContext";
 import {
   Box,
@@ -73,6 +73,16 @@ export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
     });
   }, [newFriend, username]);
   //Ask the back for the userList
+//   const contactList = friendList?.map(function (user, i) {
+// 	return (
+// 	  <div key={i}>
+// 		<ContactElement
+// 		  content={user.username}
+// 		  setConversation={setConversation}
+// 		></ContactElement>
+// 	  </div>
+// 	);
+//   })
   return (
     <>
       {username &&
