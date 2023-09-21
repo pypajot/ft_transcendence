@@ -50,6 +50,21 @@ export class UserService {
 		}
 	}
 
+	async changeUsername(id: number, newName: string) {
+		let user = await this.prisma.user.findUnique({
+			where : {username: newName}
+		})
+		if (user)
+			throw new ForbiddenException('Name already in use');
+		user = await this.prisma.user.update({
+			where: {id: id},
+			data: {
+				username: newName
+			}
+		})
+		return { username: user.username };
+	}
+
 	async addFriend(content: {friendName: string, userId: number}, server: any) {
 		console.log(content.userId);
 		const friend = await this.prisma.user.findUnique({

@@ -15,6 +15,8 @@ const Profile = () => {
 	const [imagePath, setImagePath] = useState<string | null>(null);
 	const socket = useSocketContext();
 
+	
+
 	async function HandleSubmit(e: any) {
 		e.preventDefault();
 		const response = await refreshFetch('http://localhost:3333/auth/2fa/confirm', {
@@ -31,6 +33,40 @@ const Profile = () => {
 		};
 	}
 
+	function ChangeUsernameForm() {
+
+		async function HandleChangeUsername(e: any) {
+			e.preventDefault();
+			const response = await refreshFetch('http://localhost:3333/user/username', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
+				},
+				body: JSON.stringify({code: e.target.username.value})
+			});
+			if (response.status === 201) {
+				user && setUser({...user, username: e.target.usernae.value})
+			}
+		}
+
+		return (
+			<>
+				<form onSubmit={HandleChangeUsername}>
+					<div>
+						<label>
+							New username: <input type="text" name="username" />
+						</label>
+					</div>
+					<div>
+						<button type="submit">
+							Submit
+						</button>
+					</div>
+				</form>
+			</>
+		)
+	}
 	
 	function QrDisplay() {
 		if (imagePath)
@@ -82,6 +118,9 @@ const Profile = () => {
 					{user?.username}
 				</p>
 				<p>
+					<div>
+						<ChangeUsernameForm />
+					</div>
 				<Checkbox
 					id="controlled"
 					value="controlled"
