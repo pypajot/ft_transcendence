@@ -27,7 +27,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
   handleDisconnect(client: any) {
     console.log(`Client disconnected: ${client.id}`);
-
     // Check if the client was part of an active game
     const lobbyId = this.findLobbyByClientId(client.id);
     if (!lobbyId) {
@@ -240,10 +239,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }, 50);
   }
   
-  @SubscribeMessage('forfait')
-  handleForfaitEvent(client: Socket, id: {lobbyId: string}): void {
-    this.handleForfait(client, id);
-  }
+  // @SubscribeMessage('forfait')
+  // handleForfaitEvent(client: Socket, id: {lobbyId: string}): void {
+  //   this.handleForfait(client, id);
+  // }
 
   @SubscribeMessage('destroyLobby')
   handleDestroyLobby(client: Socket, id: { lobbyId: string }): void {

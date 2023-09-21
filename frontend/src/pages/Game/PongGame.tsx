@@ -16,11 +16,15 @@ const PongGame : React.FC = () => {
   const [showBall, setShowBall] = useState(true);
   const [gameEnd, setGameEnd] = useState(false);
   const [gameEndMessage, setGameEndMessage] = useState('');
+  const [userName1, setUserName1] = useState<string>('');
+  const [userName2, setUserName2] = useState<string>('');
 
   useEffect(() => {
     // Send custom event to request game state from the server
-    socket?.on('createLobby', (lobbyId: string) => {
+    socket?.on('createLobby', (lobbyId: string, userName1: string, userName2: string) => {
       setLobbyId(lobbyId);
+      setUserName1(userName1);
+      setUserName2(userName2);
       socket?.emit('getGameState', { lobbyId });
       setCountdown(3);
       setTimeout(() => { setCountdown(2)}, 1000);
@@ -28,7 +32,6 @@ const PongGame : React.FC = () => {
       setTimeout(() => { setShowGo(true)}, 3000);
       setTimeout(() => { socket?.emit('launchBall', { lobbyId })}, 3000);
     },);
-
     // Set up WebSocket event listener to receive the game state from the server
     socket?.on('gameState', (data) => {
       // update the game state
@@ -79,19 +82,19 @@ const PongGame : React.FC = () => {
     window.addEventListener('keydown', handleKeyPress);
     window.addEventListener('keyup', handleKeyPress);
     //add event listener to detect if the user leaves the page
-    window.addEventListener('beforeunload', () => {
-      console.log('forfaiting!');
-      socket?.emit('forfait', { lobbyId });
-    });
+    // window.addEventListener('beforeunload', () => {
+    //   console.log('forfaiting!');
+    //   socket?.emit('forfait', { lobbyId });
+    // });
 
 
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
       window.removeEventListener('keyup', handleKeyPress);
-      window.removeEventListener('beforeunload', () => {
-        socket?.emit('forfait', { lobbyId });
-      });
+      // window.removeEventListener('beforeunload', () => {
+      //   socket?.emit('forfait', { lobbyId });
+      // });
     };
   }, [lobbyId, gameEnd]);
 
@@ -101,8 +104,8 @@ const PongGame : React.FC = () => {
           {/* Render scores */}
           {gameState && (
             <>
-              <div className="score">Player 1: {gameState.player1Score}</div>
-              <div className="score">Player 2: {gameState.player2Score}</div>
+              <div className="score">{userName1}: {gameState.player1Score}</div>
+              <div className="score">{userName2}: {gameState.player2Score}</div>
             </>
           )}
         </div>
