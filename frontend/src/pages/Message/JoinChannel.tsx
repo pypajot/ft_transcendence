@@ -6,14 +6,12 @@ import {
   PopoverButton,
   PopoverContainer,
   StatusBadge,
+  usePopoverState,
 } from "@twilio-paste/core";
 import { useContext, useEffect, useState } from "react";
 import { useSocketContext } from "../../context/WebSocketContext";
 import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
-
-interface JoinChannelProps {
-  setConversation: (val: ConversationInformation) => void;
-}
+import ChatContextProvider, { useChatContext } from "../../context/ChatContext";
 
 interface error {
   wrongName: boolean;
@@ -21,7 +19,7 @@ interface error {
   wrongPassword: boolean;
 }
 
-export const JoinChanel: React.FC<JoinChannelProps> = ({ setConversation }) => {
+export const JoinChanel = () => {
   const [password, setPassword] = useState("");
   const [channelName, setChannelName] = useState("");
   const [requestPassword, setReqPassword] = useState(false);
@@ -31,6 +29,8 @@ export const JoinChanel: React.FC<JoinChannelProps> = ({ setConversation }) => {
     wrongPassword: false,
   });
   const socket = useSocketContext();
+  const chatContext = useChatContext();
+
   const joinChannel: any = () => {
     socket?.emit("JoinChannel", { name: channelName, pass: password });
     //Checker que on a bien join puis
@@ -68,17 +68,27 @@ export const JoinChanel: React.FC<JoinChannelProps> = ({ setConversation }) => {
       wrongPassword: false,
     });
   };
+  const enterConversation = (arg: any) => {
+    const convInfo: ConversationInformation = {
+      ischannel: true,
+      isUser: false,
+      name: arg,
+    };
+    chatContext.setConversationInfo(convInfo);
+  };
 
   useEffect(() => {
     socket?.on("wrongName", handleWrongName);
     socket?.on("wrongPrivileges", handleWrongPrivileges);
     socket?.on("wrongPassword", handleWrongPassword);
     socket?.on("requestPassword", handleReqPassword);
+    socket?.on("successfullyJoinedChannel", enterConversation);
     return () => {
       socket?.off("wrongName", handleWrongName);
       socket?.off("wrongPrivileges", handleWrongPrivileges);
       socket?.off("wrongPassword", handleWrongPassword);
       socket?.off("requestPassword", handleReqPassword);
+      socket?.off("successfullyJoinedChannel", enterConversation);
     };
   }, [socket]);
 

@@ -1,24 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSocketContext } from "../../context/WebSocketContext";
-import {
-  Box,
-  Button,
-  Sidebar,
-  SidebarBody,
-  SidebarCollapseButton,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarHeaderIconButton,
-  SidebarHeaderLabel,
-  SidebarNavigation,
-  SidebarOverlayContentWrapper,
-} from "@twilio-paste/core";
-import { User } from "../../../public/Types/user.entity";
 import { ContactElement } from "./ContactElement";
 import { getFriendsList } from "./Hooks/GetFriendsList";
 import { useAuth } from "../../context/AuthContext";
 import { ContactType } from "../../../public/Types/contact.entity";
-import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
 
 //Possible to have channel Or People
 
@@ -31,16 +16,12 @@ import { ConversationInformation } from "../../../public/Types/conversationInfor
 
 //For the moment i will just display all user
 
-interface ContactProps {
-  setConversation: (val: ConversationInformation) => void;
-}
-
-export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
-  const [friends, setFriends] = useState<ContactType[]>();
+export const Contact = () => {
+  const [friends, setFriends] = useState<ContactType[]>([]);
   const [username, setUsername] = useState<string>("");
-  const [newFriend, setnewFriend] = useState<boolean>(false);
 
   const { user } = useAuth();
+  const socket = useSocketContext();
 
   const getName = () => {
     if (!user) {
@@ -49,6 +30,21 @@ export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
       return user.username;
     }
   };
+
+  const refreshContacts = (arg: any) => {
+    getFriendsList(username).then((res: ContactType[]) => {
+      setFriends(res);
+    });
+  };
+
+  useEffect(() => {
+    socket?.on("successfullyJoinedChannel", refreshContacts);
+    socket?.on("goodFriendsRequest", refreshContacts);
+    return () => {
+      socket?.off("successfullyJoinedChannel", refreshContacts);
+      socket?.off("goodFriendsRequest", refreshContacts);
+    };
+  }, [socket]);
 
   useEffect(() => {
     const res = getName();
@@ -71,7 +67,7 @@ export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
       setFriends(res);
       console.log(res);
     });
-  }, [newFriend, username]);
+  }, [username]);
   //Ask the back for the userList
   return (
     <>
@@ -80,10 +76,7 @@ export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
         friends.map(function (user, i) {
           return (
             <div key={i}>
-              <ContactElement
-                content={user}
-                setConversation={setConversation}
-              ></ContactElement>
+              <ContactElement content={user}></ContactElement>
             </div>
           );
         })}

@@ -81,7 +81,6 @@ export class ChatControllerService {
           friends.push(elem);
         }
       }
-      console.log(friends);
       return friends;
     } catch (error) {
       console.log(error);
@@ -288,6 +287,7 @@ export class ChatGatewayService {
           },
         },
       });
+      io.to(socket_id).emit('goodFriendsRequest');
     } catch (error) {
       console.log(error);
     }
@@ -444,6 +444,7 @@ export class ChatGatewayService {
             invited: [],
           },
         });
+        client.emit('successfullyJoinedChannel', data_chan.name);
         client.join(data_chan.name);
       }
     } catch (error) {
@@ -491,6 +492,7 @@ export class ChatGatewayService {
             members: { connect: { id: user.id } },
           },
         });
+        client.emit('successfullyJoinedChannel', info.name);
         client.join(info.name);
       } else {
         client.emit('wrongName');

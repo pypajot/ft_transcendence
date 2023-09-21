@@ -25,33 +25,34 @@ import { TopbarMenu } from "./TopMenu";
 import { MoreIcon } from "@twilio-paste/icons/esm/MoreIcon";
 import { useSocketContext } from "../../context/WebSocketContext";
 import { ConversationInformation } from "../../../public/Types/message.entity";
+import ChatContextProvider from "../../context/ChatContext";
 
 const ChatComponent = () => {
-  const [contact, setContact] = useState<ConversationInformation>();
-
   return (
     <>
-      <TopbarMenu setConversation={setContact} />
-      <Flex>
+      <ChatContextProvider>
+        <TopbarMenu />
         <Flex>
-          <Box
-            backgroundColor="colorBackgroundDecorativWeakest"
-            padding="space40"
-            width="100%"
-          >
-            <Contact setConversation={setContact} />
-          </Box>
+          <Flex>
+            <Box
+              backgroundColor="colorBackgroundDecorativWeakest"
+              padding="space40"
+              width="100%"
+            >
+              <Contact />
+            </Box>
+          </Flex>
+          <Flex grow>
+            <Box
+              backgroundColor="colorBackgroundDecorativWeakest"
+              padding="space40"
+              width="100%"
+            >
+              <Conversation />
+            </Box>
+          </Flex>
         </Flex>
-        <Flex grow>
-          <Box
-            backgroundColor="colorBackgroundDecorativWeakest"
-            padding="space40"
-            width="100%"
-          >
-            <Conversation info={contact} />
-          </Box>
-        </Flex>
-      </Flex>
+      </ChatContextProvider>
     </>
   );
 };

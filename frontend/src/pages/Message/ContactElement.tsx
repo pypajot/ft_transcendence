@@ -7,31 +7,25 @@ import {
   SidebarBody,
   useMenuState,
 } from "@twilio-paste/core";
-import React, { useEffect } from "react";
 import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
 import { ContactType } from "../../../public/Types/contact.entity";
+import { OptionMenu } from "./OptionMenu";
+import { useChatContext } from "../../context/ChatContext";
 
-type ContactElementProps = {
-  content: ContactType;
-  setConversation: (user: ConversationInformation) => void;
-};
-
-export const ContactElement: React.FC<ContactElementProps> = ({
-  content,
-  setConversation,
-}) => {
+export const ContactElement = ({ content }: { content: ContactType }) => {
+  const chatContext = useChatContext();
   const handleContact = (content: ContactType) => {
     const conversationInfo: ConversationInformation = {
       ischannel: content.channel,
       isUser: content.user,
       name: content.name,
     };
-
-    setConversation(conversationInfo);
+    chatContext.setConversationInfo(conversationInfo);
   };
+  const menu = useMenuState();
 
   return (
-    <div onClick={() => handleContact(content)}>
+    <div>
       <Box
         borderStyle="solid"
         borderWidth="borderWidth0"
@@ -44,7 +38,10 @@ export const ContactElement: React.FC<ContactElementProps> = ({
         paddingTop="space50"
       >
         <SidebarBody>
-          <h1 color="white">{content.name}</h1>
+          <h4 color="white" onClick={() => handleContact}>
+            {content.name}
+          </h4>
+          <OptionMenu info={content} />
         </SidebarBody>
       </Box>
     </div>

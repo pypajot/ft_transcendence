@@ -13,12 +13,9 @@ import { useAuth } from "../../context/AuthContext";
 import { AddFriends } from "./AddFriends";
 import { JoinChanel } from "./JoinChannel";
 import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
+import { useChatContext } from "../../context/ChatContext";
 
-interface TopbarProps {
-  setConversation: (val: ConversationInformation) => void;
-}
-
-export const TopbarMenu: React.FC<TopbarProps> = ({ setConversation }) => {
+export const TopbarMenu = () => {
   const userDialogList = useUserDialogListState();
 
   const { user } = useAuth();
@@ -34,9 +31,9 @@ export const TopbarMenu: React.FC<TopbarProps> = ({ setConversation }) => {
   return (
     <Topbar id="topbar">
       <TopbarActions justify="start">
-        <CreateNewConversation setConversation={setConversation} />
+        <CreateNewConversation />
         <AddFriends />
-        <JoinChanel setConversation={setConversation} />
+        <JoinChanel />
       </TopbarActions>
       <TopbarActions justify="end">
         <UserDialogContainer name={name} baseId="i-am-user-dialog">

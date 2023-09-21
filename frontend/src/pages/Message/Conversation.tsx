@@ -22,7 +22,7 @@ import { BasicInMessage, BasicOutMessage } from "./BasicMessage";
 import { useSocketContext } from "../../context/WebSocketContext";
 import { useAuth } from "../../context/AuthContext";
 import { MoreIcon } from "@twilio-paste/icons/esm/MoreIcon";
-import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
+import { useChatContext } from "../../context/ChatContext";
 
 const sortByDate = () => {
   return function (a: any, b: any) {
@@ -35,7 +35,7 @@ const sortByDate = () => {
   };
 };
 
-export const Conversation = ({ info }: { info: ConversationInformation }) => {
+export const Conversation = () => {
   const [content, setContent] = useState<string>("A basic chat composer");
   const { user } = useAuth();
   const [sentMessage, setSentMessage] = useState<Message[]>();
@@ -47,6 +47,7 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
 
   //Make a component to get the previous messsage
   const socket = useSocketContext();
+  const info = useChatContext().conversationInfo;
 
   useEffect(() => {
     if (!user) {
@@ -135,7 +136,7 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
   };
 
   const sendMessage = () => {
-    if (content) {
+    if (content && info) {
       const message_content: MessageInfo = {
         content: content,
         target: info.name,
@@ -160,7 +161,7 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
     <>
       {renderConversation && (
         <div>
-          <h1>{info.name}</h1>
+          <h1>{info?.name}</h1>
           <MenuButton {...menu} variant="reset" size="reset">
             <MoreIcon decorative={false} title="More options" />
           </MenuButton>

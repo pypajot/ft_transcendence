@@ -15,29 +15,16 @@ import {
 } from "@twilio-paste/core";
 import { useEffect, useState } from "react";
 import { useSocketContext } from "../../context/WebSocketContext";
-import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
+import { useChatContext } from "../../context/ChatContext";
 
-const getChannelType: any = (type: string | undefined) => {
-  if (type) {
-    return type;
-  } else {
-    return "";
-  }
-};
-
-interface CreateNewConversationProps {
-  setConversation: (val: ConversationInformation) => void;
-}
-
-export const CreateNewConversation: React.FC<CreateNewConversationProps> = ({
-  setConversation,
-}) => {
+export const CreateNewConversation = () => {
   const [channelType, setChannelType] = useState("Public");
   const [_public, setPublic] = useState(true);
   const [channelName, setChannelName] = useState("");
   const [channelPassword, setchannelPassword] = useState("");
   const [errorChannelName, setErrorChannelName] = useState(false);
   const socket = useSocketContext();
+  const chatContext = useChatContext();
 
   useEffect(() => {
     if (_public) {
@@ -77,7 +64,7 @@ export const CreateNewConversation: React.FC<CreateNewConversationProps> = ({
       name: channelName,
     };
     console.log("new");
-    setConversation(conversationInfo);
+    chatContext.setConversationInfo(conversationInfo);
   };
   const handleSelectChange = () => {
     if (_public) {
