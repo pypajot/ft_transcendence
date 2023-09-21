@@ -211,7 +211,7 @@ export class AuthService {
       token_family: token_family,
     };
     const token = await this.jwt.signAsync(payload, {
-      expiresIn: '600s',
+      expiresIn: '3600s',
       secret: process.env.REFRESH_SECRET,
     });
     await this.addTokenToDb(token, id, token_family);

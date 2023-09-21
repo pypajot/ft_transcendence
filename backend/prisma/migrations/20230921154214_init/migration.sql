@@ -8,6 +8,8 @@ CREATE TABLE "users" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'offline',
     "friends" INTEGER[],
+    "friendsRequest" INTEGER[],
+    "blocked" INTEGER[],
     "socketId" TEXT,
     "wins" INTEGER NOT NULL DEFAULT 0,
     "losses" INTEGER NOT NULL DEFAULT 0,

@@ -1,11 +1,12 @@
 export const getFriendsList = async (username: string) => {
-  const url = `http://localhost:3333/chat/getFriendsList?username=${username}`;
+  const url = `http://localhost:3333/user/friend/list`;
 
   try {
     const response = await fetch(url, {
       method: "GET",
       headers: {
         Accept: "application/json",
+		'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`
       },
     });
 

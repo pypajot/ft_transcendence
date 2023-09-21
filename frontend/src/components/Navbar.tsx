@@ -18,6 +18,11 @@ const Navbar = () => {
 				Profile
 			</InPageNavigationItem>
 		</Link>
+		<Link to='/friends'>
+			<InPageNavigationItem href="">
+				Friends
+			</InPageNavigationItem>
+		</Link>
 		<Link to='/game'>
 			<InPageNavigationItem href="">
 				Game
