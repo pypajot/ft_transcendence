@@ -21,18 +21,34 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket, ...args: any[]): void {
+  async handleConnection(client: Socket, ...args: any[]) {
     console.log(`Client ${client.id} connected`);
     client.emit('connection');
   }
-  async handleDisconnect(client: any) {
+  async handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
     // Check if the client was part of an active game
     const lobbyId = this.findLobbyByClientId(client.id);
     if (!lobbyId) {
+      await this.prisma.user.update({
+        where: {
+          socketId: client.id,
+        },
+        data: {
+          status: 'offline',
+        },
+      });
       return;
     }
     this.handleForfait(client, {lobbyId});
+    await this.prisma.user.update({
+      where: {
+        socketId: client.id,
+      },
+      data: {
+        status: 'offline',
+      },
+    });
   }
 
   private findLobbyByClientId(clientId: string): string | null {

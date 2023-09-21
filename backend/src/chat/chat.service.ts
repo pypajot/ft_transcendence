@@ -393,6 +393,7 @@ export class ChatGatewayService {
         },
         data: {
           socketId: client.id,
+          status: 'online',
         },
       });
       for (let i = 0; i < chatUser.channels.length; i++) {

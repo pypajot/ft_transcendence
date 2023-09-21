@@ -17,7 +17,7 @@ model User {
   updatedAt       DateTime  @updatedAt
   status          String    @default("offline")
   friends         Int[]
-  socketId        String?
+  socketId        String?   @unique
   channels        Channel[] @relation("Memberships")
   messagesSent    Message[] @relation("Author")
   messageReceived Message[] @relation("Target")

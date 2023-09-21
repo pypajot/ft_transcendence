@@ -84,6 +84,9 @@ CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 CREATE UNIQUE INDEX "users_intralogin_key" ON "users"("intralogin");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "users_socketId_key" ON "users"("socketId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Channel_name_key" ON "Channel"("name");
 
 -- CreateIndex
