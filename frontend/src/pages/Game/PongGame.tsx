@@ -33,20 +33,10 @@ const PongGame : React.FC = () => {
     socket?.on('gameState', (data) => {
       // update the game state
       setGameState(data);
-    },);
-    //add event listener for game end
-    socket?.on('gameEnd', (data) => {
-      // display game end message
-      setGameEnd(true);
-      setShowBall(false);
-      if (data === socket?.id) {
-        setGameEndMessage('You win!');
-        console.log('LobbyId: ', lobbyId);
-        setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
-      }
-      else {
-        setGameEndMessage('You lose!');
-      }
+    });
+
+    socket?.on('gameEnd', (data: any, forfait: boolean) => {
+      handleGameEnd(data, forfait);
     });
 
     return () => {
@@ -66,16 +56,42 @@ const PongGame : React.FC = () => {
       socket?.emit('movePaddle', { direction, lobbyId});
   };
 
+  const handleGameEnd = (data: any, forfait: boolean) => {
+    // display game end message
+    setGameEnd(true);
+    setShowBall(false);
+    if (data === socket?.id) {
+      if (forfait)
+        setGameEndMessage('You win by forfait!');
+      else
+        setGameEndMessage('You win!');
+      console.log('LobbyId: ', lobbyId);
+      setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
+    }
+    else {
+      setGameEndMessage('You lose!');
+    }
+  }
+
   useEffect(() => {
     // Add event listener for user input (arrow keys)
 
     window.addEventListener('keydown', handleKeyPress);
     window.addEventListener('keyup', handleKeyPress);
+    //add event listener to detect if the user leaves the page
+    window.addEventListener('beforeunload', () => {
+      console.log('forfaiting!');
+      socket?.emit('forfait', { lobbyId });
+    });
+
 
     // Clean up event listener on component unmount
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
       window.removeEventListener('keyup', handleKeyPress);
+      window.removeEventListener('beforeunload', () => {
+        socket?.emit('forfait', { lobbyId });
+      });
     };
   }, [lobbyId, gameEnd]);
 
