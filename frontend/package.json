@@ -20,6 +20,7 @@
     "@twilio-paste/lexical-library": "^4.0.0",
     "@twilio-paste/theme": "^11.0.1",
     "axios": "^1.5.0",
+    "cloudinary": "^1.40.0",
     "draft-js": "^0.11.7",
     "htop": "^1.0.1",
     "lexical": "^0.12.0",

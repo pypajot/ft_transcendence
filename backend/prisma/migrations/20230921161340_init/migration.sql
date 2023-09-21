@@ -6,8 +6,11 @@ CREATE TABLE "users" (
     "intralogin" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "avatar" TEXT NOT NULL DEFAULT 'https://i.imgur.com/WxNkK7J.png',
     "status" TEXT NOT NULL DEFAULT 'offline',
     "friends" INTEGER[],
+    "friendsRequest" INTEGER[],
+    "blocked" INTEGER[],
     "socketId" TEXT,
     "wins" INTEGER NOT NULL DEFAULT 0,
     "losses" INTEGER NOT NULL DEFAULT 0,
@@ -82,6 +85,9 @@ CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_intralogin_key" ON "users"("intralogin");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_socketId_key" ON "users"("socketId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Channel_name_key" ON "Channel"("name");

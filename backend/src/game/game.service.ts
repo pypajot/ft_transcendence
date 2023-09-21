@@ -26,8 +26,6 @@ export class GameService {
   public gameId: number; // Unique ID for the game
   public player1: Player;
   public player2: Player;
-  private paddle1Y: number; // Position of paddle 1 (Player 1)
-  private paddle2Y: number; // Position of paddle 2 (Player 2)
   private ballX: number; // Position of the ball along the X-axis
   private ballY: number; // Position of the ball along the Y-axis
   private ballSpeedX: number; // Ball movement speed along the X-axis
@@ -90,8 +88,8 @@ export class GameService {
     this.player2 = Player2;
     this.paddleWidth = gameConfiguration.paddleWidth;
     this.paddleHeight = gameConfiguration.paddleHeight;
-    this.paddle1Y = this.gameHeight / 2 - this.paddleHeight / 2; // Set initial Y position for paddle 1 (Player 1)
-    this.paddle2Y = this.gameHeight / 2 - this.paddleHeight / 2; // Set initial Y position for paddle 2 (Player 2)
+    this.player1.paddlePos = this.gameHeight / 2 - this.paddleHeight / 2; // Set initial Y position for paddle 1 (Player 1)
+    this.player2.paddlePos = this.gameHeight / 2 - this.paddleHeight / 2; // Set initial Y position for paddle 2 (Player 2)
     this.ballX = this.gameWidth / 2; // Set initial X position for the ball
     this.ballY = this.gameHeight / 2; // Set initial Y position for the ball
     this.ballSpeedX = gameConfiguration.ballSpeed; // Set the initial speed of the ball along the X-axis
@@ -104,8 +102,8 @@ export class GameService {
   // Add a method to get the current game state, which will be sent to the clients via WebSocket.
   getGameState(): GameState {
     return {
-      paddle1Y: this.paddle1Y,
-      paddle2Y: this.paddle2Y,
+      paddle1Y: this.player1.paddlePos,
+      paddle2Y: this.player2.paddlePos,
       ballX: this.ballX,
       ballY: this.ballY,
       player1Score: this.player1.score,
@@ -117,37 +115,37 @@ export class GameService {
 
   // Methods to move the paddles up and down
   movePaddleUp(clientId: string): void {
-    if (clientId === this.player1.socket.id) {
-      if (this.paddle1Y >= this.paddleMoveSpeed)
-        // prevents paddle from going off screen
-        this.paddle1Y -= this.paddleMoveSpeed;
-    } else if (clientId === this.player2.socket.id) {
-      if (this.paddle2Y >= this.paddleMoveSpeed)
-        this.paddle2Y -= this.paddleMoveSpeed;
-    }
+    let player = clientId === this.player1.socket.id ? this.player1 : this.player2;
+    if (player.paddlePos >= this.paddleMoveSpeed)
+      player.paddleVelocity = -this.paddleMoveSpeed;
   }
+  
   movePaddleDown(clientId: string): void {
-    if (clientId === this.player1.socket.id) {
-      if (
-        this.paddle1Y <=
-        this.gameHeight - this.paddleHeight - this.paddleMoveSpeed
-      )
-        this.paddle1Y += this.paddleMoveSpeed;
-    } else if (clientId === this.player2.socket.id) {
-      if (
-        this.paddle2Y <=
-        this.gameHeight - this.paddleHeight - this.paddleMoveSpeed
-      )
-        this.paddle2Y += this.paddleMoveSpeed;
-    }
+    let player = clientId === this.player1.socket.id ? this.player1 : this.player2;
+    if (player.paddlePos <= this.gameHeight - this.paddleHeight - this.paddleMoveSpeed)
+      player.paddleVelocity = this.paddleMoveSpeed;
+  }
+  
+  stopPaddle(clientId: string): void {
+    let player = clientId === this.player1.socket.id ? this.player1 : this.player2;
+    player.paddleVelocity = 0;
   }
   // Method to update the game state based on physics and user input
   updateGameState(): void {
     const ballXVelocity = this.ballSpeedX * this.ballSpeedXDirection;
     const ballYVelocity = this.ballSpeedY * this.ballSpeedYDirection;
+    const buffer = this.gameWidth / 100;
     // Move the ball based on its current speed and direction
     this.ballX += ballXVelocity;
     this.ballY += ballYVelocity;
+    // Move the paddles based on their velocities.
+    this.player1.paddlePos += this.player1.paddleVelocity;
+    this.player2.paddlePos += this.player2.paddleVelocity;
+    
+    // Ensure the paddles don’t move out of the game boundaries.
+    this.player1.paddlePos = Math.max(0, Math.min(this.gameHeight - this.paddleHeight, this.player1.paddlePos));
+    this.player2.paddlePos = Math.max(0, Math.min(this.gameHeight - this.paddleHeight, this.player2.paddlePos));
+
     // Check for collisions with top and bottom walls
     if (
       this.ballY - this.ballSize / 2 <= 0 ||
@@ -156,14 +154,23 @@ export class GameService {
       this.ballSpeedYDirection *= -1; // Reverse the Y-direction when the ball hits the top or bottom wall
     }
     const collisionPaddle1 =
-      this.ballX - this.ballSize / 2 + ballXVelocity <= this.paddleWidth &&
-      this.ballY + ballYVelocity >= this.paddle1Y &&
-      this.ballY + ballYVelocity <= this.paddle1Y + this.paddleHeight;
+    this.ballX - this.ballSize / 2 + ballXVelocity <= this.paddleWidth + buffer &&
+    this.ballY >= this.player1.paddlePos &&
+    this.ballY <= this.player1.paddlePos + this.paddleHeight;
     const collisionPaddle2 =
-      this.ballX + this.ballSize / 2 + ballXVelocity >=
-        this.gameWidth - this.paddleWidth - this.gameWidth / 100 &&
-      this.ballY + ballYVelocity >= this.paddle2Y &&
-      this.ballY + ballYVelocity <= this.paddle2Y + this.paddleHeight;
+    this.ballX + this.ballSize / 2 + ballXVelocity >= this.gameWidth - this.paddleWidth - buffer &&
+    this.ballY >= this.player2.paddlePos &&
+    this.ballY <= this.player2.paddlePos + this.paddleHeight;
+
+    // const collisionPaddle1 =
+    //   this.ballX - this.ballSize / 2 + ballXVelocity <= this.paddleWidth &&
+    //   this.ballY + ballYVelocity >= this.player1.paddlePos &&
+    //   this.ballY + ballYVelocity <= this.player1.paddlePos + this.paddleHeight;
+    // const collisionPaddle2 =
+    //   this.ballX + this.ballSize / 2 + ballXVelocity >=
+    //     this.gameWidth - this.paddleWidth - this.gameWidth / 100 &&
+    //   this.ballY + ballYVelocity >= this.player2.paddlePos &&
+    //   this.ballY + ballYVelocity <= this.player2.paddlePos + this.paddleHeight;
     // Check for collisions with the paddles
     if (collisionPaddle1 || collisionPaddle2) {
       // Reverse the X-direction and increase the ball speed after hitting a paddle

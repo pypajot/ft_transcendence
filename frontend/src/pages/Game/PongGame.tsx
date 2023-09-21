@@ -16,37 +16,30 @@ const PongGame : React.FC = () => {
   const [showBall, setShowBall] = useState(true);
   const [gameEnd, setGameEnd] = useState(false);
   const [gameEndMessage, setGameEndMessage] = useState('');
+  const [userName1, setUserName1] = useState<string>('');
+  const [userName2, setUserName2] = useState<string>('');
 
   useEffect(() => {
     // Send custom event to request game state from the server
-    socket?.on('createLobby', (lobbyId: string) => {
+    socket?.on('createLobby', (lobbyId: string, userName1: string, userName2: string) => {
       setLobbyId(lobbyId);
+      setUserName1(userName1);
+      setUserName2(userName2);
       socket?.emit('getGameState', { lobbyId });
       setCountdown(3);
       setTimeout(() => { setCountdown(2)}, 1000);
       setTimeout(() => { setCountdown(1)}, 2000);
-      setTimeout(() => { setShowGo(true)}, 3000);
+      setTimeout(() => { setShowGo(true), setCountdown(null)}, 3000);
       setTimeout(() => { socket?.emit('launchBall', { lobbyId })}, 3000);
     },);
-
     // Set up WebSocket event listener to receive the game state from the server
     socket?.on('gameState', (data) => {
       // update the game state
       setGameState(data);
-    },);
-    //add event listener for game end
-    socket?.on('gameEnd', (data) => {
-      // display game end message
-      setGameEnd(true);
-      setShowBall(false);
-      if (data === socket?.id) {
-        setGameEndMessage('You win!');
-        console.log('LobbyId: ', lobbyId);
-        setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
-      }
-      else {
-        setGameEndMessage('You lose!');
-      }
+    });
+
+    socket?.on('gameEnd', (data: any, forfait: boolean) => {
+      handleGameEnd(data, forfait);
     });
 
     return () => {
@@ -56,23 +49,46 @@ const PongGame : React.FC = () => {
     };
   }, [lobbyId]);
 
-  // Other game logic and rendering based on the received gameState
-
   const handleKeyPress = (event: any) => {
-    // Handle user input (e.g., arrow keys) for moving paddles
-    const direction = event.key === 'ArrowUp' ? 'up' : event.key === 'ArrowDown' ? 'down' : null;
-    // Emit paddle movements to the server via WebSocket
-    if (!gameEnd)
-      socket?.emit('movePaddle', { direction, lobbyId});
+    if (!gameEnd) {
+      if (event.type === 'keydown') {
+        if (event.keyCode === 38) {
+          socket?.emit('movePaddle', { lobbyId, direction: 'up' });
+        }
+        if (event.keyCode === 40) {
+          socket?.emit('movePaddle', { lobbyId, direction: 'down' });
+        }
+      }
+      else if (event.type === 'keyup') {
+        if (event.keyCode === 38 || event.keyCode === 40) {
+          socket?.emit('movePaddle', { lobbyId, direction: 'stop' });
+        }
+      }
+    }
   };
+
+  const handleGameEnd = (data: any, forfait: boolean) => {
+    // display game end message
+    setGameEnd(true);
+    setShowBall(false);
+    if (data === socket?.id) {
+      if (forfait)
+        setGameEndMessage('You win by forfait!');
+      else
+        setGameEndMessage('You win!');
+      console.log('LobbyId: ', lobbyId);
+      setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
+    }
+    else {
+      setGameEndMessage('You lose!');
+    }
+  }
 
   useEffect(() => {
     // Add event listener for user input (arrow keys)
-
     window.addEventListener('keydown', handleKeyPress);
     window.addEventListener('keyup', handleKeyPress);
 
-    // Clean up event listener on component unmount
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
       window.removeEventListener('keyup', handleKeyPress);
@@ -85,8 +101,8 @@ const PongGame : React.FC = () => {
           {/* Render scores */}
           {gameState && (
             <>
-              <div className="score">Player 1: {gameState.player1Score}</div>
-              <div className="score">Player 2: {gameState.player2Score}</div>
+              <div className="score">{userName1}: {gameState.player1Score}</div>
+              <div className="score">{userName2}: {gameState.player2Score}</div>
             </>
           )}
         </div>

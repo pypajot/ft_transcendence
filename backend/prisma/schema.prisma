@@ -15,9 +15,12 @@ model User {
   intralogin      String?   @unique
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  avatar          String    @default("https://i.imgur.com/WxNkK7J.png")
   status          String    @default("offline")
   friends         Int[]
-  socketId        String?
+  friendsRequest  Int[]
+  blocked         Int[]
+  socketId        String?   @unique
   channels        Channel[] @relation("Memberships")
   messagesSent    Message[] @relation("Author")
   messageReceived Message[] @relation("Target")

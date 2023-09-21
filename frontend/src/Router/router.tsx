@@ -10,6 +10,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ChatComponent from "../pages/Message/ChatPage";
 import Login2fa from "../pages/Login/Login2fa";
+import Friends from "../pages/Friends/Friends";
 
 function AppRoutes() {
   const { accessToken } = useAuth();
@@ -46,6 +47,10 @@ function AppRoutes() {
       <Route
         path="/home"
         element={accessToken ? <Home /> : <Navigate to="/landing" />}
+      />
+	  <Route
+        path="/friends"
+        element={accessToken ? <Friends /> : <Navigate to="/landing" />}
       />
       <Route
         path="/game"

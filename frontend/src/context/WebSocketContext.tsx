@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Socket, io } from "socket.io-client";
-import { useAuth } from "./AuthContext";
+import { useAuth } from './AuthContext';
 
 type WebContext = {
   io: Socket;
@@ -36,6 +36,7 @@ export default function SocketContextProvider(
     setSocket(newSocket);
     console.log(newSocket.io.connected);
     return () => {
+	  newSocket.io.off("connect_error");
       newSocket.io.disconnect();
     };
   }, [user && user.id]);
