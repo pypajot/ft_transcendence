@@ -24,7 +24,7 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	async changeUsername(@Headers('Authorization') token: string, @Req() req: any) {
 		const payload = this.jwt.decode(token.split(' ')[1]) as { [key: string] : any}; 
-		this.userservice.changeUsername(payload.sub, req.newName);
+		this.userservice.changeUsername(payload.sub, req.body.newName);
 	}
 
 	@Get('friend/request')

@@ -43,10 +43,10 @@ const Profile = () => {
 					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
 				},
-				body: JSON.stringify({code: e.target.username.value})
+				body: JSON.stringify({newName: e.target.username.value})
 			});
 			if (response.status === 201) {
-				user && setUser({...user, username: e.target.usernae.value})
+				user && setUser({...user, username: e.target.username.value})
 			}
 		}
 
