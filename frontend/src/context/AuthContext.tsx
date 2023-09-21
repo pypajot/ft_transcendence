@@ -93,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     sessionStorage.removeItem("access_token");
   };
 
-  const value = useMemo(
+  const value = useMemo (
     () => ({
       user,
       setUser,

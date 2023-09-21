@@ -9,6 +9,9 @@ export class Player {
   score: number;
   gameMode: string;
   lobby: string;
+  paddlePos: number;
+  paddleDirection: string;
+  paddleVelocity: number;
 
   constructor(
     socket: Socket,
@@ -22,5 +25,7 @@ export class Player {
     this.score = 0;
     this.gameMode = gameMode;
     this.lobby = '';
+    this.paddleDirection = null;
+    this.paddleVelocity = 0;
   }
 }

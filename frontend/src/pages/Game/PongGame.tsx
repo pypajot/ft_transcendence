@@ -49,14 +49,22 @@ const PongGame : React.FC = () => {
     };
   }, [lobbyId]);
 
-  // Other game logic and rendering based on the received gameState
-
   const handleKeyPress = (event: any) => {
-    // Handle user input (e.g., arrow keys) for moving paddles
-    const direction = event.key === 'ArrowUp' ? 'up' : event.key === 'ArrowDown' ? 'down' : null;
-    // Emit paddle movements to the server via WebSocket
-    if (!gameEnd)
-      socket?.emit('movePaddle', { direction, lobbyId});
+    if (!gameEnd) {
+      if (event.type === 'keydown') {
+        if (event.keyCode === 38) {
+          socket?.emit('movePaddle', { lobbyId, direction: 'up' });
+        }
+        if (event.keyCode === 40) {
+          socket?.emit('movePaddle', { lobbyId, direction: 'down' });
+        }
+      }
+      else if (event.type === 'keyup') {
+        if (event.keyCode === 38 || event.keyCode === 40) {
+          socket?.emit('movePaddle', { lobbyId, direction: 'stop' });
+        }
+      }
+    }
   };
 
   const handleGameEnd = (data: any, forfait: boolean) => {
@@ -78,23 +86,12 @@ const PongGame : React.FC = () => {
 
   useEffect(() => {
     // Add event listener for user input (arrow keys)
-
     window.addEventListener('keydown', handleKeyPress);
     window.addEventListener('keyup', handleKeyPress);
-    //add event listener to detect if the user leaves the page
-    // window.addEventListener('beforeunload', () => {
-    //   console.log('forfaiting!');
-    //   socket?.emit('forfait', { lobbyId });
-    // });
 
-
-    // Clean up event listener on component unmount
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
       window.removeEventListener('keyup', handleKeyPress);
-      // window.removeEventListener('beforeunload', () => {
-      //   socket?.emit('forfait', { lobbyId });
-      // });
     };
   }, [lobbyId, gameEnd]);
 

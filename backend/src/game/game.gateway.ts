@@ -25,7 +25,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client ${client.id} connected`);
     client.emit('connection');
   }
-  handleDisconnect(client: any) {
+  async handleDisconnect(client: any) {
     console.log(`Client disconnected: ${client.id}`);
     // Check if the client was part of an active game
     const lobbyId = this.findLobbyByClientId(client.id);
@@ -47,7 +47,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return null;
   }
 
-  private handleForfait(client: any, id: {lobbyId: string}): Promise<void> {
+  async handleForfait(client: any, id: {lobbyId: string}): Promise<void> {
     const lobbyId = id.lobbyId;
     const forfait = true;
     if (lobbyId === undefined) {
@@ -103,6 +103,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
           gamesPlayed: {
             connect: [{ id: gameId }],
           },
+          status: 'online',
         },
       });
       await this.prisma.user.update({
@@ -119,6 +120,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
           gamesPlayed: {
             connect: [{ id: gameId }],
           },
+          status: 'online',
         },
       });
       await this.prisma.game.update({
@@ -144,24 +146,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('selectGameMode')
   async handleSelectGameMode(client: Socket, mode: string): Promise<void> {
     const player = await this.createPlayer(client, mode);
-    console.log(`Player ${client.id} selected ${player.gameMode} mode`);
     // place the player in the appropriate queue based on selected mode.
     this.matchmakingService.enqueue(player);
     const lobbyId = this.matchmakingService.tryMatchPlayers(mode);
     if (lobbyId !== undefined) {
+      const gameService = this.matchmakingService.gameService[lobbyId];
       // wait for 1/2 second before emitting the createLobby event
       setTimeout(() => {
-        const username1 =
-          this.matchmakingService.gameService[lobbyId].player1.username;
-        const username2 =
-          this.matchmakingService.gameService[lobbyId].player2.username;
+        const username1 = gameService.player1.username;
+        const username2 = gameService.player2.username;
         client.emit('createLobby', lobbyId, username1, username2);
-        this.matchmakingService.gameService[lobbyId].player1.socket.emit(
-          'createLobby',
-          lobbyId,
-          username1,
-          username2,
-        );
+        gameService.player1.socket.emit('createLobby', lobbyId, username1, username2);
         console.log(`Lobby ${lobbyId} created`);
       }, 500);
     }
@@ -177,21 +172,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('movePaddle')
-  handleMovePaddle(
-    client: Socket,
-    data: { direction: string; lobbyId: string },
-  ): void {
-    const { direction } = data;
-    const { lobbyId } = data;
-    if (lobbyId === undefined) {
-      return;
-    }
+  handleMovePaddle(client: Socket, data: { lobbyId: string; direction: string }): void {
+    const { lobbyId, direction } = data;
+    if (!lobbyId)
+      return; 
+    const gameService = this.matchmakingService.gameService[lobbyId];
+    const clientId = client.id;
+
     if (direction === 'up') {
-      this.matchmakingService.gameService[lobbyId].movePaddleUp(client.id);
-    } else if (direction === 'down') {
-      this.matchmakingService.gameService[lobbyId].movePaddleDown(client.id);
+      gameService.movePaddleUp(clientId);
+    } 
+    else if (direction === 'down') {
+      gameService.movePaddleDown(clientId);
+    } 
+    else if (direction === 'stop') {
+      gameService.stopPaddle(clientId);
     }
   }
+  
 
   // Event to start game loop emitting game state to the client every 50ms
   @SubscribeMessage('getGameState')
@@ -203,32 +201,28 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (lobbyId === undefined) {
       return;
     }
-    let gameState = this.matchmakingService.gameService[lobbyId].getGameState();
-    const player1 = this.matchmakingService.gameService[lobbyId].player1;
-    const player2 = this.matchmakingService.gameService[lobbyId].player2;
-    const gameId = this.matchmakingService.gameService[lobbyId].gameId;
+    const gameService = this.matchmakingService.gameService[lobbyId];
+    let gameState = gameService.getGameState();
+    const player1 = gameService.player1;
+    const player2 = gameService.player2;
+    const gameId = gameService.gameId;
     // create a loop with a delay of 50ms
     let interval = setInterval(async () => {
       // check if the game service still exists
-      if (this.matchmakingService.gameService[lobbyId] === undefined) {
+      if (gameService === undefined) {
         clearInterval(interval);
         return;
       }
-      this.matchmakingService.gameService[lobbyId].updateGameState(); // Update the game state
-      gameState = this.matchmakingService.gameService[lobbyId].getGameState(); // Get the updated game state
+      gameService.updateGameState(); // Update the game state
+      gameState = gameService.getGameState(); // Get the updated game state
       // check for game end
-      if (
-        this.matchmakingService.gameService[lobbyId].player1.score ===
-        this.matchmakingService.gameService[lobbyId]?.goalLimit
-      ) {
+      if (gameService.player1.score === gameService.goalLimit) {
         if (client.id === player1.socket.id)
           this.handleUpdateDB(player1, player2, gameId);
         client.emit('gameEnd', player1.socket.id, false);
         clearInterval(interval);
-      } else if (
-        this.matchmakingService.gameService[lobbyId].player2.score ===
-        this.matchmakingService.gameService[lobbyId]?.goalLimit
-      ) {
+      } 
+      else if ( gameService.player2.score === gameService.goalLimit) {
         if (client.id === player1.socket.id)
           this.handleUpdateDB(player2, player1, gameId);
         client.emit('gameEnd', player2.socket.id, false);
@@ -236,7 +230,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       // Send the game state to the client
       client.emit('gameState', gameState);
-    }, 50);
+    }, 1000 / 60);
   }
   
   // @SubscribeMessage('forfait')
