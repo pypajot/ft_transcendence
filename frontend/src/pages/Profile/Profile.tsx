@@ -16,6 +16,9 @@ const Profile = () => {
 	const [imagePath, setImagePath] = useState<string | null>(null);
 	const socket = useSocketContext();
 
+	if (!user)
+		return ;
+
 	function DisplayAvatar() {
 		return (
 			<>
@@ -161,7 +164,7 @@ const Profile = () => {
 				<p>
 					{user?.username}
 				</p>
-				<p>
+				
 					<div>
 						<ChangeUsernameForm />
 					</div>
@@ -169,7 +172,7 @@ const Profile = () => {
 					id="controlled"
 					value="controlled"
 					name="controlled"
-					checked={user?.twoFactorAuthActive}
+					checked={user.twoFactorAuthActive}
 					onChange={() => {
 						if (!user)
 							return ;
@@ -181,7 +184,7 @@ const Profile = () => {
 				>
 				Activate Two Factor Authentification
 				</Checkbox>
-				</p>
+				
 				<QrDisplay />
 			</div>
 			
