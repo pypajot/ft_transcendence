@@ -29,7 +29,7 @@ const PongGame : React.FC = () => {
       setCountdown(3);
       setTimeout(() => { setCountdown(2)}, 1000);
       setTimeout(() => { setCountdown(1)}, 2000);
-      setTimeout(() => { setShowGo(true)}, 3000);
+      setTimeout(() => { setShowGo(true), setCountdown(null)}, 3000);
       setTimeout(() => { socket?.emit('launchBall', { lobbyId })}, 3000);
     },);
     // Set up WebSocket event listener to receive the game state from the server
