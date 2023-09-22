@@ -80,6 +80,15 @@ class ChatGateway
     this.chatService.channelCreation(this.io, data, client.id, client);
   }
 
+  @SubscribeMessage('ChannelInvitResponse')
+  handleChannelInvitResponse(client: any, data: any) {
+    this.chatService.channelInviteResponse(client, data);
+  }
+  @SubscribeMessage('ChannelInvitation')
+  handleChannelInvitation(client: any, data: any) {
+    this.chatService.inviteToChannel(this.io, client, data);
+  }
+
   @SubscribeMessage('userLeavingChannel')
   handleUserLeavingchannel(client: any, data: any): void {
     this.chatService.leaveChannel(client, data);

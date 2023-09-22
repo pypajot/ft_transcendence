@@ -30,29 +30,27 @@ import ChatContextProvider from "../../context/ChatContext";
 const ChatComponent = () => {
   return (
     <>
-      <ChatContextProvider>
-        <TopbarMenu />
+      <TopbarMenu />
+      <Flex>
         <Flex>
-          <Flex>
-            <Box
-              backgroundColor="colorBackgroundDecorativWeakest"
-              padding="space40"
-              width="100%"
-            >
-              <Contact />
-            </Box>
-          </Flex>
-          <Flex grow>
-            <Box
-              backgroundColor="colorBackgroundDecorativWeakest"
-              padding="space40"
-              width="100%"
-            >
-              <Conversation />
-            </Box>
-          </Flex>
+          <Box
+            backgroundColor="colorBackgroundDecorativWeakest"
+            padding="space40"
+            width="100%"
+          >
+            <Contact />
+          </Box>
         </Flex>
-      </ChatContextProvider>
+        <Flex grow>
+          <Box
+            backgroundColor="colorBackgroundDecorativWeakest"
+            padding="space40"
+            width="100%"
+          >
+            <Conversation />
+          </Box>
+        </Flex>
+      </Flex>
     </>
   );
 };

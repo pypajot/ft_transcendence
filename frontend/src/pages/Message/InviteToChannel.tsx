@@ -16,6 +16,8 @@ import { useChatContext } from "../../context/ChatContext";
 import { User } from "../../context/AuthContext";
 import { UserDTO } from "../Signup/api/dto/user.dto";
 import { ProfileContext } from "../../context/ProfileContext";
+import { ContactType } from "../../../public/Types/contact.entity";
+import { useSocketContext } from "../../context/WebSocketContext";
 
 export interface SimpleDialogProps {
   open: boolean;
@@ -24,6 +26,7 @@ export interface SimpleDialogProps {
 
 export function InviteToChannel(props: SimpleDialogProps) {
   const { onClose, open } = props;
+  const socket = useSocketContext();
   const chatContext = useChatContext();
   const friends: User[] = React.useContext(ProfileContext).friendList;
 
@@ -32,13 +35,17 @@ export function InviteToChannel(props: SimpleDialogProps) {
   };
 
   const handleListItemClick = (target: User) => {
+    socket?.emit("ChannelInvitation", {
+      target: target,
+      channel: chatContext.conversationInfo?.name,
+    });
     onClose();
   };
 
   return (
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>
-        Add friends to ${chatContext.conversationInfo?.name}
+        Add friends to {chatContext.conversationInfo?.name}
       </DialogTitle>
       <List sx={{ pt: 0 }}>
         {friends.map((friends) => (

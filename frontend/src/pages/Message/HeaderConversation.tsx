@@ -1,33 +1,28 @@
+import { useMenuState } from "@twilio-paste/core";
+import { useChatContext } from "../../context/ChatContext";
 import {
   Menu,
   MenuButton,
   MenuItem,
   MenuSeparator,
-  useMenuState,
-} from "@twilio-paste/core";
-import { ContactType } from "../../../public/Types/contact.entity";
+} from "@twilio-paste/paste-reakit-fork";
 import { MoreIcon } from "@twilio-paste/icons/esm/MoreIcon";
-import { useState } from "react";
 import { InviteToChannel } from "./InviteToChannel";
-import { User } from "../../context/AuthContext";
-import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
+import { useState } from "react";
 
-export const OptionMenu = ({
-  info,
-}: {
-  info: ConversationInformation | undefined;
-}) => {
-  const menu = useMenuState();
+export const HeaderConversation = () => {
+  const info = useChatContext().conversationInfo;
   const [displayInviteList, setDisplayInviteList] = useState<boolean>(false);
 
-  //do we set the invite to play to any member of a channel ?
+  const menu = useMenuState();
   return (
-    <div>
-      <MenuButton {...menu} variant="reset" size="reset">
-        <MoreIcon decorative={false} title="More options" />
-      </MenuButton>
+    <div style={{ display: "flex", alignItems: "center" }}>
       {info?.ischannel && (
-        <div>
+        <h1>
+          {info?.name}
+          <MenuButton {...menu}>
+            <MoreIcon decorative={false} title="More options"></MoreIcon>
+          </MenuButton>
           <InviteToChannel
             open={displayInviteList}
             onClose={() => {
@@ -48,10 +43,14 @@ export const OptionMenu = ({
             <MenuSeparator {...menu} />
             <MenuItem {...menu}>Invite to Play </MenuItem>
           </Menu>{" "}
-        </div>
+        </h1>
       )}
       {info?.isUser && (
-        <div>
+        <h1>
+          {info?.name}
+          <MenuButton {...menu}>
+            <MoreIcon decorative={false} title="More options"></MoreIcon>
+          </MenuButton>
           <Menu {...menu} aria-label="Preferences">
             <MenuItem {...menu}>Block</MenuItem>
             <MenuSeparator {...menu} />
@@ -59,7 +58,7 @@ export const OptionMenu = ({
             <MenuSeparator {...menu} />
             <MenuItem {...menu}>Profile</MenuItem>
           </Menu>{" "}
-        </div>
+        </h1>
       )}
     </div>
   );

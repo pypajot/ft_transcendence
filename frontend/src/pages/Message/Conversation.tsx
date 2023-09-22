@@ -22,6 +22,7 @@ import { useSocketContext } from "../../context/WebSocketContext";
 import { useAuth } from "../../context/AuthContext";
 import { MoreIcon } from "@twilio-paste/icons/esm/MoreIcon";
 import { useChatContext } from "../../context/ChatContext";
+import { OptionMenu } from "./OptionMenu";
 
 const sortByDate = () => {
   return function (a: any, b: any) {
@@ -190,17 +191,9 @@ export const Conversation = () => {
     <>
       {renderConversation && (
         <div>
-          <h1>{info?.name}</h1>
-          <MenuButton {...menu} variant="reset" size="reset">
-            <MoreIcon decorative={false} title="More options" />
-          </MenuButton>
-          <Menu {...menu} aria-label="Preferences">
-            <MenuItem {...menu}>Block</MenuItem>
-            <MenuSeparator {...menu} />
-            <MenuItem {...menu}>Invite Into Channel</MenuItem>
-            <MenuSeparator {...menu} />
-            <MenuItem {...menu}>Invite to Play </MenuItem>
-          </Menu>{" "}
+          <h1>
+            {info?.name} <OptionMenu info={info} />
+          </h1>
         </div>
       )}
       {conversationMsg &&

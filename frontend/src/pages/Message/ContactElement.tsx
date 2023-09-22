@@ -14,6 +14,7 @@ import { useChatContext } from "../../context/ChatContext";
 
 export const ContactElement = ({ content }: { content: ContactType }) => {
   const chatContext = useChatContext();
+
   const handleContact = (content: ContactType) => {
     const conversationInfo: ConversationInformation = {
       ischannel: content.channel,
@@ -38,10 +39,9 @@ export const ContactElement = ({ content }: { content: ContactType }) => {
         paddingTop="space50"
       >
         <SidebarBody>
-          <h4 color="white" onClick={() => handleContact}>
-            {content.name}
-          </h4>
-          <OptionMenu info={content} />
+            <h3 color="white" onClick={() => handleContact(content)}>
+              {content.name}
+            </h3>
         </SidebarBody>
       </Box>
     </div>

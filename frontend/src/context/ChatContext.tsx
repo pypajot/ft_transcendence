@@ -57,13 +57,18 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
       setChannelIn([...channelIn, channel]);
     }
   };
+  const initChannels = (channels: Channel[]) => {
+    setChannelIn(channels);
+  };
 
   React.useEffect(() => {
+    socket?.on("InitChannels", initChannels);
     socket?.on("successfullyJoinedChannel", addChannel);
     return () => {
       socket?.off("successfullyJoinedChannel", addChannel);
+      socket?.off("InitChannels", initChannels);
     };
-  });
+  }, [socket, addChannel, initChannels]);
 
   const value = useMemo(
     () => ({

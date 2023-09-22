@@ -86,6 +86,7 @@ export class ChatControllerService {
       console.log(error);
     }
   }
+
   async getLogsUserToUser(sender_name: string, receiver_name: string) {
     try {
       console.log(`From  : ${sender_name} To : ${receiver_name}`);
@@ -410,9 +411,16 @@ export class ChatGatewayService {
           status: 'online',
         },
       });
+      let channelsJoined: Channel[] = [];
       for (let i = 0; i < chatUser.channels.length; i++) {
+        const channelJoined: Channel = {
+          member: this.getChannelMember(chatUser.channels[i]),
+          name: chatUser.channels[i].name,
+        };
+        channelsJoined = [...channelsJoined, channelJoined];
         client.join(chatUser.channels[i].name);
       }
+      client.emit('InitChannels', channelsJoined);
     } catch (error) {
       console.log(error);
     }
@@ -440,9 +448,81 @@ export class ChatGatewayService {
     return users;
   }
 
+  async inviteToChannel(io: Server, client: any, data: any) {
+    try {
+      const channel = await this.prisma.channel.findUnique({
+        where: {
+          name: data.channel,
+        },
+      });
+      const user = await this.prisma.user.findUnique({
+        where: {
+          username: data.target,
+        },
+      });
+      const updatedChannel = await this.prisma.channel.update({
+        where: {
+          name: channel.name,
+        },
+        include: {
+          members: true,
+        },
+        data: {
+          invited: [...channel.invited, user.id],
+        },
+      });
+      const res: Channel = {
+        name: updatedChannel.name,
+        member: this.getChannelMember(updatedChannel),
+      };
+      io.to(user.socketId).emit('joinRequest', res);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async channelInviteResponse(client: any, data: any) {
+    try {
+      const userId = await this.findIdFromSocketId(client.id);
+      const channel = await this.prisma.channel.findUnique({
+        where: {
+          name: data.channel,
+        },
+        include: {
+          members: true,
+        },
+      });
+      channel.invited.map((id, i) => {
+        if (id != userId) {
+          //Error not possible
+          return;
+        }
+      });
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId[0],
+        },
+      });
+      if (data.response) {
+        const channelUpdate = await this.prisma.channel.update({
+          where: {
+            name: data.channel,
+          },
+          data: {
+            members: {
+              connect: { id: user.id },
+            },
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async leaveChannel(client: any, info: any) {
     try {
-      const userLeaving = this.prisma.user.findMany({
+      const userLeaving = await this.prisma.user.findMany({
         where: {
           username: info.username,
         },
@@ -457,7 +537,7 @@ export class ChatGatewayService {
         }
         return true;
       });
-      this.prisma.user.update({
+      await this.prisma.user.update({
         where: {
           username: info.username,
         },
