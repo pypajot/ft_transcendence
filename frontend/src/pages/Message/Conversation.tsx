@@ -57,34 +57,34 @@ export const Conversation = () => {
   }, [user]);
 
   const getMessageReceived = async (obj: {
-	sender: string;
-	receiver: string;
-	isUser: boolean;
+    sender: string;
+    receiver: string;
+    isUser: boolean;
   }) => {
-	const url = "http://localhost:3333/chat/getMessageReceived";
-	
-	try {
-	  const response = await refreshFetch(url, {
-		method: "POST",
-		headers: {
-		  "Content-Type": "application/json",
-		  "Authorization": `Bearer ${sessionStorage.getItem("access_token")}`,
-		},
-		body: JSON.stringify({
-		  sender: obj.sender,
-		  receiver: obj.receiver,
-		  isUser: obj.isUser,
-		}),
-	  });
-  
-	  if (!response.ok) {
-		throw new Error(`HTTP error! Status: ${response.status}`);
-	  }
-  
-	  return await response.json();
-	} catch (error) {
-	  console.error("There was an error fetching the data", error);
-	}
+    const url = "http://localhost:3333/chat/getMessageReceived";
+
+    try {
+      const response = await refreshFetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+        },
+        body: JSON.stringify({
+          sender: obj.sender,
+          receiver: obj.receiver,
+          isUser: obj.isUser,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("There was an error fetching the data", error);
+    }
   };
 
   useEffect(() => {
@@ -140,7 +140,6 @@ export const Conversation = () => {
       setConversationMsg(
         sentMessage.concat(receivedMessage).sort(sortByDate())
       );
-      console.log(conversationMsg);
     }
   }, [sentMessage, receivedMessage, info]);
 

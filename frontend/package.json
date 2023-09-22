@@ -24,6 +24,7 @@
     "draft-js": "^0.11.7",
     "htop": "^1.0.1",
     "lexical": "^0.12.0",
+    "material-ui-colors": "^1.0.0",
     "or": "^0.2.0",
     "prop-types": "^15.8.1",
     "react": ">=16.8.0",

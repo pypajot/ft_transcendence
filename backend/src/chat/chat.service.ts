@@ -205,6 +205,20 @@ export class ChatControllerService {
   }
 }
 
+interface User {
+  id: number;
+  username: string;
+  avatar: string;
+  socketId?: string;
+  twoFactorAuthActive: boolean;
+}
+
+interface Channel {
+  member: User[];
+  name: string;
+  picture?: string;
+}
+
 @Injectable()
 export class ChatGatewayService {
   private readonly logger = new Logger(ChatGatewayService.name);
@@ -408,6 +422,57 @@ export class ChatGatewayService {
     io.emit('message', message);
   }
 
+  getChannelMember(channel: any) {
+    let users: User[] = [];
+
+    if (channel.members) {
+      for (let i = 0; i < channel.members.length; i++) {
+        const user: User = {
+          id: channel.members[i].id,
+          username: channel.members[i].username,
+          avatar: channel.members[i].avatar,
+          socketId: channel.members[i].socketId,
+          twoFactorAuthActive: channel.members[i].twoFactorAuthActive,
+        };
+        users = [...users, user];
+      }
+    }
+    return users;
+  }
+
+  async leaveChannel(client: any, info: any) {
+    try {
+      const userLeaving = this.prisma.user.findMany({
+        where: {
+          username: info.username,
+        },
+        include: {
+          channels: true,
+        },
+      });
+
+      const updatedChannelList = userLeaving[0].channels.filter((channel) => {
+        if (channel.name == info.channelName) {
+          return false;
+        }
+        return true;
+      });
+      this.prisma.user.update({
+        where: {
+          username: info.username,
+        },
+        include: {
+          channels: true,
+        },
+        data: {
+          channels: updatedChannelList,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async channelCreation(
     io: Server,
     data_chan: channelInfo,
@@ -445,8 +510,12 @@ export class ChatGatewayService {
             invited: [],
           },
         });
-        client.emit('successfullyJoinedChannel', data_chan.name);
+        const channelJoined: Channel = {
+          member: this.getChannelMember(newchannel),
+          name: newchannel.name,
+        };
         client.join(data_chan.name);
+        client.emit('successfullyJoinedChannel', channelJoined);
       }
     } catch (error) {
       console.log(error);
@@ -485,7 +554,7 @@ export class ChatGatewayService {
           client.emit('wrongPassword');
           return;
         }
-        const newUserChannel = await this.prisma.channel.update({
+        const newUpdatedChannel = await this.prisma.channel.update({
           where: {
             name: info.name,
           },
@@ -493,8 +562,12 @@ export class ChatGatewayService {
             members: { connect: { id: user.id } },
           },
         });
-        client.emit('successfullyJoinedChannel', info.name);
+        const channelJoined: Channel = {
+          member: this.getChannelMember(newUpdatedChannel),
+          name: newUpdatedChannel.name,
+        };
         client.join(info.name);
+        client.emit('successfullyJoinedChannel', channelJoined);
       } else {
         client.emit('wrongName');
       }

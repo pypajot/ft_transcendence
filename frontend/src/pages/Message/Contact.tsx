@@ -4,17 +4,7 @@ import { ContactElement } from "./ContactElement";
 import { getFriendsList } from "./Hooks/GetFriendsList";
 import { useAuth } from "../../context/AuthContext";
 import { ContactType } from "../../../public/Types/contact.entity";
-
-//Possible to have channel Or People
-
-//Should display the name of the people with his picture
-//Or the Channel Name if it is a channel
-
-//How to list all contact ?
-
-//I should get all friends of the User Logs in the DB
-
-//For the moment i will just display all user
+import { useChatContext } from "../../context/ChatContext";
 
 export const Contact = () => {
   const [friends, setFriends] = useState<ContactType[]>([]);
@@ -22,6 +12,7 @@ export const Contact = () => {
 
   const { user } = useAuth();
   const socket = useSocketContext();
+  const chatContext = useChatContext();
 
   const getName = () => {
     if (!user) {
@@ -30,21 +21,14 @@ export const Contact = () => {
       return user.username;
     }
   };
-
-  const refreshContacts = (arg: any) => {
-    getFriendsList(username).then((res: ContactType[]) => {
-      setFriends(res);
-    });
-  };
-
+  /*
   useEffect(() => {
-    socket?.on("successfullyJoinedChannel", refreshContacts);
     socket?.on("goodFriendsRequest", refreshContacts);
     return () => {
-      socket?.off("successfullyJoinedChannel", refreshContacts);
       socket?.off("goodFriendsRequest", refreshContacts);
     };
   }, [socket]);
+  */
 
   useEffect(() => {
     const res = getName();
@@ -61,32 +45,28 @@ export const Contact = () => {
   //If not channel then link to the user
   //Return a list of string Channel And User
 
-  useEffect(() => {
-    if (username === "") return;
-    getFriendsList(username).then((res: ContactType[]) => {
-      setFriends(res);
-      console.log(res);
-    });
-  }, [username]);
   //Ask the back for the userList
-//   const contactList = friendList?.map(function (user, i) {
-// 	return (
-// 	  <div key={i}>
-// 		<ContactElement
-// 		  content={user.username}
-// 		  setConversation={setConversation}
-// 		></ContactElement>
-// 	  </div>
-// 	);
-//   })
+  //   const contactList = friendList?.map(function (user, i) {
+  // 	return (
+  // 	  <div key={i}>
+  // 		<ContactElement
+  // 		  content={user.username}
+  // 		  setConversation={setConversation}
+  // 		></ContactElement>
+  // 	  </div>
+  // 	);
+  //   })
   return (
     <>
       {username &&
-        friends != undefined &&
-        friends.map(function (user, i) {
+        chatContext.channelIn != undefined &&
+        chatContext.channelIn.map(function (channel, i) {
+          console.log(channel);
           return (
             <div key={i}>
-              <ContactElement content={user}></ContactElement>
+              <ContactElement
+                content={{ channel: true, user: false, name: channel.name }}
+              ></ContactElement>
             </div>
           );
         })}

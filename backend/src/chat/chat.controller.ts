@@ -17,6 +17,7 @@ export class ChatController {
 
   @Post('getMessageSent')
   async getLogsSender(@Body() dto: PrivMsgLogsDto): Promise<string> {
+    console.log(dto);
     if (dto.isUser) {
       return this.chatService.getLogsUserToUser(dto.sender, dto.receiver);
     } else {

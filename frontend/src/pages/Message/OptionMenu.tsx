@@ -8,10 +8,12 @@ import {
 import { ContactType } from "../../../public/Types/contact.entity";
 import { MoreIcon } from "@twilio-paste/icons/esm/MoreIcon";
 import { useState } from "react";
+import { InviteToChannel } from "./InviteToChannel";
+import { User } from "../../context/AuthContext";
 
 export const OptionMenu = ({ info }: { info: ContactType }) => {
   const menu = useMenuState();
-  const [invitePeople, setInvitePeole] = useState<boolean>(false);
+  const [displayInviteList, setDisplayInviteList] = useState<boolean>(false);
 
   return (
     <div>
@@ -20,13 +22,19 @@ export const OptionMenu = ({ info }: { info: ContactType }) => {
       </MenuButton>
       {info.channel && (
         <div>
+          <InviteToChannel
+            open={displayInviteList}
+            onClose={() => {
+              setDisplayInviteList(false);
+            }}
+          />
           <Menu {...menu} aria-label="Preferences">
             <MenuItem {...menu}>Settings</MenuItem>
             <MenuSeparator {...menu} />
             <MenuItem
               {...menu}
               onClick={() => {
-                setInvitePeole(true);
+                setDisplayInviteList(true);
               }}
             >
               Invite Into Channel

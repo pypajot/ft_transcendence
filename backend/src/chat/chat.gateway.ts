@@ -79,6 +79,11 @@ class ChatGateway
   handleChannelCreation(client: any, data: channelInfo): void {
     this.chatService.channelCreation(this.io, data, client.id, client);
   }
+
+  @SubscribeMessage('userLeavingChannel')
+  handleUserLeavingchannel(client: any, data: any): void {
+    this.chatService.leaveChannel(client, data);
+  }
   @SubscribeMessage('friendsRequest')
   handleFriendsRequest(client: any, target: string): void {
     this.chatService.requestFriends(this.io, client.id, target);
