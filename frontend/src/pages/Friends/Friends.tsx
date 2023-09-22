@@ -4,10 +4,15 @@ import { useAuth } from "../../context/AuthContext";
 import { useSocketContext } from "../../context/WebSocketContext";
 import { ProfileContext } from "../../context/ProfileContext";
 import { Button } from "@twilio-paste/core";
-import { Channel } from "../../context/ChatContext";
+import {
+  Channel,
+  ChatContext,
+  useChatContext,
+} from "../../context/ChatContext";
 
 const Friends = () => {
   const socket = useSocketContext();
+  const chatContext = useChatContext();
   const { user } = useAuth();
   async function SendFriendRequest(e: any) {
     e.preventDefault();
@@ -98,42 +103,64 @@ const Friends = () => {
 
   function handleChannelRequest(channelToJoin: Channel, accepted: boolean) {
     socket.emit("ChannelInvitResponse", {
-      channel: channelToJoin,
+      channel: channelToJoin.name,
       response: accepted,
     });
+    chatContext.setChannelRequestList(
+      chatContext.channelRequestList?.filter((channel) => {
+        if (channel == channelToJoin) {
+          return false;
+        }
+        return true;
+      })
+    );
   }
 
   function ChannelRequestList() {
-    const [channelRequestList, setChannelRequestList] = useState<Channel[]>([]);
     const socket = useSocketContext();
+    const chatContext = useChatContext();
 
     const handleJoinRequest = (channel: Channel) => {
-      setChannelRequestList([...channelRequestList, channel]);
+      if (chatContext.channelRequestList) {
+        chatContext.setChannelRequestList([
+          ...chatContext.channelRequestList,
+          channel,
+        ]);
+      }
     };
     useEffect(() => {
       socket?.on("joinRequest", handleJoinRequest);
       return () => {
         socket?.off("joinRequest", handleJoinRequest);
       };
-    });
-    const res = channelRequestList.map((elem, i) => {
-      <div>
-        <h4>You are invited in {elem.name} channel</h4>;
-        <Button
-          variant="primary"
-          onClick={() => handleChannelRequest(elem, true)}
-        >
-          Accept
-        </Button>
-        <Button
-          variant="primary"
-          onClick={() => handleChannelRequest(elem, false)}
-        >
-          Decline
-        </Button>
-      </div>;
-    });
-    return res;
+    }, []);
+    console.log();
+    if (
+      chatContext.channelRequestList != undefined &&
+      chatContext.channelRequestList.length > 0
+    ) {
+      const res = chatContext.channelRequestList.map((elem: Channel) => (
+        <>
+          <div>
+            <h4>You are invited in {elem.name} channel</h4>;
+            <Button
+              variant="primary"
+              onClick={() => handleChannelRequest(elem, true)}
+            >
+              Accept
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => handleChannelRequest(elem, false)}
+            >
+              Decline
+            </Button>
+          </div>
+        </>
+      ));
+      return <>{res}</>;
+    }
+    return <>{}</>;
   }
 
   return (
@@ -151,6 +178,9 @@ const Friends = () => {
         <FriendRequestList />
       </div>
       <div>Channel Request:</div>
+      <div>
+        <ChannelRequestList />
+      </div>
     </>
   );
 };

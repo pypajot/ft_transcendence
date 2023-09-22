@@ -7,6 +7,7 @@ import {
 } from "@twilio-paste/lexical-library";
 import {
   Box,
+  Flex,
   Menu,
   MenuButton,
   MenuItem,
@@ -142,7 +143,7 @@ export const Conversation = () => {
         sentMessage.concat(receivedMessage).sort(sortByDate())
       );
     }
-  }, [sentMessage, receivedMessage, info]);
+  }, [sentMessage, receivedMessage]);
 
   const handleComposerChange = (editorState: EditorState): void => {
     editorState.read(() => {
@@ -190,11 +191,12 @@ export const Conversation = () => {
   return (
     <>
       {renderConversation && (
-        <div>
-          <h1>
-            {info?.name} <OptionMenu info={info} />
-          </h1>
-        </div>
+        <Flex>
+          <Flex grow shrink basis="1px">
+            <Flex>{info?.name}</Flex>
+          </Flex>
+          <OptionMenu info={info} />
+        </Flex>
       )}
       {conversationMsg &&
         conversationMsg.map(function (message, i) {

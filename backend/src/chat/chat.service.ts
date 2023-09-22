@@ -7,6 +7,7 @@ import { channelInfo } from 'src/types/channelInfo.entity';
 import { Conversation } from 'src/types/conversation.entity';
 import { MessageInfo } from 'src/types/message.info';
 import { joinChannelInfo } from './chat.gateway';
+import { use } from 'passport';
 
 @Injectable()
 export class ChatControllerService {
@@ -123,8 +124,11 @@ export class ChatControllerService {
         },
       });
       const res: Message[] = [];
-      for (let i = 0; i < channel.messages.length; i++) {
-        console.log(`${i}, size: ${channel.messages.length}`);
+      for (
+        let i = 0;
+        channel && channel.messages && i < channel.messages.length;
+        i++
+      ) {
         if (channel.messages[i].authorId != user.id) {
           const msg: Message = {
             id: channel.messages[i].id,
@@ -460,6 +464,9 @@ export class ChatGatewayService {
           username: data.target,
         },
       });
+      if (!channel.invited) {
+        channel.invited = [user.id];
+      }
       const updatedChannel = await this.prisma.channel.update({
         where: {
           name: channel.name,
@@ -515,9 +522,45 @@ export class ChatGatewayService {
           },
         });
       }
+      const newId = channel.invited.filter((id) => {
+        if (id == user.id) {
+          return false;
+        }
+        return true;
+      });
+      await this.prisma.channel.update({
+        where: {
+          name: data.channel,
+        },
+        data: {
+          invited: {
+            set: newId,
+          },
+        },
+      });
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async responsePendingRequest(client: any, username: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username: username,
+      },
+    });
+    const channelReqList = [];
+    const channelList = await this.prisma.channel.findMany({});
+    channelList.map((channel) => {
+      if (channel.invited) {
+        channel.invited.map((id) => {
+          if (id == user.id) {
+            channelReqList.push(channel);
+          }
+        });
+      }
+    });
+    client.emit('InitChannelsRequest', channelReqList);
   }
 
   async leaveChannel(client: any, info: any) {
@@ -531,7 +574,9 @@ export class ChatGatewayService {
         },
       });
 
-      const updatedChannelList = userLeaving[0].channels.filter((channel) => {
+      const channel = await this.prisma.channel.findMany({});
+
+      const updatedChannelList = channel.filter((channel) => {
         if (channel.name == info.channelName) {
           return false;
         }
@@ -545,9 +590,12 @@ export class ChatGatewayService {
           channels: true,
         },
         data: {
-          channels: updatedChannelList,
+          channels: {
+            set: updatedChannelList as any,
+          },
         },
       });
+      client.leave(info.channelName);
     } catch (error) {
       console.log(error);
     }
@@ -617,10 +665,12 @@ export class ChatGatewayService {
       if (existingChannel) {
         if (!existingChannel.public) {
           let find = false;
-          for (let i = 0; i < existingChannel.invited.length; i++) {
-            if (existingChannel.invited[i] == user.id) {
-              find = true;
-              break;
+          if (existingChannel.invited) {
+            for (let i = 0; i < existingChannel.invited.length; i++) {
+              if (existingChannel.invited[i] == user.id) {
+                find = true;
+                break;
+              }
             }
           }
           if (!find) {

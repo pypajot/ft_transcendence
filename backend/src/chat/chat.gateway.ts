@@ -36,6 +36,7 @@ class ChatGateway
     if (client.handshake.query.username !== 'null') {
       this.username = client.handshake.query.username;
       this.chatService.new_cli(client, client.handshake.query.username);
+      this.chatService.responsePendingRequest(client, client.handshake.query.username);
     }
     this.logger.log(
       `Client ${client.id} ${client.handshake.query.username} arrived`,
@@ -84,6 +85,7 @@ class ChatGateway
   handleChannelInvitResponse(client: any, data: any) {
     this.chatService.channelInviteResponse(client, data);
   }
+
   @SubscribeMessage('ChannelInvitation')
   handleChannelInvitation(client: any, data: any) {
     this.chatService.inviteToChannel(this.io, client, data);

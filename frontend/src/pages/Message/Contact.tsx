@@ -5,14 +5,14 @@ import { getFriendsList } from "./Hooks/GetFriendsList";
 import { useAuth } from "../../context/AuthContext";
 import { ContactType } from "../../../public/Types/contact.entity";
 import { useChatContext } from "../../context/ChatContext";
+import { ProfileContext } from "../../context/ProfileContext";
 
 export const Contact = () => {
-  const [friends, setFriends] = useState<ContactType[]>([]);
   const [username, setUsername] = useState<string>("");
 
   const { user } = useAuth();
-  const socket = useSocketContext();
   const chatContext = useChatContext();
+  const friends = useContext(ProfileContext).friendList;
 
   const getName = () => {
     if (!user) {
@@ -38,7 +38,7 @@ export const Contact = () => {
     } else {
       setUsername(res);
     }
-  }, [user, setFriends]);
+  }, [user]);
 
   //Request the back (Should Get all Message from a certain User)
   //Then check on all message to list all conversation / Channel Or nOt
@@ -58,14 +58,28 @@ export const Contact = () => {
   //   })
   return (
     <>
+      <div>
+        <h1> Channel </h1>
+        {username &&
+          chatContext.channelIn != undefined &&
+          chatContext.channelIn.map(function (channels, i) {
+            return (
+              <div key={i}>
+                <ContactElement
+                  content={{ channel: true, user: false, name: channels.name }}
+                ></ContactElement>
+              </div>
+            );
+          })}
+      </div>
+      <h1> Friend </h1>
       {username &&
-        chatContext.channelIn != undefined &&
-        chatContext.channelIn.map(function (channel, i) {
-          console.log(channel);
+        friends &&
+        friends.map((user, i) => {
           return (
             <div key={i}>
               <ContactElement
-                content={{ channel: true, user: false, name: channel.name }}
+                content={{ channel: false, user: true, name: user.username }}
               ></ContactElement>
             </div>
           );

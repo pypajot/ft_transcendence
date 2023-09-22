@@ -9,8 +9,9 @@ import { ContactType } from "../../../public/Types/contact.entity";
 import { MoreIcon } from "@twilio-paste/icons/esm/MoreIcon";
 import { useState } from "react";
 import { InviteToChannel } from "./InviteToChannel";
-import { User } from "../../context/AuthContext";
+import { User, useAuth } from "../../context/AuthContext";
 import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
+import { useChatContext } from "../../context/ChatContext";
 
 export const OptionMenu = ({
   info,
@@ -19,7 +20,8 @@ export const OptionMenu = ({
 }) => {
   const menu = useMenuState();
   const [displayInviteList, setDisplayInviteList] = useState<boolean>(false);
-
+  const chatContext = useChatContext();
+  const { user } = useAuth();
   //do we set the invite to play to any member of a channel ?
   return (
     <div>
@@ -35,7 +37,14 @@ export const OptionMenu = ({
             }}
           />
           <Menu {...menu} aria-label="Preferences">
-            <MenuItem {...menu}>Settings</MenuItem>
+            <MenuItem
+              {...menu}
+              onClick={() => {
+                user && chatContext.leaveChannel(info?.name, user?.username);
+              }}
+            >
+              Leave
+            </MenuItem>
             <MenuSeparator {...menu} />
             <MenuItem
               {...menu}

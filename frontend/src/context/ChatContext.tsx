@@ -17,6 +17,8 @@ type ChatContext = {
   ) => void;
   channelIn: Channel[] | undefined;
   leaveChannel: (channelName: string, username: string) => void;
+  channelRequestList: Channel[] | undefined;
+  setChannelRequestList: (channelRequestList: Channel[] | undefined) => void;
 };
 
 type ChatContextProviderProps = {
@@ -30,45 +32,68 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
   >(undefined);
   const [channelIn, setChannelIn] = useState<Channel[] | undefined>(undefined);
   const socket = useSocketContext();
+  const [channelRequestList, setChannelRequestList] = useState<
+    Channel[] | undefined
+  >(undefined);
 
   //Case we update : New Channel created | Joined a new channel
-  const leaveChannel = (channelName: string, username: string) => {
-    socket?.emit("userLeavingChannel", {
-      chanelName: channelName,
-      user: username,
-    });
+  const leaveChannel = React.useCallback(
+    (channelName: string, username: string) => {
+      socket?.emit("userLeavingChannel", {
+        chanelName: channelName,
+        user: username,
+      });
 
-    //Do we ask the back to assure that we correctly leaved the channel or not
-    setChannelIn(
-      channelIn?.filter((channel) => {
-        if (channel.name == channelName) {
-          return false;
-        } else {
-          return true;
-        }
-      })
-    );
-  };
+      //Do we ask the back to assure that we correctly leaved the channel or not
+      setChannelIn(
+        channelIn?.filter((channel) => {
+          if (channel.name == channelName) {
+            return false;
+          } else {
+            return true;
+          }
+        })
+      );
+    },
+    [setChannelIn, channelIn, socket]
+  );
 
-  const addChannel = (channel: Channel) => {
-    if (channelIn == undefined) {
-      setChannelIn([channel]);
-    } else {
-      setChannelIn([...channelIn, channel]);
-    }
-  };
-  const initChannels = (channels: Channel[]) => {
-    setChannelIn(channels);
-  };
+  const addChannel = React.useCallback(
+    (channel: Channel) => {
+      if (channelIn == undefined) {
+        setChannelIn([channel]);
+      } else {
+        setChannelIn([...channelIn, channel]);
+      }
+    },
+    [setChannelIn, channelIn]
+  );
+
+  const initChannels = React.useCallback(
+    (channels: Channel[]) => {
+      setChannelIn(channels);
+    },
+    [setChannelIn]
+  );
+
+  const initChannelsRequest = React.useCallback(
+    (channels: Channel[]) => {
+      if (channels) {
+        setChannelRequestList(channels);
+      }
+    },
+    [setChannelRequestList]
+  );
 
   React.useEffect(() => {
+    socket?.on("InitChannelsRequest", initChannelsRequest);
     socket?.on("InitChannels", initChannels);
     socket?.on("successfullyJoinedChannel", addChannel);
     return () => {
       socket?.off("successfullyJoinedChannel", addChannel);
       socket?.off("InitChannels", initChannels);
     };
-  }, [socket, addChannel, initChannels]);
+  }, [socket, addChannel, initChannels, initChannelsRequest]);
 
   const value = useMemo(
     () => ({
@@ -76,8 +101,17 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
       setConversationInfo,
       channelIn,
       leaveChannel,
+      channelRequestList,
+      setChannelRequestList,
     }),
-    [conversationInfo, setConversationInfo, channelIn, leaveChannel]
+    [
+      conversationInfo,
+      setConversationInfo,
+      channelIn,
+      leaveChannel,
+      channelRequestList,
+      setChannelRequestList,
+    ]
   );
   return (
     <ChatContext.Provider value={value}>{props.children}</ChatContext.Provider>
@@ -91,6 +125,9 @@ export function useChatContext() {
     throw new Error(
       "You need to use ChatContext with in a ChatContextProvider"
     );
+  }
+  if (context.channelRequestList == undefined) {
+    context.channelRequestList = [];
   }
   return context;
 }

@@ -63,7 +63,6 @@ export const CreateNewConversation = () => {
       isUser: false,
       name: channelName,
     };
-    console.log("new");
     chatContext.setConversationInfo(conversationInfo);
   };
   const handleSelectChange = () => {

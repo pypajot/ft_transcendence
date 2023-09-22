@@ -36,7 +36,7 @@ export function InviteToChannel(props: SimpleDialogProps) {
 
   const handleListItemClick = (target: User) => {
     socket?.emit("ChannelInvitation", {
-      target: target,
+      target: target.username,
       channel: chatContext.conversationInfo?.name,
     });
     onClose();
