@@ -2,10 +2,14 @@ import "./Login.css";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { FormControl, FormHelperText, Input, InputLabel } from "@mui/material";
+import { useState } from "react";
 
 function Login() {
   const { setAccessToken } = useAuth();
   const navigate = useNavigate();
+  const [usernameError, setUsernameError] = useState<string | undefined>(undefined)
+  const [passwordError, setPasswordError] = useState<string | undefined>(undefined)
 
   async function HandleSubmit(e: any) {
     e.preventDefault();
@@ -17,21 +21,33 @@ function Login() {
       password: formData.get("password"),
     };
     // alert(JSON.stringify(formBody));
-    const response = await fetch("http://localhost:3333/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formBody),
-      credentials: "include",
-    });
-    if (response.status !== 201) return;
-    const responseJson = await response.json();
-    if (responseJson.user2fa) {
-      sessionStorage.setItem("2faToken", responseJson.access_token);
-      navigate("/login2fa");
-    } else {
-      sessionStorage.setItem("access_token", responseJson.access_token);
-      setAccessToken(sessionStorage.getItem("access_token"));
-    }
+	try {
+		setUsernameError(undefined);
+		setPasswordError(undefined);
+		const response = await fetch("http://localhost:3333/auth/login", {
+		  method: "POST",
+		  headers: { "Content-Type": "application/json" },
+		  body: JSON.stringify(formBody),
+		  credentials: "include",
+		});
+		if (response.status !== 201) {
+			const body = await response.json();
+			if (body.message.includes("User"))
+				setUsernameError("Username already taken")
+			if (body.message.includes(""))
+			return ;
+		}
+		const responseJson = await response.json();
+		if (responseJson.user2fa) {
+		  sessionStorage.setItem("2faToken", responseJson.access_token);
+		  navigate("/login2fa");
+		} else {
+		  sessionStorage.setItem("access_token", responseJson.access_token);
+		  setAccessToken(sessionStorage.getItem("access_token"));
+		}
+	} catch(err) {
+		console.log("test", err)
+	}
     // .then(response => response.json())
     // .then(response => sessionStorage.setItem("access_token",response.access_token))
   }
@@ -55,7 +71,7 @@ function Login() {
         <form onSubmit={HandleSubmit}>
           <div>
             <div className="username">
-              <label>
+			<label>
                 <input
                   type="text"
                   name="username"

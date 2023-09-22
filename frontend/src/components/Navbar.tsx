@@ -2,17 +2,17 @@ import { InPageNavigation, InPageNavigationItem } from "@twilio-paste/core";
 import { Link } from "react-router-dom";
 import { Button } from "@twilio-paste/core/button";
 import { useAuth } from "../context/AuthContext";
+import { Navigate } from "react-router-dom";
+
 
 const Navbar = () => {
 	const { logout } = useAuth();
 
 	return (
 		<InPageNavigation aria-label="get started">
-		<Link to='/home'>
-			<InPageNavigationItem href="">
+			<InPageNavigationItem component="">
 				Home
 			</InPageNavigationItem>
-		</Link>
 		<Link to='/profile'>
 			<InPageNavigationItem href="">
 				Profile

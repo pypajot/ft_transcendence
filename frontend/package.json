@@ -13,7 +13,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@lexical/react": "^0.12.0",
-    "@mui/material": "^5.14.7",
+    "@mui/material": "^5.14.10",
     "@twilio-paste/chat-composer": "^5.0.0",
     "@twilio-paste/core": "^20.2.0",
     "@twilio-paste/icons": "^12.1.0",

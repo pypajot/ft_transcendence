@@ -14,7 +14,7 @@ function IntraLogin() {
 
 	useEffect(() => {
 		const HandleIntra = async () => {
-			if (searchParams.get("error"))
+			if (searchParams.get("error") || !searchParams.get("code"))
 			{
 				navigate("/landing");
 				return ;

@@ -1,10 +1,13 @@
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import "./Signup.css";
+import { useState } from "react";
 
 const Signup = () => {
   const { setAccessToken } = useAuth();
-
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  
   async function HandleSubmit(e: any) {
     e.preventDefault();
 
@@ -22,7 +25,16 @@ const Signup = () => {
       body: body,
       credentials: "include",
     });
-    if (response.status !== 201) return;
+    if (response.status !== 201) {
+		const message = (await response.json()).message.toString();
+		if (message.includes("Credentials"))
+			setUsernameError("Username already taken")
+		if (message.includes("username"))
+			setUsernameError("Username cannot be empty")
+		if (message.includes("password"))
+			setPasswordError("Password cannot be empty")
+		return ;
+	}
     sessionStorage.setItem(
       "access_token",
       (await response.json()).access_token

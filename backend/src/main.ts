@@ -10,9 +10,7 @@ async function bootstrap() {
 		// process.env.JWT_SECRET,
 		process.env.REFRESH_SECRET
 	))
-	app.useGlobalPipes(new ValidationPipe({
-		whitelist: true,
-	}));
+	app.useGlobalPipes(new ValidationPipe());
 	app.enableCors({
 		origin: 'http://localhost:5173',
 		methods: ['GET', 'POST', 'PUT', 'DELETE'],

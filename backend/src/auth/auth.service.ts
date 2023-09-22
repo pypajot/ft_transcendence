@@ -13,6 +13,8 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
+import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
+import { promisify } from 'util';
 
 type RefreshPayloadType = {
   sub: number;
@@ -23,7 +25,12 @@ type RefreshPayloadType = {
 type JwtPaylodType = {
   sub: number;
   username: string;
+  twofactor_on: boolean
 };
+
+const iv = randomBytes(16);
+const password = process.env.ENCRPYT_SECRET;
+const salt = randomBytes(42).toString();
 
 const RefreshTokenParams = {
   httpOnly: true,
@@ -60,7 +67,7 @@ export class AuthService {
         RefreshTokenParams,
       );
       return {
-        access_token: await this.signAccessToken(user.id, user.username),
+        access_token: await this.signAccessToken(user.id, user.username, false),
       };
     } catch (err) {
       if (
@@ -93,7 +100,7 @@ export class AuthService {
         RefreshTokenParams,
       );
     return {
-      access_token: await this.signAccessToken(user.id, user.username),
+      access_token: await this.signAccessToken(user.id, user.username, false),
       user2fa: user.twoFactorAuthActive,
     };
   }
@@ -144,7 +151,7 @@ export class AuthService {
         RefreshTokenParams,
       );
     return {
-      access_token: await this.signAccessToken(user.id, user.username),
+      access_token: await this.signAccessToken(user.id, user.username, false),
       user2fa: user.twoFactorAuthActive,
     };
   }
@@ -156,9 +163,9 @@ export class AuthService {
       },
     });
 
-    if (!user) return null;
+    if (!user) throw new UnauthorizedException('User does not exist');
     const pwMatch = await argon2.verify(user.hash, password);
-    if (!pwMatch) return null;
+    if (!pwMatch) throw new UnauthorizedException('Invalid password');
 
     return user;
   }
@@ -166,12 +173,14 @@ export class AuthService {
   async signAccessToken(
     id: number,
     username: string,
+	twofactor_on: boolean,
     time?: string,
   ): Promise<any> {
     if (!time) time = '30s';
     const payload = {
       sub: id,
       username: username,
+	  twofactor_on: twofactor_on
     };
     const token = await this.jwt.signAsync(payload, {
       expiresIn: time,
@@ -275,7 +284,7 @@ export class AuthService {
       payload.token_family,
     );
     res.cookie('refresh_token', newtoken, RefreshTokenParams);
-    return await this.signAccessToken(payload.sub, payload.username);
+    return await this.signAccessToken(payload.sub, payload.username, payload.twofactor_on);
   }
 
   async logout(res: any, refresh_token?: any) {
@@ -309,12 +318,18 @@ export class AuthService {
       },
     });
     const secret = authenticator.generateSecret();
+	const key = (await promisify(scrypt)(password, salt, 32)) as Buffer;
+	const cipher = createCipheriv('aes-256-ctr', key, iv);
+	const encryptedText = Buffer.concat([
+		cipher.update(secret),
+		cipher.final(),
+	  ]);
     await this.prisma.user.update({
       where: {
         id: payload.sub,
       },
       data: {
-        twoFactorAuthSecret: secret,
+        twoFactorAuthSecret: encryptedText,
       },
     });
     const otp = authenticator.keyuri(
@@ -324,6 +339,16 @@ export class AuthService {
     );
     const imagePath = await toDataURL(otp);
     return { path: imagePath };
+  }
+
+  async decrypt(buf: Buffer) {
+	const key = (await promisify(scrypt)(password, salt, 32)) as Buffer;
+	const decipher = createDecipheriv('aes-256-ctr', key, iv);
+	const decryptedText = Buffer.concat([
+		decipher.update(buf),
+		decipher.final(),
+	]);
+	return decryptedText.toString();
   }
 
   async confirm2fa(req: any) {
@@ -337,7 +362,7 @@ export class AuthService {
     });
     const isValid = authenticator.verify({
       token: req.body.code,
-      secret: user.twoFactorAuthSecret,
+      secret: await this.decrypt(user.twoFactorAuthSecret),
     });
     if (!isValid) throw new ForbiddenException('Invalid code');
     await this.prisma.user.update({
@@ -348,7 +373,7 @@ export class AuthService {
         twoFactorAuthActive: true,
       },
     });
-    return '2FA activated';
+    return { token: await this.signAccessToken(user.id, user.username, true) };
   }
 
   async login2fa(res: any, req: any) {
@@ -362,7 +387,7 @@ export class AuthService {
     });
     const isValid = authenticator.verify({
       token: req.body.code,
-      secret: user.twoFactorAuthSecret,
+      secret: await this.decrypt(user.twoFactorAuthSecret),
     });
     if (!isValid) throw new ForbiddenException('Invalid code');
     res.cookie(
@@ -370,6 +395,6 @@ export class AuthService {
       await this.signRefreshToken(user.id, user.username),
       RefreshTokenParams,
     );
-    return { access_token: await this.signAccessToken(user.id, user.username) };
+    return { access_token: await this.signAccessToken(user.id, user.username, true) };
   }
 }

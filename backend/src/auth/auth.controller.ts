@@ -1,7 +1,6 @@
 import { Controller, Post, Body, Get, UseGuards, Res, Req, HttpCode, HttpStatus} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto, CodeDto } from "./dto";
-import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { RefreshAuthGuard } from "./guards/refresh-auth.guard";
 import { JwtAuthGuard } from "./guards";
 import { get } from "http";
@@ -22,8 +21,8 @@ export class AuthController {
 	}
 	
 	@Post('login')
-	@UseGuards(LocalAuthGuard)
 	async login(@Body() dto: AuthDto, @Res() res: any) {
+		await this.authservice.validateUser(dto.username, dto.password);
 		const token = await this.authservice.login(dto, res);
 		res.send(token);
 	}
@@ -61,7 +60,7 @@ export class AuthController {
 	@UseGuards(JwtAuthGuard)
 	async confirm2fa(@Req() req: any) {
 		const response = await this.authservice.confirm2fa(req);
-		return { result: response };
+		return response ;
 	}
 
 	@Post('2fa/login')

@@ -37,7 +37,8 @@ const Profile = () => {
 	
 	function ChangeAvatar() {
 		async function HandleChangeAvatar(files: any) {
-			const fileUrl = files.map((x: any) => x.fileUrl);
+			const fileUrl = files.map((x: any) => x.fileUrl)[0];
+			console.log(fileUrl);
 			const response = await refreshFetch("http://localhost:3333/user/avatar", {
 				method: 'POST',
 				headers: {
@@ -78,6 +79,7 @@ const Profile = () => {
 		});
 		if (response.status === 201) {
 			setImagePath(null);
+			sessionStorage.setItem("access_token", (await response.json().token))
 			user && setUser({...user, twoFactorAuthActive: true})
 		};
 	}
