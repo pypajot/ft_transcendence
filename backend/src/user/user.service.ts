@@ -74,24 +74,15 @@ export class UserService {
 	}
 
 	async changeAvatar(id: number, file: string) {
-		const user = await this.prisma.user.findUnique({
-			where : {id: id}
+		const user = await this.prisma.user.update({
+			where : {id: id},
+			data: {
+				avatar: file
+			}
 		})
 		if (!user)
 			throw new ForbiddenException('No such user');
-		try {
-			const imageResponse = await cloudinary.uploader.upload(file);
-			await this.prisma.user.update({
-				where : {id: id},
-				data: {
-					avatar: imageResponse.secure_url
-				}
-			})
-			return { avatar: imageResponse.secure_url }
-		} catch (err) {
-			console.log(err);
-		}
-		throw new ForbiddenException('invalid file')
+		return user;
 	}
 
 	async addFriend(content: {friendName: string, userId: number}, server: any) {

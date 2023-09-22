@@ -9,6 +9,12 @@ import { isAbsolute } from 'path';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { ProfileContext } from '../../context/ProfileContext';
 
+import {Uploader} from "uploader"
+import { UploadButton } from "react-uploader";
+
+const uploader = Uploader({
+	apiKey: "free"
+  });
 
 const Profile = () => {
 
@@ -30,33 +36,32 @@ const Profile = () => {
 	}
 	
 	function ChangeAvatar() {
-		async function HandleChangeAvatar(e: any) {
-			e.preventDefault();
+		async function HandleChangeAvatar(files: any) {
+			const fileUrl = files.map((x: any) => x.fileUrl);
 			const response = await refreshFetch("http://localhost:3333/user/avatar", {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
 				},
-				body: JSON.stringify({file: e.target.file.value})
+				body: JSON.stringify({file: fileUrl})
 			});
 			if (response.status === 201)
-				user && setUser({...user, avatar: (await response.json()).avatar});
+				user && setUser({...user, avatar: fileUrl});
 		}
 		return (
 			<>
-				<form onSubmit={HandleChangeAvatar}>
-					<div>
-						<label>
-							File Path: <input type="text" name="file" />
-						</label>
-					</div>
-					<div>
-						<button type="submit">
-							Upload
+				<div>
+					Change avatar
+				</div>
+				<UploadButton uploader={uploader}
+					onComplete={HandleChangeAvatar}>
+					{({onClick}) =>
+						<button onClick={onClick}>
+							Upload file
 						</button>
-					</div>
-				</form>
+					}
+				</UploadButton>
 			</>
 		)
 	}

@@ -29,6 +29,7 @@
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
     "react-router-dom": "^6.15.0",
+    "react-uploader": "^3.43.0",
     "reactjs-popup": "^2.0.6",
     "scroll-to": "^0.0.2",
     "socket.io-client": "^4.7.2"
