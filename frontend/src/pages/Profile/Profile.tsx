@@ -39,6 +39,8 @@ const Profile = () => {
 		async function HandleChangeAvatar(files: any) {
 			const fileUrl = files.map((x: any) => x.fileUrl)[0];
 			console.log(fileUrl);
+			if (!fileUrl)
+				return ;
 			const response = await refreshFetch("http://localhost:3333/user/avatar", {
 				method: 'POST',
 				headers: {
