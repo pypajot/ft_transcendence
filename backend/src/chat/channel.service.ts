@@ -260,7 +260,7 @@ export class ChannelService {
                         members: { connect: { id: user.id } },
                     },
                 });
-                client.join(info.name);
+                console.log(newUpdatedChannel);
                 client.emit('successfullyJoinedChannel', newUpdatedChannel);
             } else {
                 client.emit('Error', { noSuchChannelName: true });

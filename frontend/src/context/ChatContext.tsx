@@ -3,7 +3,6 @@ import { ConversationInformation } from '../../public/Types/conversationInformat
 import { createContext, useContext, useMemo, useState } from 'react';
 import { User, useAuth } from './AuthContext';
 import { useSocketContext } from './WebSocketContext';
-import { channel } from 'diagnostics_channel';
 
 export interface Channel {
     id: number;

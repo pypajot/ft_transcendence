@@ -13,6 +13,7 @@ import { User, useAuth } from '../../context/AuthContext';
 import { ConversationInformation } from '../../../public/Types/conversationInformation.entity';
 import { useChatContext } from '../../context/ChatContext';
 import { UserList } from './UserList';
+import { OptionsUserList } from './OptionsUserList';
 
 export const OptionMenu = ({
     info,
@@ -22,8 +23,21 @@ export const OptionMenu = ({
     const menu = useMenuState();
     const [displayInviteList, setDisplayInviteList] = useState<boolean>(false);
     const [displayUserList, setDisplayUserList] = useState<boolean>(false);
+    const [displayOptionUserList, setDisplayOptionUserList] =
+        useState<boolean>(false);
+    const [target, setTarget] = useState<User | undefined>(undefined);
     const chatContext = useChatContext();
     const { user } = useAuth();
+    const handleCloseUserList = (user: User | undefined) => {
+        setTarget(user);
+        setDisplayUserList(false);
+        console.log(user);
+        setDisplayOptionUserList(true);
+    };
+
+    const handleCloseOptionUserList = () => {
+        setDisplayOptionUserList(false);
+    };
     //do we set the invite to play to any member of a channel ?
     return (
         <div>
@@ -40,9 +54,12 @@ export const OptionMenu = ({
                     />
                     <UserList
                         open={displayUserList}
-                        onClose={() => {
-                            setDisplayUserList(false);
-                        }}
+                        onClose={handleCloseUserList}
+                    />
+                    <OptionsUserList
+                        onClose={handleCloseOptionUserList}
+                        target={target}
+                        open={displayOptionUserList}
                     />
                     <Menu {...menu} aria-label="Preferences">
                         <MenuItem
@@ -65,7 +82,14 @@ export const OptionMenu = ({
                             Invite Into Channel
                         </MenuItem>
                         <MenuSeparator {...menu} />
-                        <MenuItem {...menu}> User List </MenuItem>
+                        <MenuItem
+                            {...menu}
+                            onClick={() => {
+                                setDisplayUserList(true);
+                            }}>
+                            {' '}
+                            User List{' '}
+                        </MenuItem>
                         {chatContext.isChannelOwner() && (
                             <div>
                                 <MenuSeparator {...menu} />

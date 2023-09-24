@@ -2,31 +2,60 @@ import { SimpleDialogProps } from './InviteToChannel';
 import {
     Dialog,
     DialogTitle,
-    List,
+    ListItem,
     ListItemAvatar,
     ListItemText,
 } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 import { useSocketContext } from '../../context/WebSocketContext';
-import { SimpleDialogProps } from './InviteToChannel';
 import { useChatContext } from '../../context/ChatContext';
 import { blue } from 'material-ui-colors';
-import { ListItem } from '@twilio-paste/core';
 import Avatar from '@mui/material/Avatar';
 import { User } from '../../context/AuthContext';
 import { useContext, useState } from 'react';
 import { ProfileContext } from '../../context/ProfileContext';
-export const OptionsUserList = (props: SimpleDialogProps) => {
-    const { onClose, open } = props;
+import List from '@mui/material/List';
+
+interface OptionUserListProps {
+    open: boolean;
+    onClose: () => void;
+    target: User | undefined;
+}
+export const OptionsUserList = (props: OptionUserListProps) => {
+    const { onClose, target, open } = props;
     const chatContext = useChatContext();
+    const choices: string[] = [
+        'Mute',
+        'Ban',
+        'Kick',
+        'Add',
+        'Play with',
+        'Profile',
+    ];
 
     const handleClose = () => {
+        onClose();
+    };
+
+    const handleOptionClick = () => {
         onClose();
     };
 
     return (
         <Dialog onClose={handleClose} open={open}>
             <DialogTitle>Choose an option below</DialogTitle>
+            <List sx={{ pt: 0 }}>
+                {' '}
+                {choices.map((choice, i) => (
+                    <ListItem key={i}>
+                        <ListItemButton onClick={handleOptionClick}>
+                            <ListItemText
+                                primary={choice + ' ' + target?.username}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
+            </List>
         </Dialog>
     );
 };

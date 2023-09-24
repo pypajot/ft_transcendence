@@ -38,7 +38,7 @@ CREATE TABLE "Channel" (
     "name" TEXT NOT NULL,
     "public" BOOLEAN NOT NULL,
     "password" TEXT,
-    "creator" TEXT NOT NULL,
+    "owner" INTEGER NOT NULL,
     "invited" INTEGER[],
 
     CONSTRAINT "Channel_pkey" PRIMARY KEY ("id")

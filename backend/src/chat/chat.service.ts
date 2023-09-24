@@ -176,10 +176,22 @@ export class ChatGatewayService {
                     status: 'online',
                 },
             });
+            const channelArr = [];
             for (let i = 0; i < chatUser.channels.length; i++) {
                 client.join(chatUser.channels[i].name);
+                channelArr.push(
+                    await this.prisma.channel.findUnique({
+                        where: {
+                            name: chatUser.channels[i].name,
+                        },
+                        include: {
+                            members: true,
+                        },
+                    })
+                );
             }
-            client.emit('InitChannels', chatUser.channels);
+            console.log(channelArr);
+            client.emit('InitChannels', channelArr);
         } catch (error) {
             console.log(error);
         }

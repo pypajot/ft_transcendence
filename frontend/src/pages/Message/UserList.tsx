@@ -1,68 +1,72 @@
-import {
-    Dialog,
-    DialogTitle,
-    List,
-    ListItemAvatar,
-    ListItemText,
-} from '@mui/material';
-import ListItemButton from '@mui/material/ListItemButton';
-import { useSocketContext } from '../../context/WebSocketContext';
-import { SimpleDialogProps } from './InviteToChannel';
-import { useChatContext } from '../../context/ChatContext';
-import { blue } from 'material-ui-colors';
-import { ListItem } from '@twilio-paste/core';
+import * as React from 'react';
+import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import PersonIcon from '@mui/icons-material/Person';
+import AddIcon from '@mui/icons-material/Add';
+import Typography from '@mui/material/Typography';
+import { blue } from '@mui/material/colors';
+import { useChatContext } from '../../context/ChatContext';
 import { User } from '../../context/AuthContext';
-import { useContext, useState } from 'react';
+import { UserDTO } from '../Signup/api/dto/user.dto';
 import { ProfileContext } from '../../context/ProfileContext';
-import { OptionsUserList } from './OptionsUserList';
+import { ContactType } from '../../../public/Types/contact.entity';
+import { useSocketContext } from '../../context/WebSocketContext';
 
-export const UserList = (props: SimpleDialogProps) => {
+interface UserListProps {
+    onClose: (user: User | undefined) => void;
+    open: boolean;
+}
+
+export const UserList = (props: UserListProps) => {
     const { onClose, open } = props;
-    const [render, setRender] = useState<boolean>(true);
-    const socket = useSocketContext();
     const chatContext = useChatContext();
+    const [target, setTarget] = React.useState<User | undefined>(undefined);
 
     const handleClose = () => {
-        onClose();
+        console.log('bruh');
+        onClose(target);
     };
 
     const handleListItemClick = (target: User) => {
-        onClose();
+        setTarget(target);
+        onClose(target);
     };
 
     return (
         <>
-            {render && (
-                <Dialog onClose={handleClose} open={open}>
-                    <DialogTitle>
-                        List of the User of {chatContext.conversationInfo?.name}
-                    </DialogTitle>
-                    {chatContext &&
-                        chatContext.channels &&
-                        chatContext.conversationInfo &&
-                        chatContext.channels
-                            .get(chatContext.conversationInfo.name)
-                            ?.members.map((member) => (
-                                <ListItem key={member.username}>
-                                    <ListItemButton
-                                        onClick={() => handleListItemClick()}>
-                                        <ListItemAvatar>
-                                            <Avatar
-                                                sx={{
-                                                    bgcolor: blue[100],
-                                                    color: blue[600],
-                                                }}></Avatar>
-                                        </ListItemAvatar>
-                                        <ListItemText
-                                            primary={member.username}
-                                        />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
-                </Dialog>
-            )}
-            <OptionsUserList onClose={handleClose} open={open} />
+            {chatContext &&
+                chatContext.channels &&
+                chatContext.conversationInfo && (
+                    <Dialog onClose={handleClose} open={open}>
+                        <DialogTitle>
+                            List of the User of{' '}
+                            {chatContext.conversationInfo?.name}
+                        </DialogTitle>
+                        <List sx={{ pt: 0 }}>
+                            {chatContext.channels
+                                .get(chatContext.conversationInfo.name)
+                                ?.members.map((member) => (
+                                    <ListItem key={member.id}>
+                                        <ListItemButton
+                                            onClick={() =>
+                                                handleListItemClick(member)
+                                            }>
+                                            <ListItemText
+                                                primary={member.username}
+                                            />
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))}
+                        </List>
+                    </Dialog>
+                )}
         </>
     );
 };
