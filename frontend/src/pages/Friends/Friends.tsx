@@ -1,16 +1,24 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import Navbar from '../../components/Navbar';
 import { useAuth } from '../../context/AuthContext';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { ProfileContext } from '../../context/ProfileContext';
 import { Button } from '@twilio-paste/core';
+import HelperText from '../../components/HelperText';
 
 const Friends = () => {
-	const socket = useSocketContext();
+	const { socket, socketError, setSocketError } = useSocketContext();
 	const { user } = useAuth()
+	const [friendError, setFriendError] = useState<string | null>(null);
+	const [blockError, setBlockError] = useState<string | null>(null);
+
 	async function SendFriendRequest(e: any) {
 		e.preventDefault();
-		socket.emit("addFriend", {friendName: e.target.username.value, userId: user?.id});
+		setFriendError(null);
+		setSocketError(null);
+		socket?.emit("addFriend", {friendName: e.target.username.value, userId: user?.id});
+		if (socketError)
+			setFriendError(socketError);
 	}
 	
 	function FriendRequestForm() {
@@ -20,6 +28,7 @@ const Friends = () => {
 				<div>
 					<label>
 						Username: <input type="text" name="username" />
+						<HelperText errorText={friendError} />
 					</label>
 				</div>
 				<div>
@@ -34,7 +43,11 @@ const Friends = () => {
 
 	async function BlockUser(e: any) {
 		e.preventDefault();
-		socket.emit("blockUser", {targetName: e.target.username.value, userId: user?.id});
+		setSocketError(null);
+		setBlockError(null);
+		socket?.emit("blockUser", {targetName: e.target.username.value, userId: user?.id});
+		if (socketError)
+			setBlockError(socketError);
 	}
 	
 	function BlockUserForm() {
@@ -44,6 +57,7 @@ const Friends = () => {
 				<div>
 					<label>
 						Username: <input type="text" name="username" />
+						<HelperText errorText={blockError} />
 					</label>
 				</div>
 				<div>
@@ -59,13 +73,15 @@ const Friends = () => {
 	function FriendRequestList() {
 		const {friendRequestList, setFriendRequestList} = useContext(ProfileContext)
 		const { user } = useAuth();
-		const socket = useSocketContext()
+		const { socket } = useSocketContext()
+
 		const AcceptFriendRequest = async (id: number, accept: boolean) => {
-			socket.emit("respondFriendRequest", { friendId: id, userId: user?.id, accept: accept});
+			socket?.emit("respondFriendRequest", { friendId: id, userId: user?.id, accept: accept});
 			setFriendRequestList(current => current.filter(
 				value => (value.id !== id)
 			))
 		}
+
 		const list = friendRequestList?.map((user: any) => (
 			<>
 				<div>
@@ -77,6 +93,7 @@ const Friends = () => {
 				</div>
 			</>
 		));
+
 		return (
 			<>
 				{list}

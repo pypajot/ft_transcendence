@@ -4,44 +4,54 @@ import { Socket, io } from "socket.io-client";
 import { useAuth } from './AuthContext';
 
 type WebContext = {
-  io: Socket;
+  socket: Socket | null;
+  socketError: string | null;
+  setSocketError: React.Dispatch<React.SetStateAction<string | null>>
 };
 
 type SocketContextProviderProps = {
   children: React.ReactNode;
 };
 
-export const SocketContext = createContext<WebContext | undefined>(undefined);
+export const SocketContext = createContext<WebContext>({} as WebContext);
 
 export default function SocketContextProvider(
   props: SocketContextProviderProps
 ) {
-  const [socket, setSocket] = useState<WebContext>({} as WebContext);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [socketError, setSocketError] = useState<string | null>(null);
   const { user, logout } = useAuth();
 
   useEffect(() => {
     if (!user) return;
-    const newSocket: WebContext = {
-      io: io("http://localhost:3333/", {
+    const newSocket = io("http://localhost:3333/", {
         reconnectionAttempts: 1,
         query: {
           token: sessionStorage.getItem("access_token"),
           username: user?.username,
         },
-      }),
-    };
-    newSocket.io.on("connect_error", () => {
+      });
+    newSocket.on("connect_error", () => {
       logout();
     });
     setSocket(newSocket);
-    console.log(newSocket.io.connected);
+	newSocket.on("exception", (msg) => {
+		console.log(msg.message);
+	})
+
+    console.log(newSocket.connected);
     return () => {
-	  newSocket.io.off("connect_error");
-      newSocket.io.disconnect();
+	  newSocket.off("connect_error");
+	  newSocket.off("exception");
+      newSocket.disconnect();
     };
   }, [user && user.id]);
 
-  const value = useMemo(() => socket, [socket]);
+  const value = useMemo(() => ({
+	socket,
+	socketError,
+	setSocketError,
+  }), [socket, socketError, setSocketError]);
 
   return (
     <SocketContext.Provider value={value}>
@@ -50,12 +60,5 @@ export default function SocketContextProvider(
   );
 }
 
-export function useSocketContext() {
-  const context = useContext(SocketContext);
-  if (context == undefined) {
-    throw new Error(
-      "You need to use SocketContext with the SocketContextProvider"
-    );
-  }
-  return context.io;
-}
+export const useSocketContext = () =>  useContext(SocketContext);
+

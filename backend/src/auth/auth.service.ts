@@ -28,9 +28,9 @@ type JwtPaylodType = {
   twofactor_on: boolean
 };
 
-const iv = randomBytes(16);
+const iv = Buffer.alloc(16, 0);
 const password = process.env.ENCRPYT_SECRET;
-const salt = randomBytes(42).toString();
+const salt = process.env.ENCRYPT_SALT;
 
 const RefreshTokenParams = {
   httpOnly: true,

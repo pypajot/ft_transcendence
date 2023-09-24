@@ -59,6 +59,8 @@ export class UserService {
 	}
 
 	async changeUsername(id: number, newName: string) {
+		if (newName === '')
+			throw new BadRequestException('Name cannot be empty');
 		let user = await this.prisma.user.findUnique({
 			where : {username: newName}
 		})
@@ -193,12 +195,13 @@ export class UserService {
 		console.log(list);
 		return list;
 	}
+
 	async blockUser(content: any, server: any) {
 		const target = await this.prisma.user.findUnique({
 			where: { username: content.targetName },
 		});
 		if (!target)
-			throw new WsException("no such user");
+			throw new WsException("No such user");
 		const user = await this.prisma.user.findUnique({
 			where: { id: content.userId },
 		});

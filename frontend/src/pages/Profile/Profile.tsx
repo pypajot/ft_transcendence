@@ -1,7 +1,7 @@
 import './Profile.css';
 import { useAuth } from '../../context/AuthContext';
 import Navbar, { Navbar2 } from '../../components/Navbar';
-import { Button, Checkbox } from '@twilio-paste/core';
+import { Button, Checkbox, HelpText } from '@twilio-paste/core';
 import { User } from '../../context/AuthContext';
 import { useContext, useEffect, useRef } from 'react';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ import { ProfileContext } from '../../context/ProfileContext';
 
 import {Uploader} from "uploader"
 import { UploadButton } from "react-uploader";
+import HelperText from '../../components/HelperText';
 
 const uploader = Uploader({
 	apiKey: "free"
@@ -20,7 +21,9 @@ const Profile = () => {
 
 	const { user, setUser, refreshFetch } = useAuth();
 	const [imagePath, setImagePath] = useState<string | null>(null);
-	const socket = useSocketContext();
+	const { socket } = useSocketContext();
+	const [usernameError, setUsernameError] = useState<string | null>(null);
+	const [codeError, setCodeError] = useState<string | null>(null);
 
 	if (!user)
 		return ;
@@ -71,6 +74,7 @@ const Profile = () => {
 
 	async function HandleSubmit(e: any) {
 		e.preventDefault();
+		setCodeError(null);
 		const response = await refreshFetch('http://localhost:3333/auth/2fa/confirm', {
 			method: 'POST',
 			headers: {
@@ -83,13 +87,16 @@ const Profile = () => {
 			setImagePath(null);
 			sessionStorage.setItem("access_token", (await response.json().token))
 			user && setUser({...user, twoFactorAuthActive: true})
-		};
+		}
+		else if (response.status !== 401)
+			setCodeError((await response.json()).message);
 	}
 
 	function ChangeUsernameForm() {
 
 		async function HandleChangeUsername(e: any) {
 			e.preventDefault();
+			setUsernameError(null);
 			const response = await refreshFetch('http://localhost:3333/user/username', {
 				method: 'POST',
 				headers: {
@@ -98,9 +105,10 @@ const Profile = () => {
 				},
 				body: JSON.stringify({newName: e.target.username.value})
 			});
-			if (response.status === 201) {
+			if (response.status === 201)
 				user && setUser({...user, username: e.target.username.value})
-			}
+			else if (response.status !== 401)
+				setUsernameError((await response.json()).message);
 		}
 
 		return (
@@ -109,6 +117,7 @@ const Profile = () => {
 					<div>
 						<label>
 							New username: <input type="text" name="username"  />
+							<HelperText errorText={usernameError} />
 						</label>
 					</div>
 					<div>
@@ -134,6 +143,7 @@ const Profile = () => {
 						<div>
 							<label>
 								Authenticator code: <input type="text" name="code" />
+								<HelperText errorText={codeError} />
 							</label>
 						</div>
 						<div>

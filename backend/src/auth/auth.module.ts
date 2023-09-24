@@ -7,6 +7,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { RefreshStrategy } from './strategies';
 import { HttpModule } from '@nestjs/axios';
+import { TwofaStrategy } from './strategies/twofa.strategy';
 
 @Module({
 	imports: [
@@ -19,7 +20,7 @@ import { HttpModule } from '@nestjs/axios';
 		HttpModule
 	],
 	controllers: [AuthController],
-	providers: [AuthService, LocalStrategy, JwtStrategy, RefreshStrategy],
+	providers: [AuthService, LocalStrategy, JwtStrategy, RefreshStrategy, TwofaStrategy],
 	exports: [AuthService],
 })
 export class AuthModule {}

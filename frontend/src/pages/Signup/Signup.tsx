@@ -2,6 +2,7 @@ import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import "./Signup.css";
 import { useState } from "react";
+import HelperText from "../../components/HelperText";
 
 const Signup = () => {
   const { setAccessToken } = useAuth();
@@ -68,6 +69,7 @@ const Signup = () => {
                   className="user-input"
                   placeholder="username"
                 />
+				<HelperText errorText={usernameError} />
               </label>
             </div>
             <div>
@@ -78,6 +80,7 @@ const Signup = () => {
                   className="user-input"
                   placeholder="password"
                 />
+				<HelperText errorText={passwordError} />
               </label>
             </div>
           </div>

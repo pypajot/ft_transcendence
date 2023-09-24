@@ -2,14 +2,14 @@ import "./Login.css";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { FormControl, FormHelperText, Input, InputLabel } from "@mui/material";
 import { useState } from "react";
+import HelperText from "../../components/HelperText";
 
 function Login() {
   const { setAccessToken } = useAuth();
   const navigate = useNavigate();
-  const [usernameError, setUsernameError] = useState<string | undefined>(undefined)
-  const [passwordError, setPasswordError] = useState<string | undefined>(undefined)
+  const [usernameError, setUsernameError] = useState<string | null>(null)
+  const [passwordError, setPasswordError] = useState<string | null>(null)
 
   async function HandleSubmit(e: any) {
     e.preventDefault();
@@ -22,8 +22,8 @@ function Login() {
     };
     // alert(JSON.stringify(formBody));
 	try {
-		setUsernameError(undefined);
-		setPasswordError(undefined);
+		setUsernameError(null);
+		setPasswordError(null);
 		const response = await fetch("http://localhost:3333/auth/login", {
 		  method: "POST",
 		  headers: { "Content-Type": "application/json" },
@@ -31,10 +31,15 @@ function Login() {
 		  credentials: "include",
 		});
 		if (response.status !== 201) {
-			const body = await response.json();
-			if (body.message.includes("User"))
-				setUsernameError("Username already taken")
-			if (body.message.includes(""))
+			const body = (await response.json()).message.toString();
+			if (body.includes("username should not be empty"))
+				setUsernameError("Username should not be empty")
+			if (body.includes("password should not be empty"))
+				setPasswordError("Password should not be empty")
+			if (body.includes("Username"))
+				setUsernameError("Username not found")
+			if (body.includes("Invalid"))
+				setPasswordError("Invalid password")
 			return ;
 		}
 		const responseJson = await response.json();
@@ -78,6 +83,7 @@ function Login() {
                   className="user-input"
                   placeholder="username"
                 />
+				<HelperText errorText={usernameError} />
               </label>
             </div>
             <div>
@@ -88,6 +94,7 @@ function Login() {
                   className="user-input"
                   placeholder="password"
                 />
+				<HelperText errorText={passwordError} />
               </label>
             </div>
           </div>

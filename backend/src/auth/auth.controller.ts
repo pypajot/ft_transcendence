@@ -4,6 +4,7 @@ import { AuthDto, CodeDto } from "./dto";
 import { RefreshAuthGuard } from "./guards/refresh-auth.guard";
 import { JwtAuthGuard } from "./guards";
 import { get } from "http";
+import { TwofaAuthGuard } from "./guards/twofa-auth.guard";
 
 @Controller('auth')
 export class AuthController {
@@ -64,7 +65,7 @@ export class AuthController {
 	}
 
 	@Post('2fa/login')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(TwofaAuthGuard)
 	async login2fa(@Res() res: any, @Req() req: any) {
 		const response = await this.authservice.login2fa(res, req);
 		res.send(response);
