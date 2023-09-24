@@ -187,7 +187,9 @@ export class ChannelService {
                 },
             });
             if (existingChannel) {
-                io.to(client_id).emit('channelNameTaken');
+                io.to(client_id).emit('Error', {
+                    alreadyUsedChannelName: true,
+                });
                 return;
             } else {
                 const newchannel = await this.prisma.channel.create({
@@ -244,14 +246,14 @@ export class ChannelService {
                         }
                     }
                     if (!find) {
-                        client.emit('wrongPrivileges');
+                        client.emit('Error', { wrongPrivileges: true });
                         return;
                     }
                 } else if (info.pass == '' && existingChannel.password != '') {
                     client.emit('requestPassword');
                     return;
                 } else if (info.pass != existingChannel.password) {
-                    client.emit('wrongPassword');
+                    client.emit('Error', { wrongPassword: true });
                     return;
                 }
                 const newUpdatedChannel = await this.prisma.channel.update({
@@ -271,7 +273,7 @@ export class ChannelService {
                 client.join(info.name);
                 client.emit('successfullyJoinedChannel', channelJoined);
             } else {
-                client.emit('wrongName');
+                client.emit('Error', { noSuchChannelName: true });
             }
         } catch (error) {
             console.log(error);
