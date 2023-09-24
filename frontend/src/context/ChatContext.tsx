@@ -1,12 +1,15 @@
 import * as React from 'react';
 import { ConversationInformation } from '../../public/Types/conversationInformation.entity';
 import { createContext, useContext, useMemo, useState } from 'react';
-import { User } from './AuthContext';
+import { User, useAuth } from './AuthContext';
 import { useSocketContext } from './WebSocketContext';
+import { channel } from 'diagnostics_channel';
 
 export interface Channel {
+    id: number;
     members: User[];
     name: string;
+    owner: number;
     picture?: string;
 }
 
@@ -22,12 +25,14 @@ type ChatContext = {
     setConversationInfo: (
         coversationInfo: ConversationInformation | undefined
     ) => void;
-    channelIn: Channel[] | undefined;
+    channels: Map<string, Channel> | undefined;
+    arrayChannels: Channel[];
     leaveChannel: (channelName: string, username: string) => void;
-    channelRequestList: Channel[] | undefined;
-    setChannelRequestList: (channelRequestList: Channel[] | undefined) => void;
+    //channelRequestList: Channel[] | undefined;
+    // setChannelRequestList: (channelRequestList: Channel[] | undefined) => void;
     error: Error;
     resetError: () => void;
+    isChannelOwner: () => boolean;
 };
 
 type ChatContextProviderProps = {
@@ -39,13 +44,13 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
     const [conversationInfo, setConversationInfo] = useState<
         ConversationInformation | undefined
     >(undefined);
-    const [channelIn, setChannelIn] = useState<Channel[] | undefined>(
-        undefined
-    );
+    const [channels] = useState<Map<string, Channel> | undefined>(new Map());
+    const [arrayChannels, setArrayChannels] = useState<Channel[]>([]);
     const socket = useSocketContext();
-    const [channelRequestList, setChannelRequestList] = useState<
-        Channel[] | undefined
-    >(undefined);
+    const { user } = useAuth();
+    // const [channelRequestList, setChannelRequestList] = useState<
+    //    Channel[] | undefined
+    // >(undefined);
     const [error, setError] = React.useState<Error>({
         noSuchChannelName: false,
         wrongPrivileges: false,
@@ -60,44 +65,58 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
                 chanelName: channelName,
                 user: username,
             });
-
-            //Do we ask the back to assure that we correctly leaved the channel or not
-            setChannelIn(
-                channelIn?.filter((channel) => {
-                    if (channel.name == channelName) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                })
-            );
+            if (channels) {
+                const actualChannel = channels?.get(channelName);
+                if (actualChannel) {
+                    const newMemberList = actualChannel?.members.filter(
+                        (members) => {
+                            if (members.username != username) {
+                                return true;
+                            }
+                            return false;
+                        }
+                    );
+                    actualChannel.members = newMemberList;
+                    channels.set(actualChannel?.name, actualChannel);
+                }
+                //Do we ask the back to assure that we correctly leaved the channel or not
+            }
         },
-        [setChannelIn, channelIn, socket]
+        [socket, channels]
     );
+    const isChannelOwner = React.useCallback(() => {
+        if (channels && conversationInfo) {
+            const channel = channels.get(conversationInfo?.name);
+            if (channel && channel.owner == user?.id) return true;
+        }
+        return false;
+    }, [channels, conversationInfo, user]);
 
     const addChannel = React.useCallback(
         (channel: Channel) => {
-            if (channelIn == undefined) {
-                setChannelIn([channel]);
-            } else {
-                setChannelIn([...channelIn, channel]);
-                setConversationInfo({
-                    ischannel: true,
-                    isUser: false,
-                    name: channel.name,
-                });
-            }
+            channels?.set(channel.name, channel);
+            setConversationInfo({
+                ischannel: true,
+                isUser: false,
+                name: channel.name,
+            });
+            console.log(channels);
+            setArrayChannels([...arrayChannels, channel]);
         },
-        [setChannelIn, channelIn, setConversationInfo]
+        [channels, setConversationInfo, setArrayChannels, arrayChannels]
     );
 
     const initChannels = React.useCallback(
-        (channels: Channel[]) => {
-            setChannelIn(channels);
+        (channelsArray: Channel[]) => {
+            channelsArray.map((channel) => {
+                channels?.set(channel.name, channel);
+                setArrayChannels([...arrayChannels, channel]);
+            });
+            console.log(channels);
         },
-        [setChannelIn]
+        [channels, arrayChannels, setArrayChannels]
     );
-
+    /*
     const initChannelsRequest = React.useCallback(
         (channels: Channel[]) => {
             if (channels) {
@@ -105,7 +124,7 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
             }
         },
         [setChannelRequestList]
-    );
+    );*/
 
     const setErrorFromBackend = (error: Error) => {
         setError(error);
@@ -121,7 +140,7 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
     }, [setError]);
 
     React.useEffect(() => {
-        socket?.on('InitChannelsRequest', initChannelsRequest);
+        // socket?.on('InitChannelsRequest', initChannelsRequest);
         socket?.on('InitChannels', initChannels);
         socket?.on('successfullyJoinedChannel', addChannel);
         socket?.on('Error', setErrorFromBackend);
@@ -130,28 +149,32 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
             socket?.off('InitChannels', initChannels);
             socket?.off('Error', setErrorFromBackend);
         };
-    }, [socket, addChannel, initChannels, initChannelsRequest]);
+    }, [socket, addChannel, initChannels /*initChannelsRequest*/]);
 
     const value = useMemo(
         () => ({
             conversationInfo,
             setConversationInfo,
-            channelIn,
+            channels,
             leaveChannel,
-            channelRequestList,
-            setChannelRequestList,
+            //  channelRequestList,
+            // setChannelRequestList,
+            arrayChannels,
             error,
             resetError,
+            isChannelOwner,
         }),
         [
             conversationInfo,
             setConversationInfo,
-            channelIn,
+            channels,
             leaveChannel,
-            channelRequestList,
-            setChannelRequestList,
+            //channelRequestList,
+            //setChannelRequestList,
             error,
+            arrayChannels,
             resetError,
+            isChannelOwner,
         ]
     );
     return (
@@ -169,8 +192,8 @@ export function useChatContext() {
             'You need to use ChatContext with in a ChatContextProvider'
         );
     }
-    if (context.channelRequestList == undefined) {
-        context.channelRequestList = [];
-    }
+    //   if (context.channelRequestList == undefined) {
+    //      context.channelRequestList = [];
+    // }
     return context;
 }

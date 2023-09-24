@@ -195,7 +195,7 @@ export class ChannelService {
                 const newchannel = await this.prisma.channel.create({
                     data: {
                         name: data_chan.name,
-                        creator: user.username,
+                        owner: user.id,
                         members: {
                             connect: { id: user.id },
                         },
@@ -204,12 +204,8 @@ export class ChannelService {
                         invited: [],
                     },
                 });
-                const channelJoined: Channel = {
-                    member: this.serviceUtils.getChannelMember(newchannel),
-                    name: newchannel.name,
-                };
                 client.join(data_chan.name);
-                client.emit('successfullyJoinedChannel', channelJoined);
+                client.emit('successfullyJoinedChannel', newchannel);
             }
         } catch (error) {
             console.log(error);
@@ -264,14 +260,8 @@ export class ChannelService {
                         members: { connect: { id: user.id } },
                     },
                 });
-                const channelJoined: Channel = {
-                    member: this.serviceUtils.getChannelMember(
-                        newUpdatedChannel
-                    ),
-                    name: newUpdatedChannel.name,
-                };
                 client.join(info.name);
-                client.emit('successfullyJoinedChannel', channelJoined);
+                client.emit('successfullyJoinedChannel', newUpdatedChannel);
             } else {
                 client.emit('Error', { noSuchChannelName: true });
             }

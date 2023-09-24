@@ -57,7 +57,7 @@ model Channel {
   password String?
   messages Message[]
   members  User[]    @relation("Memberships")
-  creator  String
+  owner    Int 
   invited  Int[]
 
   @@unique([name])

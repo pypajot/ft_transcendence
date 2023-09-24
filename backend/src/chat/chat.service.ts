@@ -176,18 +176,10 @@ export class ChatGatewayService {
                     status: 'online',
                 },
             });
-            let channelsJoined: Channel[] = [];
             for (let i = 0; i < chatUser.channels.length; i++) {
-                const channelJoined: Channel = {
-                    member: this.utilsService.getChannelMember(
-                        chatUser.channels[i]
-                    ),
-                    name: chatUser.channels[i].name,
-                };
-                channelsJoined = [...channelsJoined, channelJoined];
                 client.join(chatUser.channels[i].name);
             }
-            client.emit('InitChannels', channelsJoined);
+            client.emit('InitChannels', chatUser.channels);
         } catch (error) {
             console.log(error);
         }
