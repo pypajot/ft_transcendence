@@ -14,7 +14,7 @@ export const ProfileContext = createContext<ProfileContextData>({} as ProfileCon
 
 export const ProfileProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
 
-	const socket = useSocketContext();
+	const { socket } = useSocketContext();
 	const { user, refreshFetch } = useAuth();
 	const [friendRequestList, setFriendRequestList] = useState<User[]>([]);
 	const [friendList, setFriendList] = useState<User[]>([]);
