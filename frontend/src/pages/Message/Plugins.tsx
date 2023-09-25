@@ -38,25 +38,19 @@ interface Props {
     onClick: () => void;
 }
 
-export const EnterKeySubmitPlugin = ({ onClick }: Props) => {
-    const [editor] = useLexicalComposerContext();
+interface EnterKeySubmitPluginProps {
+  onKeyDown: () => void;
+}
 
-    useLayoutEffect(() => {
-        const onKeyDown = (event: any) => {
-            if (event.keyCode == 13) {
-                onClick();
-            }
-        };
-        return editor.registerRootListener(
-            (rootElement: null | HTMLElement) => {
-                if (rootElement !== null) {
-                    rootElement.addEventListener('keydown', onKeyDown);
-                }
-            }
-        );
-    }, [editor]);
-    //editor.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
-    return <></>;
+export const EnterKeySubmitPlugin = ({ onKeyDown }: EnterKeySubmitPluginProps) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      onKeyDown();
+    }
+  };
+
+  return <div onKeyDown={handleKeyDown} tabIndex={0}></div>;
 };
 
 export const SendButtonPlugin = ({ onClick }: SendButtonProps) => {

@@ -30,7 +30,26 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         onClose();
     };
 
-    const handleOptionClick = () => {
+    const handleOptionClick = (choice) => {
+	switch(choice){
+		case 'Mute':
+			handleMute();
+			break;
+		case 'Ban':
+			handleBan();
+			break;
+		case 'Kick':
+			handleKick();
+			break;
+		case 'Play with';
+			handleInviteGame();
+			break;
+		case 'Profile';
+			handleProfile();
+			break;
+		default:
+			break ;
+}
         onClose();
     };
 
@@ -60,7 +79,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 {' '}
                 {options.map((choice, i) => (
                     <ListItem key={i}>
-                        <ListItemButton onClick={handleOptionClick}>
+                        <ListItemButton onClick={() => {handleOptionClick()}}>
                             <ListItemText
                                 primary={choice + ' ' + target?.username}
                             />
