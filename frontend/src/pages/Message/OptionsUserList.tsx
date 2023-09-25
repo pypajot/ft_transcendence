@@ -12,7 +12,7 @@ import { useChatContext } from '../../context/ChatContext';
 import { blue } from 'material-ui-colors';
 import Avatar from '@mui/material/Avatar';
 import { User } from '../../context/AuthContext';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ProfileContext } from '../../context/ProfileContext';
 import List from '@mui/material/List';
 
@@ -23,15 +23,8 @@ interface OptionUserListProps {
 }
 export const OptionsUserList = (props: OptionUserListProps) => {
     const { onClose, target, open } = props;
+    const [options, setOptions] = useState<string[]>([]);
     const chatContext = useChatContext();
-    const choices: string[] = [
-        'Mute',
-        'Ban',
-        'Kick',
-        'Add',
-        'Play with',
-        'Profile',
-    ];
 
     const handleClose = () => {
         onClose();
@@ -41,12 +34,31 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         onClose();
     };
 
+    useEffect(() => {
+        const choices: string[] = [
+            'Mute',
+            'Ban',
+            'Kick',
+            'Add',
+            'Play with',
+            'Profile',
+        ];
+        const choices2: string[] = ['Add', 'Play with', 'Profile'];
+        if (chatContext.isChannelOwner()) {
+            setOptions([...choices, 'Sudo ']);
+        } else if (chatContext.isAdmin()) {
+            setOptions(choices);
+        } else {
+            setOptions(choices2);
+        }
+    }, [chatContext, chatContext.channels]);
+
     return (
         <Dialog onClose={handleClose} open={open}>
             <DialogTitle>Choose an option below</DialogTitle>
             <List sx={{ pt: 0 }}>
                 {' '}
-                {choices.map((choice, i) => (
+                {options.map((choice, i) => (
                     <ListItem key={i}>
                         <ListItemButton onClick={handleOptionClick}>
                             <ListItemText

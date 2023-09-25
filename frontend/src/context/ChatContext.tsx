@@ -9,6 +9,8 @@ export interface Channel {
     members: User[];
     name: string;
     owner: number;
+    admins: number[];
+    invited: number[];
     picture?: string;
 }
 
@@ -32,6 +34,9 @@ type ChatContext = {
     error: Error;
     resetError: () => void;
     isChannelOwner: () => boolean;
+    isAdmin: () => boolean;
+    setRenderConversation: (value: boolean) => void;
+    renderConversation: boolean;
 };
 
 type ChatContextProviderProps = {
@@ -43,7 +48,11 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
     const [conversationInfo, setConversationInfo] = useState<
         ConversationInformation | undefined
     >(undefined);
-    const [channels] = useState<Map<string, Channel> | undefined>(new Map());
+    const [renderConversation, setRenderConversation] =
+        useState<boolean>(false);
+    const [channels, setChannels] = useState<Map<string, Channel> | undefined>(
+        new Map()
+    );
     const [arrayChannels, setArrayChannels] = useState<Channel[]>([]);
     const socket = useSocketContext();
     const { user } = useAuth();
@@ -57,14 +66,28 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
         alreadyUsedChannelName: false,
     });
 
+    React.useEffect(() => {
+        const buff: Channel[] = [];
+        if (channels) {
+            console.log(buff, channels);
+            for (const [key, value] of channels) {
+                buff.push(value);
+            }
+        }
+        setArrayChannels(buff);
+    }, [channels]);
+
     //Case we update : New Channel created | Joined a new channel
     const leaveChannel = React.useCallback(
         (channelName: string, username: string) => {
+            const buffChannel = new Map(channels);
             socket?.emit('userLeavingChannel', {
-                chanelName: channelName,
+                channelName: channelName,
                 user: username,
             });
-            if (channels) {
+            if (buffChannel) {
+                buffChannel.delete(channelName);
+                /*
                 const actualChannel = channels?.get(channelName);
                 if (actualChannel) {
                     const newMemberList = actualChannel?.members.filter(
@@ -77,12 +100,30 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
                     );
                     actualChannel.members = newMemberList;
                     channels.set(actualChannel?.name, actualChannel);
-                }
+                }*/
                 //Do we ask the back to assure that we correctly leaved the channel or not
+                setChannels(buffChannel);
+                setRenderConversation(false);
             }
         },
         [socket, channels]
     );
+
+    const isAdmin = React.useCallback(() => {
+        if (channels && conversationInfo) {
+            const channel = channels.get(conversationInfo?.name);
+            if (channel) {
+                for (let i = 0; i < channel.admins.length; i++) {
+                    if (channel.admins[i] == user?.id) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }, [channels, conversationInfo, user]);
+
     const isChannelOwner = React.useCallback(() => {
         if (channels && conversationInfo) {
             const channel = channels.get(conversationInfo?.name);
@@ -93,25 +134,29 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
 
     const addChannel = React.useCallback(
         (channel: Channel) => {
-            channels?.set(channel.name, channel);
+            const buffChannel = new Map(channels);
+
+            buffChannel.set(channel.name, channel);
             setConversationInfo({
                 ischannel: true,
                 isUser: false,
                 name: channel.name,
             });
-            console.log(channels);
-            setArrayChannels([...arrayChannels, channel]);
+            setChannels(buffChannel);
         },
-        [channels, setConversationInfo, setArrayChannels, arrayChannels]
+        [channels, setConversationInfo]
     );
 
     const initChannels = React.useCallback(
         (channelsArray: Channel[]) => {
+            channels?.clear();
+            const buffChannel = new Map(channels);
+            setArrayChannels([]);
             channelsArray.map((channel) => {
-                channels?.set(channel.name, channel);
+                buffChannel.set(channel.name, channel);
                 setArrayChannels([...arrayChannels, channel]);
             });
-            console.log(channels);
+            setChannels(buffChannel);
         },
         [channels, arrayChannels, setArrayChannels]
     );
@@ -148,7 +193,7 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
             socket?.off('InitChannels', initChannels);
             socket?.off('Error', setErrorFromBackend);
         };
-    }, [socket, addChannel, initChannels /*initChannelsRequest*/]);
+    }, [socket, addChannel, initChannels]);
 
     const value = useMemo(
         () => ({
@@ -162,6 +207,9 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
             error,
             resetError,
             isChannelOwner,
+            isAdmin,
+            setRenderConversation,
+            renderConversation,
         }),
         [
             conversationInfo,
@@ -174,6 +222,9 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
             arrayChannels,
             resetError,
             isChannelOwner,
+            isAdmin,
+            setRenderConversation,
+            renderConversation,
         ]
     );
     return (

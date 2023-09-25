@@ -8,16 +8,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
-import PersonIcon from '@mui/icons-material/Person';
-import AddIcon from '@mui/icons-material/Add';
-import Typography from '@mui/material/Typography';
-import { blue } from '@mui/material/colors';
 import { useChatContext } from '../../context/ChatContext';
-import { User } from '../../context/AuthContext';
-import { UserDTO } from '../Signup/api/dto/user.dto';
-import { ProfileContext } from '../../context/ProfileContext';
-import { ContactType } from '../../../public/Types/contact.entity';
-import { useSocketContext } from '../../context/WebSocketContext';
+import { User, useAuth } from '../../context/AuthContext';
 
 interface UserListProps {
     onClose: (user: User | undefined) => void;
@@ -27,10 +19,11 @@ interface UserListProps {
 export const UserList = (props: UserListProps) => {
     const { onClose, open } = props;
     const chatContext = useChatContext();
+    const [members, setMembers] = React.useState<User[]>([]);
     const [target, setTarget] = React.useState<User | undefined>(undefined);
+    const { user } = useAuth();
 
     const handleClose = () => {
-        console.log('bruh');
         onClose(target);
     };
 
@@ -38,6 +31,31 @@ export const UserList = (props: UserListProps) => {
         setTarget(target);
         onClose(target);
     };
+
+    React.useEffect(() => {
+        let isAlreadyThere = false;
+        if (
+            chatContext &&
+            chatContext.channels &&
+            chatContext.conversationInfo
+        ) {
+            const memberList = chatContext.channels.get(
+                chatContext.conversationInfo.name
+            )?.members;
+            if (memberList) {
+                memberList.map((member) => {
+                    members.map((user) => {
+                        if (user.id == member.id) {
+                            isAlreadyThere = true;
+                            return;
+                        }
+                    });
+                    if (user?.username != member.username && !isAlreadyThere)
+                        setMembers([...members, member]);
+                });
+            }
+        }
+    }, [chatContext, user]);
 
     return (
         <>
@@ -50,20 +68,18 @@ export const UserList = (props: UserListProps) => {
                             {chatContext.conversationInfo?.name}
                         </DialogTitle>
                         <List sx={{ pt: 0 }}>
-                            {chatContext.channels
-                                .get(chatContext.conversationInfo.name)
-                                ?.members.map((member) => (
-                                    <ListItem key={member.id}>
-                                        <ListItemButton
-                                            onClick={() =>
-                                                handleListItemClick(member)
-                                            }>
-                                            <ListItemText
-                                                primary={member.username}
-                                            />
-                                        </ListItemButton>
-                                    </ListItem>
-                                ))}
+                            {members.map((member) => (
+                                <ListItem key={member.id}>
+                                    <ListItemButton
+                                        onClick={() =>
+                                            handleListItemClick(member)
+                                        }>
+                                        <ListItemText
+                                            primary={member.username}
+                                        />
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
                         </List>
                     </Dialog>
                 )}

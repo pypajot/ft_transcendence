@@ -58,6 +58,7 @@ model Channel {
   messages Message[]
   members  User[]    @relation("Memberships")
   owner    Int 
+  admins   Int[]
   invited  Int[]
 
   @@unique([name])

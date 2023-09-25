@@ -7,11 +7,14 @@ import {
 } from '@twilio-paste/lexical-library';
 import {
     Box,
+    ChatBookend,
+    ChatBookendItem,
     Flex,
     Menu,
     MenuButton,
     MenuItem,
     MenuSeparator,
+    useChatLogger,
     useMenuState,
 } from '@twilio-paste/core';
 import SendButton from './SendButton';
@@ -24,6 +27,7 @@ import { useAuth } from '../../context/AuthContext';
 import { MoreIcon } from '@twilio-paste/icons/esm/MoreIcon';
 import { useChatContext } from '../../context/ChatContext';
 import { OptionMenu } from './OptionMenu';
+import { EnterKeySubmitPlugin, SendButtonPlugin } from './Plugins';
 
 const sortByDate = () => {
     return function (a: any, b: any) {
@@ -37,16 +41,15 @@ const sortByDate = () => {
 };
 
 export const Conversation = () => {
-    const [content, setContent] = useState<string>('A basic chat composer');
+    const [content, setContent] = useState<string>('');
     const { user, refreshFetch } = useAuth();
     const [sentMessage, setSentMessage] = useState<Message[]>();
     const [receivedMessage, setReceivedMessage] = useState<Message[]>();
     const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
-    const [renderConversation, setRenderConversation] =
-        useState<boolean>(false);
     const [username, setUsername] = useState<string>('');
     const menu = useMenuState();
 
+    const chatContext = useChatContext();
     //Make a component to get the previous messsage
     const socket = useSocketContext();
     const info = useChatContext().conversationInfo;
@@ -97,7 +100,7 @@ export const Conversation = () => {
             return;
         }
         if (username != '') {
-            setRenderConversation(true);
+            chatContext.setRenderConversation(true);
             getMessageReceived({
                 sender: info.name,
                 receiver: username,
@@ -106,7 +109,7 @@ export const Conversation = () => {
                 setReceivedMessage(res);
             });
         } else {
-            setRenderConversation(false);
+            chatContext.setRenderConversation(false);
         }
     }, [info, username]);
 
@@ -176,7 +179,7 @@ export const Conversation = () => {
     );
 
     const sendMessage = () => {
-        if (content && info) {
+        if (content && content != '' && info) {
             const message_content: MessageInfo = {
                 content: content,
                 target: info.name,
@@ -199,7 +202,7 @@ export const Conversation = () => {
 
     return (
         <>
-            {renderConversation && (
+            {chatContext.renderConversation && (
                 <Flex>
                     <Flex grow shrink basis="1px">
                         <Flex>{info?.name}</Flex>
@@ -225,7 +228,7 @@ export const Conversation = () => {
                         );
                     }
                 })}
-            {renderConversation && (
+            {chatContext.renderConversation && (
                 <Box
                     borderStyle="solid"
                     borderWidth="borderWidth0"
@@ -239,7 +242,7 @@ export const Conversation = () => {
                     <ChatComposer
                         maxHeight="size10"
                         config={{
-                            namespace: 'foo',
+                            namespace: 'chatBox',
                             onError: (error) => {
                                 throw error;
                             },
@@ -248,10 +251,43 @@ export const Conversation = () => {
                         placeholder="Type here..."
                         onChange={handleComposerChange}>
                         <ClearEditorPlugin />
+                        <SendButtonPlugin onClick={sendMessage} />
                     </ChatComposer>
-                    <SendButton onClick={sendMessage} />
                 </Box>
             )}
         </>
     );
 };
+/*
+const ConversationRender = () => {
+    const {chat, push} = useChatLogger({
+        content: (
+            <ChatBookend>
+                <ChatBookendItem>Date</ChatBookendItem>
+                <ChatBookendItem>
+                    <strong>This is a header</strong> Which time ?
+                </ChatBookendItem>
+            </ChatBookend>
+        ),
+    },
+    {
+        conversationMsg.map(function (message, i) {
+            if (message.sent) {
+                return (
+                    <div key={i}>
+                        <BasicOutMessage
+                            message={message}></BasicOutMessage>
+                    </div>
+                );
+            } else {
+                return (
+                    <div key={i}>
+                        <BasicInMessage
+                            message={message}></BasicInMessage>
+                    </div>
+                );
+            }
+        })}   
+    })
+    }
+}*/

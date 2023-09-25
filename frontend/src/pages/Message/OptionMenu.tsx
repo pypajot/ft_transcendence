@@ -29,10 +29,12 @@ export const OptionMenu = ({
     const chatContext = useChatContext();
     const { user } = useAuth();
     const handleCloseUserList = (user: User | undefined) => {
-        setTarget(user);
+        if (user) {
+            setDisplayOptionUserList(true);
+            setTarget(user);
+        }
         setDisplayUserList(false);
         console.log(user);
-        setDisplayOptionUserList(true);
     };
 
     const handleCloseOptionUserList = () => {

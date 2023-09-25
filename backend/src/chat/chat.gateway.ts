@@ -54,8 +54,8 @@ class ChatGateway
     }
     handleDisconnect(client: any) {
         //Remove the client.id and the username
-        this.logger.log(`Client ${client.id} left`);
         client.emit('disconnection');
+        this.logger.log(`Client ${client.id} left`);
     }
     @SubscribeMessage('message')
     async handleEvent(client: any, data: MessageInfo): Promise<void> {

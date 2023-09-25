@@ -127,33 +127,22 @@ export class ChannelService {
 
     async leaveChannel(client: any, info: any) {
         try {
-            const userLeaving = await this.prisma.user.findMany({
+            const channelToLeave = await this.prisma.channel.findUnique({
                 where: {
-                    username: info.username,
-                },
-                include: {
-                    channels: true,
+                    name: info.channelName,
                 },
             });
 
-            const channel = await this.prisma.channel.findMany({});
-
-            const updatedChannelList = channel.filter((channel) => {
-                if (channel.name == info.channelName) {
-                    return false;
-                }
-                return true;
-            });
-            await this.prisma.user.update({
+            const userLeaving = await this.prisma.user.update({
                 where: {
-                    username: info.username,
+                    username: info.user,
                 },
                 include: {
                     channels: true,
                 },
                 data: {
                     channels: {
-                        set: updatedChannelList as any,
+                        disconnect: { id: channelToLeave.id },
                     },
                 },
             });
@@ -202,6 +191,10 @@ export class ChannelService {
                         public: public_chan,
                         password: data_chan.pwd,
                         invited: [],
+                        admins: [user.id],
+                    },
+                    include: {
+                        members: true,
                     },
                 });
                 client.join(data_chan.name);
@@ -258,6 +251,9 @@ export class ChannelService {
                     },
                     data: {
                         members: { connect: { id: user.id } },
+                    },
+                    include: {
+                        members: true,
                     },
                 });
                 console.log(newUpdatedChannel);

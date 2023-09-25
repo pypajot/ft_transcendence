@@ -15,14 +15,14 @@ export const Contact = () => {
     const { user } = useAuth();
     const chatContext = useChatContext();
     const friends = useContext(ProfileContext).friendList;
-    const [dataLoaded, setDataLoaded] = useState(false);
-
+    //  const [dataLoaded, setDataLoaded] = useState(false);
+    /*
     useEffect(() => {
         // Simulate data loading
         setTimeout(() => {
             setDataLoaded(true);
         }, 200);
-    }, []);
+    }, []);*/
 
     const getName = () => {
         if (!user) {
@@ -66,22 +66,25 @@ export const Contact = () => {
     // 	  </div>
     // 	);
     //   })
+    const [conversationList, setConversationList] = useState<Channel[]>([]);
+
+    useEffect(() => {
+        setConversationList(chatContext.arrayChannels);
+        console.log(chatContext.arrayChannels);
+    }, [chatContext.arrayChannels]);
     return (
         <>
             <div>
                 <h1> Channel </h1>
                 {username &&
-                    chatContext.channels &&
-                    dataLoaded &&
-                    Array.from(chatContext.channels).map(([key, value]) => {
-                        console.log(key);
+                    conversationList.map((channel) => {
                         return (
-                            <div key={value.id}>
+                            <div key={channel.id}>
                                 <ContactElement
                                     content={{
                                         channel: true,
                                         user: false,
-                                        name: key,
+                                        name: channel.name,
                                     }}></ContactElement>
                             </div>
                         );
