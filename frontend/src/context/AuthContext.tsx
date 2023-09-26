@@ -13,11 +13,15 @@ export interface User {
 	avatar: string
 	socketId?: string
 	twoFactorAuthActive: boolean
+	friends: {id: number, username: string}[]
+	friendRequests: {id: number, username: string}[]
+	blocked: number[]
+
 }
 
 export interface AuthContextData {
   user: User | null;
-  setUser: (user: User | null) => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   accessToken: string | null;
   setAccessToken: (token: string | null) => void;
   logout: () => void;

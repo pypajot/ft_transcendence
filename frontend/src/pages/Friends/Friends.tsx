@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Navbar from '../../components/Navbar';
 import { useAuth } from '../../context/AuthContext';
 import { useSocketContext } from '../../context/WebSocketContext';
@@ -12,13 +12,20 @@ const Friends = () => {
 	const [friendError, setFriendError] = useState<string | null>(null);
 	const [blockError, setBlockError] = useState<string | null>(null);
 
+	useEffect(() => {
+		console.log(socketError)
+		if (!socketError) return ;
+		if (socketError.func === "addFriend")
+			setFriendError(socketError.msg);
+		if (socketError.func === "blockUser")
+			setBlockError(socketError.msg);
+	}, [socketError])
+
 	async function SendFriendRequest(e: any) {
 		e.preventDefault();
 		setFriendError(null);
 		setSocketError(null);
 		socket?.emit("addFriend", {friendName: e.target.username.value, userId: user?.id});
-		if (socketError)
-			setFriendError(socketError);
 	}
 	
 	function FriendRequestForm() {
@@ -46,8 +53,6 @@ const Friends = () => {
 		setSocketError(null);
 		setBlockError(null);
 		socket?.emit("blockUser", {targetName: e.target.username.value, userId: user?.id});
-		if (socketError)
-			setBlockError(socketError);
 	}
 	
 	function BlockUserForm() {
@@ -71,18 +76,16 @@ const Friends = () => {
 	}
 
 	function FriendRequestList() {
-		const {friendRequestList, setFriendRequestList} = useContext(ProfileContext)
-		const { user } = useAuth();
+		const { friendRequestList, setFriendRequestList } = useContext(ProfileContext)
+		const { user, setUser } = useAuth();
 		const { socket } = useSocketContext()
 
 		const AcceptFriendRequest = async (id: number, accept: boolean) => {
 			socket?.emit("respondFriendRequest", { friendId: id, userId: user?.id, accept: accept});
-			setFriendRequestList(current => current.filter(
-				value => (value.id !== id)
-			))
+			setUser(current => {...current, ?.friendRequests.filter(value => (value.id !== id))})
 		}
 
-		const list = friendRequestList?.map((user: any) => (
+		const list = user?.friendRequests?.map((user: any) => (
 			<>
 				<div>
 					{user.username} wants to be your friend !
