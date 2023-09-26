@@ -89,18 +89,21 @@ export class AuthService {
       code: code,
       redirect_uri: 'http://localhost:5173/intralogin',
     };
+	let time = '30s';
     const response = await firstValueFrom(
       this.http.post(url, null, { params: parameters }),
     );
     const user = await this.createIntraUser(response.data.access_token);
-    if (!user.twoFactorAuthActive)
-      res.cookie(
-        'refresh_token',
-        await this.signRefreshToken(user.id, user.username),
-        RefreshTokenParams,
-      );
+    if (!user.twoFactorAuthActive) {
+		res.cookie(
+		  'refresh_token',
+		  await this.signRefreshToken(user.id, user.username),
+		  RefreshTokenParams,
+		);
+		time = '300s';
+	}
     return {
-      access_token: await this.signAccessToken(user.id, user.username, false),
+      access_token: await this.signAccessToken(user.id, user.username, false, time),
       user2fa: user.twoFactorAuthActive,
     };
   }
@@ -144,14 +147,17 @@ export class AuthService {
         username: dto.username,
       },
     });
-    if (!user.twoFactorAuthActive)
-      res.cookie(
-        'refresh_token',
-        await this.signRefreshToken(user.id, user.username),
-        RefreshTokenParams,
-      );
+	let time = '30s';
+    if (!user.twoFactorAuthActive) {
+		res.cookie(
+		  'refresh_token',
+		  await this.signRefreshToken(user.id, user.username),
+		  RefreshTokenParams,
+		);
+		time = '300s';
+	}
     return {
-      access_token: await this.signAccessToken(user.id, user.username, false),
+      access_token: await this.signAccessToken(user.id, user.username, false, time),
       user2fa: user.twoFactorAuthActive,
     };
   }

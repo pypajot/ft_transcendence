@@ -16,22 +16,38 @@ export class UserService {
 	constructor(private prisma: PrismaService) {}
 
 	async getUser(params: any) {
-		console.log(params.id);
 		const user = await this.prisma.user.findUnique({
 			where: {
 				id: Number(params.id),
 			},
 		});
-		return (user);
+		return {...user, hash: undefined, twoFactorAuthSecret: undefined};
 	}
 	
-	async getMe(id: string) {
+	async getUsersbyId(ids: number[]) {
+		const users = await this.prisma.user.findMany({
+			where: {
+				id: { in: ids }
+			},
+			select: {
+				id: true,
+				avatar: true,
+				username: true,
+				status: true 
+			}
+		})
+		return users;
+	}
+
+	async getMe(id: number) {
 		const user = await this.prisma.user.findUnique({
 			where: {
-				id: Number(id),
+				id: id,
 			},
 		});
-		return { id: user.id, username: user.username, avatar: user.avatar, twoFactorAuthActive: user.twoFactorAuthActive};
+		const friends = await this.getUsersbyId(user.friends);
+		const friendsRequest = await this.getUsersbyId(user.friendsRequest);
+		return {...user, hash: undefined, twoFactorAuthSecret: undefined, friends: friends, friendsRequest: friendsRequest};
 	}
 
 	async updateUser(user: UserDTO) {
@@ -88,26 +104,24 @@ export class UserService {
 	}
 
 	async addFriend(content: {friendName: string, userId: number}, server: any) {
-		console.log(content.userId);
 		const friend = await this.prisma.user.findUnique({
 			where: {
 				username: content.friendName,
 			},
 		});
 		if (!friend)
-			throw new WsException("User does not exist");
+			throw new WsException({func: "addFriend", msg: "User does not exist"});
 		if (friend.friendsRequest.includes(content.userId))
-			throw new WsException("Friend request already sent");
+			throw new WsException({func: "addFriend", msg: "Friend request already sent"});
 		if (friend.friends.includes(content.userId))
-			throw new WsException("Already friends");
+			throw new WsException({func: "addFriend", msg: "Already friends"});
 		const user = await this.prisma.user.findUnique({
 			where: {
 				id: content.userId,
 			},
 		});
 		if (user && user.friendsRequest.includes(friend.id))
-			throw new WsException("Friend request already sent");
-		console.log("request ok");
+			throw new WsException({func: "addFriend", msg: "Friend request already sent"});
 		// friend.friendsRequest.push(content.userId);
 		await this.prisma.user.update({
 			where: { id: friend.id },
@@ -117,8 +131,7 @@ export class UserService {
 				}
 			}
 		});
-		console.log("friend socket id: ", friend.socketId);
-		server.to(friend.socketId).emit("friendRequestFrom", user);
+		server.to(friend.socketId).emit("updateUser", this.getMe(friend.id));
 	}
 
 	async respondFriendRequest(content: {friendId: number, userId: number, accept: boolean}, server: any) {
@@ -147,8 +160,6 @@ export class UserService {
 		})
 		if (!content.accept)
 			return ;
-		server.to(friend.socketId).emit("friendAdded", user);
-		server.to(user.socketId).emit("friendAdded", friend);
 		await this.prisma.user.update({
 			where: { id: content.userId },
 			data: {
@@ -161,6 +172,8 @@ export class UserService {
 				friends: { push: content.userId}
 			}
 		})
+		server.to(friend.socketId).emit("updateUser", this.getMe(friend.id));
+		server.to(user.socketId).emit("updateUser", this.getMe(content.userId));
 	}
 
 	async getFriendRequest(userId: number) {
@@ -192,7 +205,6 @@ export class UserService {
 				id: { in: user.friends }
 			}
 		})
-		console.log(list);
 		return list;
 	}
 
@@ -201,17 +213,18 @@ export class UserService {
 			where: { username: content.targetName },
 		});
 		if (!target)
-			throw new WsException("No such user");
+			throw new WsException({func: "blockUser", msg: "No such user"});
 		const user = await this.prisma.user.findUnique({
 			where: { id: content.userId },
 		});
 		if (user.blocked.includes(target.id))
-			throw new WsException("User already blocked");
+			throw new WsException({func: "blockUser", msg: "User already blocked"});
 		await this.prisma.user.update({
 			where: { id: content.userId },
 			data: {
 				blocked: { push: target.id}
 			}
 		})
+		server.to(user.socketId).emit("updateUser", this.getMe(content.userId));
 	}
 }

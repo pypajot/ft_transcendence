@@ -39,7 +39,6 @@ export const ProfileProvider: React.FC<{children: React.ReactNode}> = ({ childre
 			});
 			setFriendList(await response.json());
 		}
-		console.log("context: user socket", user, socket);
 		if (!socket)
 			return ;
 		if (!user) {
@@ -47,10 +46,9 @@ export const ProfileProvider: React.FC<{children: React.ReactNode}> = ({ childre
 			setFriendList([]);
 			return ;
 		}
-		getFriendRequests();
-		getFriendList();
+		// getFriendRequests();
+		// getFriendList();
 		socket.on("friendRequestFrom", (user: any) => {
-			console.log("test socket profile", user)
 			const newRequest: User = user
 			setFriendRequestList(current => [...current, newRequest])
 		})

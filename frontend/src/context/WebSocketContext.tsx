@@ -5,8 +5,8 @@ import { useAuth } from './AuthContext';
 
 type WebContext = {
   socket: Socket | null;
-  socketError: string | null;
-  setSocketError: React.Dispatch<React.SetStateAction<string | null>>
+  socketError: {func: string, msg: string} | null;
+  setSocketError: React.Dispatch<React.SetStateAction<{func: string, msg: string} | null>>
 };
 
 type SocketContextProviderProps = {
@@ -19,8 +19,8 @@ export default function SocketContextProvider(
   props: SocketContextProviderProps
 ) {
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [socketError, setSocketError] = useState<string | null>(null);
-  const { user, logout } = useAuth();
+  const [socketError, setSocketError] = useState<{func: string, msg: string} | null>(null);
+  const { user, setUser, logout } = useAuth();
 
   useEffect(() => {
     if (!user) return;
@@ -36,13 +36,17 @@ export default function SocketContextProvider(
     });
     setSocket(newSocket);
 	newSocket.on("exception", (msg) => {
-		console.log(msg.message);
+		setSocketError(msg);
 	})
+	newSocket.on("updateUser", (user) => {
+		setUser(user);
+	});
+	console.log("socket context: ", user);
 
-    console.log(newSocket.connected);
     return () => {
 	  newSocket.off("connect_error");
 	  newSocket.off("exception");
+	  newSocket.off("updateUser");
       newSocket.disconnect();
     };
   }, [user && user.id]);

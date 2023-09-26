@@ -33,11 +33,11 @@ export class UserGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('respondFriendRequest')
 	async handleReponsdFriendRequest(client: Socket, content: any) {
-		this.userService.respondFriendRequest(content, this.server);
+		await this.userService.respondFriendRequest(content, this.server);
 	}
 
 	@SubscribeMessage('blockUser')
 	async handleblockUser(client: Socket, content: any) {
-		this.userService.blockUser(content, this.server);
+		await this.userService.blockUser(content, this.server);
 	}
 }
