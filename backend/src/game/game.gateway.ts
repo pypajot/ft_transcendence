@@ -29,18 +29,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client disconnected: ${client.id}`);
     // Check if the client was part of an active game
     const lobbyId = this.findLobbyByClientId(client.id);
-    if (!lobbyId) {
-      await this.prisma.user.update({
-        where: {
-          socketId: client.id,
-        },
-        data: {
-          status: 'offline',
-        },
-      });
-      return;
-    }
-    this.handleForfait(client, {lobbyId});
+    if (lobbyId)
+		this.handleForfait(client, {lobbyId});
     await this.prisma.user.update({
       where: {
         socketId: client.id,

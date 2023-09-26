@@ -66,11 +66,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			return response;
 		response = await fetch('http://localhost:3333/auth/refresh', {
 			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
+			headers: {
+				'Content-Type': 'application/json',
+				"Authorization": `Bearer ${sessionStorage.getItem("access_token")}`
+			},
 			credentials: 'include',
 		});
-		if (response.status !== 200 && response.status !== 201)
-		{console.log
+		if (response.status !== 200 && response.status !== 201) {
 			setUser(null);
 			setAccessToken(null);
 			sessionStorage.removeItem("access_token");

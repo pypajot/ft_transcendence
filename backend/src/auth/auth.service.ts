@@ -89,18 +89,20 @@ export class AuthService {
       code: code,
       redirect_uri: 'http://localhost:5173/intralogin',
     };
-	let time = '30s';
+	let time = '300s';
     const response = await firstValueFrom(
       this.http.post(url, null, { params: parameters }),
     );
     const user = await this.createIntraUser(response.data.access_token);
+	// if (user.status === "online")
+	// 	throw new ForbiddenException("User is already connected");
     if (!user.twoFactorAuthActive) {
 		res.cookie(
 		  'refresh_token',
 		  await this.signRefreshToken(user.id, user.username),
 		  RefreshTokenParams,
 		);
-		time = '300s';
+		time = '30s';
 	}
     return {
       access_token: await this.signAccessToken(user.id, user.username, false, time),
@@ -147,14 +149,14 @@ export class AuthService {
         username: dto.username,
       },
     });
-	let time = '30s';
+	let time = '300s';
     if (!user.twoFactorAuthActive) {
 		res.cookie(
 		  'refresh_token',
 		  await this.signRefreshToken(user.id, user.username),
 		  RefreshTokenParams,
 		);
-		time = '300s';
+		time = '30s';
 	}
     return {
       access_token: await this.signAccessToken(user.id, user.username, false, time),

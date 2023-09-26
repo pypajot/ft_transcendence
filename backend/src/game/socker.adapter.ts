@@ -20,7 +20,7 @@ export class AuthenticatedSocketIoAdapter extends IoAdapter {
           }));
       } catch (e) {
         console.log('failed connection');
-        return allowFunction('Unauthorized', false);
+        return allowFunction("Unauthorized", false);
       }
       return allowFunction(null, true);
     };

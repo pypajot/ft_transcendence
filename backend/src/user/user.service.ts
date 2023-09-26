@@ -251,4 +251,19 @@ export class UserService {
 		})
 		server.to(newUser.socketId).emit("updateUser", await this.getMe(newUser.id));
 	}
+
+	async changeStatus(socketId: string, status: string, server: any) {
+		const user = await this.prisma.user.update({
+			where: {socketId: socketId},
+			data: {
+				status: status
+			}
+		})
+		server.to(user.socketId).emit("updateUser", await this.getMe(user.id));
+		for (const friendId of user.friends) {
+			let friend = await this.prisma.user.findUnique({ where: {id: friendId}});
+			server.to(friend.socketId).emit("updateStatus", {id: user.id, status: status});
+		}
+	}
 }
+

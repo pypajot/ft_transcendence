@@ -12,6 +12,7 @@ import { ServerToClientEvents } from 'src/types/events';
 import { ChatGatewayService } from './chat.service';
 import { channelInfo } from 'src/types/channelInfo.entity';
 import { MessageInfo } from 'src/types/message.info';
+import { UserService } from 'src/user/user.service';
 
 export interface joinChannelInfo {
   name: string;
@@ -26,7 +27,8 @@ class ChatGateway
   public id_msg = 0;
   public username = null;
   private readonly logger = new Logger(ChatGateway.name);
-  constructor(private readonly chatService: ChatGatewayService) {}
+  constructor(private readonly chatService: ChatGatewayService,
+	private readonly userService: UserService) {}
   @WebSocketServer() io: Server<any, ServerToClientEvents>;
   afterInit() {
     this.logger.log('Websocket Initialized\n');
@@ -35,7 +37,8 @@ class ChatGateway
     console.log(`New Connection Socket" ${client.handshake.query.username}`);
     if (client.handshake.query.username !== 'null') {
       this.username = client.handshake.query.username;
-      this.chatService.new_cli(client, client.handshake.query.username);
+      await this.chatService.new_cli(client, client.handshake.query.username);
+	  await this.userService.changeStatus(client.id, "online", this.io);
     }
     this.logger.log(
       `Client ${client.id} ${client.handshake.query.username} arrived`,
@@ -45,6 +48,7 @@ class ChatGateway
   handleDisconnect(client: any) {
     //Remove the client.id and the username
     this.logger.log(`Client ${client.id} left`);
+	this.userService.changeStatus(client.id, "offline", this.io);
     client.emit('disconnection');
   }
   @SubscribeMessage('message')
