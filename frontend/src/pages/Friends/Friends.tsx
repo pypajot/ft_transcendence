@@ -81,31 +81,21 @@ const Friends = () => {
 		const AcceptFriendRequest = async (id: number, accept: boolean) => {
 			socket?.emit("respondFriendRequest", { friendId: id, userId: user?.id, accept: accept});
 		}
-		// const list = user?.friendsRequest?.map((user: any) => (
-		// 	<>
-		// 		<div>
-		// 			{user.username} wants to be your friend !
-		// 		</div>
-		// 		<div>
-		// 			<Button variant="primary" onClick={() => AcceptFriendRequest(user.id, true)}>Accept</Button>
-		// 			<Button variant="secondary" onClick={() => AcceptFriendRequest(user.id, false)}>Decline</Button>
-		// 		</div>
-		// 	</>
-		// ));
+		const list = user?.friendsRequest?.map((user: any) => (
+			
+				<div key={user.username}>
+					{user.username} wants to be your friend !
+					<div>
+						<Button variant="primary" onClick={() => AcceptFriendRequest(user.id, true)}>Accept</Button>
+						<Button variant="secondary" onClick={() => AcceptFriendRequest(user.id, false)}>Decline</Button>
+					</div>
+				</div>
+			
+		));
 
 		return (
 			<>
-				{user?.friendsRequest?.map((user: any) => (
-			<>
-				<div>
-					{user.username} wants to be your friend !
-				</div>
-				<div>
-					<Button variant="primary" onClick={() => AcceptFriendRequest(user.id, true)}>Accept</Button>
-					<Button variant="secondary" onClick={() => AcceptFriendRequest(user.id, false)}>Decline</Button>
-				</div>
-			</>
-		))}
+				{list}
 			</>
 		)
 	}

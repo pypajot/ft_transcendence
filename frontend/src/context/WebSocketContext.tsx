@@ -29,7 +29,7 @@ export default function SocketContextProvider(
         reconnectionAttempts: 1,
         query: {
           token: sessionStorage.getItem("access_token"),
-          username: user?.username,
+          username: user.username,
         },
       });
     newSocket.on("connect_error", () => {
@@ -40,8 +40,7 @@ export default function SocketContextProvider(
 		setSocketError(msg);
 	})
 	newSocket.on("updateUser", (user) => {
-		setUser((currentUser) => (
-			currentUser && {
+		setUser((currentUser: any) => ({
 				...currentUser,
 				username: user.username,
 				avatar: user.avatar,

@@ -131,7 +131,7 @@ export class UserService {
 				}
 			}
 		});
-		await server.to(newFriend.socketId).emit("updateUser", this.getMe(newFriend.id));
+		server.to(newFriend.socketId).emit("updateUser", await this.getMe(newFriend.id));
 	}
 
 	async respondFriendRequest(content: {friendId: number, userId: number, accept: boolean}, server: any) {
@@ -158,8 +158,10 @@ export class UserService {
 				friendsRequest: user.friendsRequest
 			}
 		})
-		if (!content.accept)
+		if (content.accept) {
+			server.to(user.socketId).emit("updateUser", await this.getMe(user.id));
 			return ;
+		}
 		const newUser = await this.prisma.user.update({
 			where: { id: content.userId },
 			data: {
@@ -172,8 +174,9 @@ export class UserService {
 				friends: { push: content.userId}
 			}
 		})
-		await server.to(newFriend.socketId).emit("updateUser", this.getMe(newFriend.id));
-		await server.to(newUser.socketId).emit("updateUser", this.getMe(newUser.id));
+		console.log()
+		server.to(newFriend.socketId).emit("updateUser", await this.getMe(newFriend.id));
+		server.to(newUser.socketId).emit("updateUser", await this.getMe(newUser.id));
 	}
 
 	async getFriendRequest(userId: number) {
@@ -225,6 +228,6 @@ export class UserService {
 				blocked: { push: target.id}
 			}
 		})
-		await server.to(newUser.socketId).emit("updateUser", this.getMe(newUser.id));
+		server.to(newUser.socketId).emit("updateUser", await this.getMe(newUser.id));
 	}
 }
