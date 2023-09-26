@@ -15,13 +15,13 @@ import {
 } from "@twilio-paste/core";
 import SendButton from "./SendButton";
 import getMessageSent from "./Hooks/GetUserMessageSent";
-import { Message } from "../../../public/Types/message.entity";
 import { MessageInfo } from "../../../public/Types/messageInfo.entity";
 import { BasicInMessage, BasicOutMessage } from "./BasicMessage";
 import { useSocketContext } from "../../context/WebSocketContext";
 import { useAuth } from "../../context/AuthContext";
 import { MoreIcon } from "@twilio-paste/icons/esm/MoreIcon";
 import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
+import { Message } from "../../../public/message.entity";
 
 const sortByDate = () => {
   return function (a: any, b: any) {
@@ -45,7 +45,7 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
   const menu = useMenuState();
 
   //Make a component to get the previous messsage
-  const socket = useSocketContext();
+  const {socket} = useSocketContext();
 
   useEffect(() => {
     if (!user) {

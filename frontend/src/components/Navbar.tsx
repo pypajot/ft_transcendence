@@ -1,42 +1,53 @@
-import { InPageNavigation, InPageNavigationItem } from "@twilio-paste/core";
 import { Link } from "react-router-dom";
-import { Button } from "@twilio-paste/core/button";
 import { useAuth } from "../context/AuthContext";
-import { Navigate } from "react-router-dom";
-
+import './Navbar.css';
 
 const Navbar = () => {
 	const { logout } = useAuth();
 
 	return (
-		<InPageNavigation aria-label="get started">
-			<InPageNavigationItem component="">
-				Home
-			</InPageNavigationItem>
-		<Link to='/profile'>
-			<InPageNavigationItem href="">
-				Profile
-			</InPageNavigationItem>
-		</Link>
-		<Link to='/friends'>
-			<InPageNavigationItem href="">
-				Friends
-			</InPageNavigationItem>
-		</Link>
-		<Link to='/game'>
-			<InPageNavigationItem href="">
-				Game
-			</InPageNavigationItem>
-		</Link>
-		<Link to='/chatapp'>
-			<InPageNavigationItem href="">
-				Chat
-			</InPageNavigationItem>
-		</Link>
-		<Button variant="primary" onClick={logout}>
-				Logout
-		</Button>
-		</InPageNavigation>
+		<nav >
+			<div className="nav-home">
+				<li><a>
+					<Link to='/profile'>
+						PROFILE
+					</Link>
+				</a></li>
+			</div>
+			<div className="nav-home">
+				<li><a>
+					<Link to='/home'>
+						HOME
+					</Link>
+				</a></li>
+			</div>
+			<div className="nav-home">
+				<li><a>
+					<Link to='/game'>
+						GAME
+					</Link>
+				</a></li>
+			</div>
+			<div className="nav-home">
+				<li><a>
+					<Link to='/friends'>
+						FRIENDS
+					</Link>
+				</a></li>
+			</div>
+			<div className="nav-home">
+				<li><a>
+					<Link to='/chatapp'>
+						CHAT
+					</Link>
+				</a></li>
+			</div>
+			<div className="logout-button">
+				<button className="button" onClick={logout}>
+					Logout
+				</button>
+			</div>
+		</nav>
 	);
 };
 
@@ -56,6 +67,5 @@ export const Navbar2 = () => {
 		</div>
 	)
 }
-
 
 export default Navbar;

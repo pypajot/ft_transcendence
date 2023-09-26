@@ -1,11 +1,12 @@
 import { useState} from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
-import { Button, ButtonGroup } from '@twilio-paste/core';
 import { LoadingIcon } from "@twilio-paste/icons/esm/LoadingIcon";
 import { useGameContext } from '../../context/GameContext';
+import './modeSelection.css';
+import Navbar from '../../components/Navbar';
 
 const ModeSelection = () => {
-  const socket = useSocketContext(); // Access the WebSocket context
+  const {socket} = useSocketContext(); // Access the WebSocket context
   const [selectedMode, setSelectedMode] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -29,27 +30,33 @@ const ModeSelection = () => {
   };
 
   return (
-    <div className="mode-selection">
-      <h1>Choose a Game Mode</h1>
-      <ButtonGroup>
-        <Button variant="secondary"
+    <div>
+      <Navbar/>
+      <div className='choice'>
+        <img src='https://i.imgur.com/9hzyEgH.png' className='choice-img'></img>
+      </div>
+      <div className='select-mode'>
+        <button className='choose-button'
           onClick={() => handleSelectedMode('Classic')}
           >Classic
-        </Button>
-        <Button variant="secondary"
+        </button>
+        <button className='choose-button'
           onClick={() => handleSelectedMode('Party')}
           >Party
-        </Button>
-        <Button variant="secondary"
+        </button>
+        <button className='choose-button'
           onClick={() => handleSelectedMode('Hardcore')}
           >Hardcore
-        </Button>
-      </ButtonGroup>
+        </button>
+      </div>
+      <div className="game-selection-mode">
+				<img src="https://i.imgur.com/vm7Rs68.gif" className="game-pong-selection-mode"/>
+      </div>
       {isLoading && (
         <div className="loading-message">
           <LoadingIcon size="sizeIcon70" decorative={false} title="In Queue..." />
       <p>{message}</p>
-        </div>
+      </div>
       )}
       {!selectedMode && <p><br></br></p>}
       {selectedMode && <p>Selected Mode: {selectedMode}</p>}

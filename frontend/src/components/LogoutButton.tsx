@@ -1,8 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { refreshFetch } from "../fetch/refreshFetch";
-import { Button } from '@twilio-paste/core/button';
 import { useAuth } from "../context/AuthContext";
-
 
 export function LogoutButton() {
 
@@ -21,9 +19,9 @@ export function LogoutButton() {
 
 	return (
 		<>
-			<Button variant="primary" onClick={Logout}>
+			<button onClick={Logout}>
 				Logout
-			</Button>
+			</button>
 		</>
 	);
 }

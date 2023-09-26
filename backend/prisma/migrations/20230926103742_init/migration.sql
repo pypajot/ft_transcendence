@@ -15,7 +15,7 @@ CREATE TABLE "users" (
     "wins" INTEGER NOT NULL DEFAULT 0,
     "losses" INTEGER NOT NULL DEFAULT 0,
     "twoFactorAuthActive" BOOLEAN NOT NULL DEFAULT false,
-    "twoFactorAuthSecret" TEXT,
+    "twoFactorAuthSecret" BYTEA,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );

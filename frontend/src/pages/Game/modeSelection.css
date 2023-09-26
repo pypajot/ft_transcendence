@@ -1,0 +1,45 @@
+.choice{
+    display: flex;
+    justify-content: center;
+    padding-top: 5%;
+}
+
+.choice-img{
+    width: 600px;
+}
+
+.game-selection-mode{
+    display: flex;
+    justify-content: center;
+}
+
+.game-pong-selection-mode{
+    width: 580px;
+}
+
+.select-mode{
+    display: flex;
+    justify-content: space-around;
+    margin-left: 30%;
+    margin-right: 30%;
+    padding-top: 6%;
+    padding-bottom: 8%;
+}
+
+.choose-button{
+    font-size: 18px;
+    color: white;
+    border: 3px solid #775d85;
+    border-radius:30px;
+    padding: 5px 20px;
+    cursor: pointer;
+    filter: drop-shadow(0 0 15px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
+    transition: .5s;
+    background: transparent;
+}
+
+.choose-button:hover {
+    color: white;
+    background-color: #775d85;
+    filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
+}

@@ -37,7 +37,7 @@ export const CreateNewConversation: React.FC<CreateNewConversationProps> = ({
   const [channelName, setChannelName] = useState("");
   const [channelPassword, setchannelPassword] = useState("");
   const [errorChannelName, setErrorChannelName] = useState(false);
-  const socket = useSocketContext();
+  const {socket} = useSocketContext();
 
   useEffect(() => {
     if (_public) {

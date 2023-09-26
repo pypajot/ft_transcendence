@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { useGameContext } from '../../context/GameContext.tsx';
 
 const PongGame : React.FC = () => {
-  const socket = useSocketContext(); // Access the WebSocket context
+  const {socket} = useSocketContext(); // Access the WebSocket context
   const [lobbyId, setLobbyId] = useState<string>(''); // The lobby ID to join
   const {gameStart, setGameStart} = useGameContext();
   const [gameState, setGameState] = useState<GameState | null>(null);
