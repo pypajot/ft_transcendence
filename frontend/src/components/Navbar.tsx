@@ -8,39 +8,39 @@ const Navbar = () => {
 	return (
 		<nav >
 			<div className="nav-home">
-				<li><a>
+				<li>
 					<Link to='/profile'>
 						PROFILE
 					</Link>
-				</a></li>
+				</li>
 			</div>
 			<div className="nav-home">
-				<li><a>
+				<li>
 					<Link to='/home'>
 						HOME
 					</Link>
-				</a></li>
+				</li>
 			</div>
 			<div className="nav-home">
-				<li><a>
+				<li>
 					<Link to='/game'>
 						GAME
 					</Link>
-				</a></li>
+				</li>
 			</div>
 			<div className="nav-home">
-				<li><a>
+				<li>
 					<Link to='/friends'>
 						FRIENDS
 					</Link>
-				</a></li>
+				</li>
 			</div>
 			<div className="nav-home">
-				<li><a>
+				<li>
 					<Link to='/chatapp'>
 						CHAT
 					</Link>
-				</a></li>
+				</li>
 			</div>
 			<div className="logout-button">
 				<button className="button" onClick={logout}>

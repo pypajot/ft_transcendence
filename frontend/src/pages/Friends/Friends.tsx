@@ -81,7 +81,21 @@ const Friends = () => {
 		const AcceptFriendRequest = async (id: number, accept: boolean) => {
 			socket?.emit("respondFriendRequest", { friendId: id, userId: user?.id, accept: accept});
 		}
-		const list = user?.friendsRequest?.map((user: any) => (
+		// const list = user?.friendsRequest?.map((user: any) => (
+		// 	<>
+		// 		<div>
+		// 			{user.username} wants to be your friend !
+		// 		</div>
+		// 		<div>
+		// 			<Button variant="primary" onClick={() => AcceptFriendRequest(user.id, true)}>Accept</Button>
+		// 			<Button variant="secondary" onClick={() => AcceptFriendRequest(user.id, false)}>Decline</Button>
+		// 		</div>
+		// 	</>
+		// ));
+
+		return (
+			<>
+				{user?.friendsRequest?.map((user: any) => (
 			<>
 				<div>
 					{user.username} wants to be your friend !
@@ -91,11 +105,7 @@ const Friends = () => {
 					<Button variant="secondary" onClick={() => AcceptFriendRequest(user.id, false)}>Decline</Button>
 				</div>
 			</>
-		));
-
-		return (
-			<>
-				{list}
+		))}
 			</>
 		)
 	}

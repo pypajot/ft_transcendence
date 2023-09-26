@@ -23,7 +23,8 @@ export default function SocketContextProvider(
   const { user, setUser, logout } = useAuth();
 
   useEffect(() => {
-    if (!user) return;
+	  if (!user) return;
+	  console.log("test test test");
     const newSocket = io("http://localhost:3333/", {
         reconnectionAttempts: 1,
         query: {
@@ -39,7 +40,18 @@ export default function SocketContextProvider(
 		setSocketError(msg);
 	})
 	newSocket.on("updateUser", (user) => {
-		setUser(user);
+		setUser((currentUser) => (
+			currentUser && {
+				...currentUser,
+				username: user.username,
+				avatar: user.avatar,
+				socketId: user.socketId,
+				twoFactorAuthActive: user.twoFactorAuthActive,
+				friends: user.friends,
+				friendsRequest: user.friendsRequest,
+				blocked: user.blocked
+			})
+		);
 	});
 	console.log("socket context: ", user);
 
@@ -49,7 +61,7 @@ export default function SocketContextProvider(
 	  newSocket.off("updateUser");
       newSocket.disconnect();
     };
-  }, [user && user.id]);
+  }, [user?.id]);
 
   const value = useMemo(() => ({
 	socket,

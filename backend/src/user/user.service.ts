@@ -123,7 +123,7 @@ export class UserService {
 		if (user && user.friendsRequest.includes(friend.id))
 			throw new WsException({func: "addFriend", msg: "Friend request already sent"});
 		// friend.friendsRequest.push(content.userId);
-		await this.prisma.user.update({
+		const newFriend = await this.prisma.user.update({
 			where: { id: friend.id },
 			data: {
 				friendsRequest: {
@@ -131,7 +131,7 @@ export class UserService {
 				}
 			}
 		});
-		server.to(friend.socketId).emit("updateUser", this.getMe(friend.id));
+		await server.to(newFriend.socketId).emit("updateUser", this.getMe(newFriend.id));
 	}
 
 	async respondFriendRequest(content: {friendId: number, userId: number, accept: boolean}, server: any) {
@@ -160,20 +160,20 @@ export class UserService {
 		})
 		if (!content.accept)
 			return ;
-		await this.prisma.user.update({
+		const newUser = await this.prisma.user.update({
 			where: { id: content.userId },
 			data: {
 				friends: { push: friend.id}
 			}
 		})
-		await this.prisma.user.update({
+		const newFriend = await this.prisma.user.update({
 			where: { id: friend.id },
 			data: {
 				friends: { push: content.userId}
 			}
 		})
-		server.to(friend.socketId).emit("updateUser", this.getMe(friend.id));
-		server.to(user.socketId).emit("updateUser", this.getMe(content.userId));
+		await server.to(newFriend.socketId).emit("updateUser", this.getMe(newFriend.id));
+		await server.to(newUser.socketId).emit("updateUser", this.getMe(newUser.id));
 	}
 
 	async getFriendRequest(userId: number) {
@@ -219,12 +219,12 @@ export class UserService {
 		});
 		if (user.blocked.includes(target.id))
 			throw new WsException({func: "blockUser", msg: "User already blocked"});
-		await this.prisma.user.update({
+		const newUser = await this.prisma.user.update({
 			where: { id: content.userId },
 			data: {
 				blocked: { push: target.id}
 			}
 		})
-		server.to(user.socketId).emit("updateUser", this.getMe(content.userId));
+		await server.to(newUser.socketId).emit("updateUser", this.getMe(newUser.id));
 	}
 }
