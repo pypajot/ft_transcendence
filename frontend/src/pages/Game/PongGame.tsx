@@ -72,10 +72,12 @@ const PongGame : React.FC = () => {
     setGameEnd(true);
     setShowBall(false);
     if (data === socket?.id) {
-      if (forfait)
+      if (forfait) {
         setGameEndMessage('You win by forfait!');
-      else
+      }
+      else {
         setGameEndMessage('You win!');
+      }
       console.log('LobbyId: ', lobbyId);
       setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
     }

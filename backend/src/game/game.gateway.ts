@@ -17,6 +17,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly matchmakingService: MatchmakingService) {}
 
   prisma = new PrismaClient();
+  private intervals: { [lobbyId: string]: NodeJS.Timeout } = {};
 
   @WebSocketServer()
   server: Server;
@@ -76,11 +77,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.handleUpdateDB(player2, player1, gameId);
       client.emit('gameEnd', player2.socket.id, forfait);
       player2.socket.emit('gameEnd', player2.socket.id, forfait);
+      clearInterval(this.intervals[lobbyId]);
     }
     else if (client.id === player2.socket.id) {
       this.handleUpdateDB(player1, player2, gameId);
       client.emit('gameEnd', player1.socket.id, forfait);
       player1.socket.emit('gameEnd', player1.socket.id, forfait);
+      clearInterval(this.intervals[lobbyId]);
     }
   }
   
@@ -223,10 +226,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const player2 = gameService.player2;
     const gameId = gameService.gameId;
     // create a loop with a delay of 50ms
-    let interval = setInterval(async () => {
+    this.intervals[lobbyId] = setInterval(async () => {
       // check if the game service still exists
       if (gameService === undefined) {
-        clearInterval(interval);
+        clearInterval(this.intervals[lobbyId]);
         return;
       }
       gameService.updateGameState(); // Update the game state
@@ -236,13 +239,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (client.id === player1.socket.id)
           this.handleUpdateDB(player1, player2, gameId);
         client.emit('gameEnd', player1.socket.id, false);
-        clearInterval(interval);
+        clearInterval(this.intervals[lobbyId]);
       } 
       else if ( gameService.player2.score === gameService.goalLimit) {
         if (client.id === player1.socket.id)
           this.handleUpdateDB(player2, player1, gameId);
         client.emit('gameEnd', player2.socket.id, false);
-        clearInterval(interval);
+        clearInterval(this.intervals[lobbyId]);
       }
       // Send the game state to the client
       client.emit('gameState', gameState);
