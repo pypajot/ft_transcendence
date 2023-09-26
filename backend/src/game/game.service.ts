@@ -162,16 +162,6 @@ export class GameService {
     this.ballY >= this.player2.paddlePos &&
     this.ballY <= this.player2.paddlePos + this.paddleHeight;
 
-    // const collisionPaddle1 =
-    //   this.ballX - this.ballSize / 2 + ballXVelocity <= this.paddleWidth &&
-    //   this.ballY + ballYVelocity >= this.player1.paddlePos &&
-    //   this.ballY + ballYVelocity <= this.player1.paddlePos + this.paddleHeight;
-    // const collisionPaddle2 =
-    //   this.ballX + this.ballSize / 2 + ballXVelocity >=
-    //     this.gameWidth - this.paddleWidth - this.gameWidth / 100 &&
-    //   this.ballY + ballYVelocity >= this.player2.paddlePos &&
-    //   this.ballY + ballYVelocity <= this.player2.paddlePos + this.paddleHeight;
-    // Check for collisions with the paddles
     if (collisionPaddle1 || collisionPaddle2) {
       // Reverse the X-direction and increase the ball speed after hitting a paddle
       this.ballSpeedXDirection *= -1;
