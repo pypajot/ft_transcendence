@@ -45,7 +45,7 @@ export const Conversation = ({ info }: { info: ConversationInformation }) => {
   const menu = useMenuState();
 
   //Make a component to get the previous messsage
-  const socket = useSocketContext();
+  const {socket} = useSocketContext();
 
   useEffect(() => {
     if (!user) {

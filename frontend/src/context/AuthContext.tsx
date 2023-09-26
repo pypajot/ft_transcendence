@@ -2,8 +2,6 @@ import { createContext, useState, useContext, useMemo } from "react";
 import * as React from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
-import { useSocketContext } from "./WebSocketContext";
-import { Socket } from 'socket.io-client';
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -14,7 +12,7 @@ export interface User {
 	socketId?: string
 	twoFactorAuthActive: boolean
 	friends: {id: number, username: string}[]
-	friendRequests: {id: number, username: string}[]
+	friendsRequest: {id: number, username: string}[]
 	blocked: number[]
 
 }
@@ -72,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			credentials: 'include',
 		});
 		if (response.status !== 200 && response.status !== 201)
-		{
+		{console.log
 			setUser(null);
 			setAccessToken(null);
 			sessionStorage.removeItem("access_token");

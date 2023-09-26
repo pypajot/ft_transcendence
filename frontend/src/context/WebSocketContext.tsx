@@ -20,7 +20,7 @@ export default function SocketContextProvider(
 ) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [socketError, setSocketError] = useState<{func: string, msg: string} | null>(null);
-  const { user, logout } = useAuth();
+  const { user, setUser, logout } = useAuth();
 
   useEffect(() => {
     if (!user) return;
@@ -36,14 +36,17 @@ export default function SocketContextProvider(
     });
     setSocket(newSocket);
 	newSocket.on("exception", (msg) => {
-		console.log("socket error: ", msg);
 		setSocketError(msg);
 	})
-	console.log(user);
+	newSocket.on("updateUser", (user) => {
+		setUser(user);
+	});
+	console.log("socket context: ", user);
 
     return () => {
 	  newSocket.off("connect_error");
 	  newSocket.off("exception");
+	  newSocket.off("updateUser");
       newSocket.disconnect();
     };
   }, [user && user.id]);

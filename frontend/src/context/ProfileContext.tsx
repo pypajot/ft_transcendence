@@ -46,8 +46,8 @@ export const ProfileProvider: React.FC<{children: React.ReactNode}> = ({ childre
 			setFriendList([]);
 			return ;
 		}
-		getFriendRequests();
-		getFriendList();
+		// getFriendRequests();
+		// getFriendList();
 		socket.on("friendRequestFrom", (user: any) => {
 			const newRequest: User = user
 			setFriendRequestList(current => [...current, newRequest])

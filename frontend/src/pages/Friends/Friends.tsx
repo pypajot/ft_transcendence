@@ -1,8 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from '../../components/Navbar';
 import { useAuth } from '../../context/AuthContext';
 import { useSocketContext } from '../../context/WebSocketContext';
-import { ProfileContext } from '../../context/ProfileContext';
 import { Button } from '@twilio-paste/core';
 import HelperText from '../../components/HelperText';
 
@@ -76,16 +75,13 @@ const Friends = () => {
 	}
 
 	function FriendRequestList() {
-		const { friendRequestList, setFriendRequestList } = useContext(ProfileContext)
 		const { user, setUser } = useAuth();
 		const { socket } = useSocketContext()
 
 		const AcceptFriendRequest = async (id: number, accept: boolean) => {
 			socket?.emit("respondFriendRequest", { friendId: id, userId: user?.id, accept: accept});
-			setUser(current => {...current, ?.friendRequests.filter(value => (value.id !== id))})
 		}
-
-		const list = user?.friendRequests?.map((user: any) => (
+		const list = user?.friendsRequest?.map((user: any) => (
 			<>
 				<div>
 					{user.username} wants to be your friend !

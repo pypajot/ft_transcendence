@@ -5,7 +5,7 @@ import { LoadingIcon } from "@twilio-paste/icons/esm/LoadingIcon";
 import { useGameContext } from '../../context/GameContext';
 
 const ModeSelection = () => {
-  const socket = useSocketContext(); // Access the WebSocket context
+  const {socket} = useSocketContext(); // Access the WebSocket context
   const [selectedMode, setSelectedMode] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');

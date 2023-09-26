@@ -11,7 +11,7 @@ import {
 } from "@twilio-paste/core";
 
 export const AddFriends = () => {
-  const socket = useSocketContext();
+  const {socket} = useSocketContext();
   const [target, setTarget] = useState("");
   const [error, setError] = useState<boolean>(false);
 

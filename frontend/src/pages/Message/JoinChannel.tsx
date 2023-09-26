@@ -30,7 +30,7 @@ export const JoinChanel: React.FC<JoinChannelProps> = ({ setConversation }) => {
     wrongPriv: false,
     wrongPassword: false,
   });
-  const socket = useSocketContext();
+  const {socket} = useSocketContext();
   const joinChannel: any = () => {
     socket?.emit("JoinChannel", { name: channelName, pass: password });
     //Checker que on a bien join puis
