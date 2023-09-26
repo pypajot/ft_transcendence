@@ -28,6 +28,12 @@ export class UserService {
 		const users = await this.prisma.user.findMany({
 			where: {
 				id: { in: ids }
+			},
+			select: {
+				id: true,
+				avatar: true,
+				username: true,
+				status: true 
 			}
 		})
 		return users;
@@ -125,7 +131,7 @@ export class UserService {
 				}
 			}
 		});
-		server.to(friend.socketId).emit("friendRequestFrom", user);
+		server.to(friend.socketId).emit("updateUser", this.getMe(friend.id));
 	}
 
 	async respondFriendRequest(content: {friendId: number, userId: number, accept: boolean}, server: any) {
@@ -154,8 +160,6 @@ export class UserService {
 		})
 		if (!content.accept)
 			return ;
-		server.to(friend.socketId).emit("friendAdded", user);
-		server.to(user.socketId).emit("friendAdded", friend);
 		await this.prisma.user.update({
 			where: { id: content.userId },
 			data: {
@@ -168,6 +172,8 @@ export class UserService {
 				friends: { push: content.userId}
 			}
 		})
+		server.to(friend.socketId).emit("updateUser", this.getMe(friend.id));
+		server.to(user.socketId).emit("updateUser", this.getMe(content.userId));
 	}
 
 	async getFriendRequest(userId: number) {
@@ -219,5 +225,6 @@ export class UserService {
 				blocked: { push: target.id}
 			}
 		})
+		server.to(user.socketId).emit("updateUser", this.getMe(content.userId));
 	}
 }
