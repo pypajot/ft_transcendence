@@ -11,6 +11,7 @@ import { GameGateway } from './game/game.gateway';
 import { UserGateway } from './user/user.gateway';
 import { GameService } from './game/game.service';
 import { MatchmakingService } from './game/matchmaking.service';
+import { MatchHistoryService } from './match_history/match_history.service';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { MatchmakingService } from './game/matchmaking.service';
     GameService,
     GameGateway,
     MatchmakingService,
+    MatchHistoryService,
   ],
 })
 export class AppModule {}
