@@ -1,9 +1,10 @@
 import { ChatComposer } from '@twilio-paste/chat-composer';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import {
     $getRoot,
     EditorState,
     ClearEditorPlugin,
+    useLexicalComposerContext,
 } from '@twilio-paste/lexical-library';
 import {
     Box,
@@ -14,6 +15,7 @@ import {
     MenuButton,
     MenuItem,
     MenuSeparator,
+    secureExternalLink,
     useChatLogger,
     useMenuState,
 } from '@twilio-paste/core';
@@ -134,15 +136,17 @@ export const Conversation = () => {
         // setRenderConversation(false);
         //return;
         // }
-        if (receivedMessage) {
+        if (receivedMessage && user) {
             receivedMessage.forEach(function (obj) {
                 obj.sent = false;
             });
+            setReceivedMessage(receivedMessage);
         }
         if (sentMessage != undefined) {
             sentMessage.forEach(function (obj) {
                 obj.sent = true;
             });
+            setSentMessage(sentMessage);
         }
         if (receivedMessage && sentMessage) {
             setConversationMsg(
@@ -172,7 +176,6 @@ export const Conversation = () => {
 
     const messageListener = useCallback(
         (message: Message) => {
-            console.log(message);
             setConversationMsg([...conversationMsg, message]);
         },
         [setConversationMsg, conversationMsg]
@@ -220,6 +223,9 @@ export const Conversation = () => {
                             </div>
                         );
                     } else {
+                        if (chatContext.isBlocked(message.autorId)) {
+                            return;
+                        }
                         return (
                             <div key={i}>
                                 <BasicInMessage
@@ -252,6 +258,7 @@ export const Conversation = () => {
                         onChange={handleComposerChange}>
                         <ClearEditorPlugin />
                         <SendButtonPlugin onClick={sendMessage} />
+                        <EnterKeySubmitPlugin onKeyDown={sendMessage} />
                     </ChatComposer>
                 </Box>
             )}

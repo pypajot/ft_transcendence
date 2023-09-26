@@ -48,21 +48,26 @@ export function InviteToChannel(props: SimpleDialogProps) {
                 Add friends to {chatContext.conversationInfo?.name}
             </DialogTitle>
             <List sx={{ pt: 0 }}>
-                {friends.map((friends) => (
-                    <ListItem key={friends.username}>
-                        <ListItemButton
-                            onClick={() => handleListItemClick(friends)}>
-                            <ListItemAvatar>
-                                <Avatar
-                                    sx={{
-                                        bgcolor: blue[100],
-                                        color: blue[600],
-                                    }}></Avatar>
-                            </ListItemAvatar>
-                            <ListItemText primary={friends.username} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
+                {friends.map((friends) => {
+                    if (chatContext.isBlocked(friends.id)) {
+                        return;
+                    }
+                    return (
+                        <ListItem key={friends.username}>
+                            <ListItemButton
+                                onClick={() => handleListItemClick(friends)}>
+                                <ListItemAvatar>
+                                    <Avatar
+                                        sx={{
+                                            bgcolor: blue[100],
+                                            color: blue[600],
+                                        }}></Avatar>
+                                </ListItemAvatar>
+                                <ListItemText primary={friends.username} />
+                            </ListItemButton>
+                        </ListItem>
+                    );
+                })}
                 <ListItem></ListItem>
             </List>
         </Dialog>

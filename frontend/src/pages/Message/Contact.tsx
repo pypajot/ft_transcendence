@@ -94,6 +94,9 @@ export const Contact = () => {
             {username &&
                 friends &&
                 friends.map((user, i) => {
+                    if (chatContext.isBlocked(user.id)) {
+                        return;
+                    }
                     return (
                         <div key={i}>
                             <ContactElement

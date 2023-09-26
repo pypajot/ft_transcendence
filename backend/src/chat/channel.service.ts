@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { UtilsService } from './utills.service';
 import { Channel } from 'src/types/interfacesList';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { channelInfo } from 'src/types/channelInfo.entity';
 import { joinChannelInfo } from './chat.gateway';
 import { Message } from 'src/types/message.entity';
@@ -11,6 +11,168 @@ import { Message } from 'src/types/message.entity';
 export class ChannelService {
     prisma = new PrismaClient();
     constructor(private readonly serviceUtils: UtilsService) {}
+
+    async unMute(userId: number, channel: any, moderationId: number) {
+        //Delete moderation elem
+        //
+        await this.prisma.channel.update({
+            where: {
+                name: channel.name,
+            },
+            include: {
+                info: true,
+            },
+            data: {
+                info: {
+                    disconnect: { id: moderationId },
+                },
+            },
+        });
+    }
+
+    async muteUser(client: any, targetId: number, channelName: string) {
+        try {
+            const moderation = await this.prisma.managementChannel.create({
+                data: {
+                    type: 'mute',
+                    target: {
+                        connect: { id: targetId },
+                    },
+                    channel: {
+                        connect: { name: channelName },
+                    },
+                },
+            });
+            await this.prisma.channel.update({
+                where: {
+                    name: channelName,
+                },
+                data: {
+                    info: {
+                        connect: { id: moderation.id },
+                    },
+                },
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async KickUser(
+        io: Server,
+        targetId,
+        channelName: string,
+        socketArr: Socket[]
+    ) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id: targetId,
+                },
+            });
+            const channel = await this.prisma.channel.findUnique({
+                where: {
+                    name: channelName,
+                },
+            });
+            if (user) {
+                await this.prisma.user.update({
+                    where: {
+                        id: targetId,
+                    },
+                    include: {
+                        channels: true,
+                    },
+                    data: {
+                        channels: {
+                            disconnect: { id: channel.id },
+                        },
+                    },
+                });
+                io.to(user.socketId).emit('Kicked', channel);
+                //Emit to the user.socketIdA
+                socketArr[user.socketId].leave(channelName);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async unBan(targetId: number, channelName: string) {
+        const channel = await this.prisma.channel.findUnique({
+            where: {
+                name: channelName,
+            },
+            include: {
+                info: true,
+            },
+        });
+        const id_arr = [];
+        const moderation = channel.info;
+        if (moderation) {
+            moderation.map((elem) => {
+                if (elem.type == 'ban') {
+                    if (elem.targetId == targetId) {
+                        id_arr.push(elem.id);
+                    }
+                }
+            });
+        }
+        id_arr.map(async (moderationId) => {
+            await this.prisma.channel.update({
+                where: {
+                    name: channelName,
+                },
+                data: {
+                    info: {
+                        disconnect: { id: moderationId },
+                    },
+                },
+            });
+        });
+    }
+
+    async BanUser(io: Server, targetId: number, channelName: string) {
+        try {
+            const newModeration = await this.prisma.managementChannel.create({
+                data: {
+                    type: 'ban',
+                    target: {
+                        connect: { id: targetId },
+                    },
+                },
+            });
+            const channel = await this.prisma.channel.update({
+                where: {
+                    name: channelName,
+                },
+                data: {
+                    info: {
+                        connect: { id: newModeration.id },
+                    },
+                },
+                include: {
+                    info: true,
+                },
+            });
+            const user = await this.prisma.user.update({
+                where: {
+                    id: targetId,
+                },
+                include: {
+                    channels: true,
+                },
+                data: {
+                    channels: {
+                        disconnect: { id: channel.id },
+                    },
+                },
+            });
+            io.to(user.socketId).emit('Kicked', channel);
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     async inviteToChannel(io: Server, client: any, data: any) {
         try {
@@ -181,6 +343,14 @@ export class ChannelService {
                 });
                 return;
             } else {
+                const moderation = await this.prisma.managementChannel.create({
+                    data: {
+                        type: 'init',
+                        target: {
+                            connect: { id: user.id },
+                        },
+                    },
+                });
                 const newchannel = await this.prisma.channel.create({
                     data: {
                         name: data_chan.name,
@@ -192,6 +362,9 @@ export class ChannelService {
                         password: data_chan.pwd,
                         invited: [],
                         admins: [user.id],
+                        info: {
+                            connect: { id: moderation.id },
+                        },
                     },
                     include: {
                         members: true,
@@ -210,6 +383,9 @@ export class ChannelService {
                 where: {
                     name: info.name,
                 },
+                include: {
+                    info: true,
+                },
             });
             const user = await this.prisma.user.findUnique({
                 where: {
@@ -220,7 +396,10 @@ export class ChannelService {
             });
             //Add check about channel right
             if (existingChannel) {
-                if (!existingChannel.public) {
+                if (this.serviceUtils.isBan(user.id, existingChannel)) {
+                    client.emit('Error', { Banned: true });
+                    return;
+                } else if (!existingChannel.public) {
                     let find = false;
                     if (existingChannel.invited) {
                         for (

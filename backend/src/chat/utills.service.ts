@@ -3,9 +3,11 @@ import { PrismaClient } from '@prisma/client';
 import { Server } from 'socket.io';
 import { Client_elem } from 'src/types/client.entity';
 import { User } from 'src/types/interfacesList';
+import { ChannelService } from './channel.service';
 
 Injectable();
 export class UtilsService {
+    constructor(private readonly channelService: ChannelService) {}
     prisma = new PrismaClient();
 
     async findUsernameFromId(id: number) {
@@ -77,5 +79,51 @@ export class UtilsService {
             }
         }
         return users;
+    }
+
+    //  isBlock()
+
+    isBan(userId: number, channel: any): boolean {
+        let res = false;
+        const moderation = channel.info;
+        if (moderation) {
+            moderation.map((elem) => {
+                if (elem.type == 'ban') {
+                    if (elem.targetId == userId) {
+                        res = true;
+                    }
+                }
+            });
+        }
+        console.log(`there ${res}`);
+        return res;
+    }
+
+    isMute(userId: number, channel: any): boolean {
+        let res = false;
+        const moderation = channel.info;
+        if (moderation) {
+            moderation.map((elem) => {
+                if (elem.type == 'mute') {
+                    if (elem.targetId == userId) {
+                        if (
+                            (new Date().getTime() - elem.createdAt.getTime()) /
+                                60000 <
+                            10
+                        ) {
+                            res = true;
+                        } else {
+                            this.channelService.unMute(
+                                userId,
+                                channel,
+                                elem.id
+                            );
+                        }
+                    }
+                }
+            });
+        }
+        console.log(`Thweree : ${res}`);
+        return res;
     }
 }

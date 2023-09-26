@@ -25,31 +25,79 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     const { onClose, target, open } = props;
     const [options, setOptions] = useState<string[]>([]);
     const chatContext = useChatContext();
+    const socket = useSocketContext();
 
     const handleClose = () => {
         onClose();
     };
 
-    const handleOptionClick = (choice) => {
-	switch(choice){
-		case 'Mute':
-			handleMute();
-			break;
-		case 'Ban':
-			handleBan();
-			break;
-		case 'Kick':
-			handleKick();
-			break;
-		case 'Play with';
-			handleInviteGame();
-			break;
-		case 'Profile';
-			handleProfile();
-			break;
-		default:
-			break ;
-}
+    const handleMute = () => {
+        if (target) {
+            socket.emit('MuteUser', {
+                targetId: target.id,
+                channelName: chatContext.conversationInfo?.name,
+            });
+        }
+    };
+    const handleBan = () => {
+        if (target) {
+            socket.emit('BanUser', {
+                targetId: target.id,
+                channelName: chatContext.conversationInfo?.name,
+            });
+        }
+    };
+
+    const handleKick = () => {
+        if (target) {
+            socket.emit('KickUser', {
+                targetId: target.id,
+                channelName: chatContext.conversationInfo?.name,
+            });
+        }
+    };
+
+    const handleInviteGame = () => {
+        console.log('invited You to Play');
+    };
+
+    const handleProfile = () => {
+        console.log(`Want to see profile of ${target?.username}`);
+    };
+
+    const handleBlock = () => {
+        if (target) {
+            socket.emit('BlockUser', {
+                targetId: target.id,
+                channelName: chatContext.conversationInfo?.name,
+            });
+        }
+    };
+
+    const handleOptionClick = (choice: string) => {
+        console.log(`dude : ${choice}`);
+        switch (choice) {
+            case 'Mute':
+                handleMute();
+                break;
+            case 'Ban':
+                handleBan();
+                break;
+            case 'Kick':
+                handleKick();
+                break;
+            case 'Play with':
+                handleInviteGame();
+                break;
+            case 'Profile':
+                handleProfile();
+                break;
+            case 'Block':
+                handleBlock();
+                break;
+            default:
+                break;
+        }
         onClose();
     };
 
@@ -61,8 +109,9 @@ export const OptionsUserList = (props: OptionUserListProps) => {
             'Add',
             'Play with',
             'Profile',
+            'Block',
         ];
-        const choices2: string[] = ['Add', 'Play with', 'Profile'];
+        const choices2: string[] = ['Add', 'Play with', 'Profile', 'Block'];
         if (chatContext.isChannelOwner()) {
             setOptions([...choices, 'Sudo ']);
         } else if (chatContext.isAdmin()) {
@@ -79,7 +128,10 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 {' '}
                 {options.map((choice, i) => (
                     <ListItem key={i}>
-                        <ListItemButton onClick={() => {handleOptionClick()}}>
+                        <ListItemButton
+                            onClick={() => {
+                                handleOptionClick(choice);
+                            }}>
                             <ListItemText
                                 primary={choice + ' ' + target?.username}
                             />

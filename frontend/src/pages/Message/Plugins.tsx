@@ -34,23 +34,21 @@ const SentIcon = () => {
     );
 };
 
-interface Props {
-    onClick: () => void;
-}
-
 interface EnterKeySubmitPluginProps {
-  onKeyDown: () => void;
+    onKeyDown: () => void;
 }
+export const EnterKeySubmitPlugin = ({
+    onKeyDown,
+}: EnterKeySubmitPluginProps) => {
+    const handleKeyDown = (e: any) => {
+        console.log(e.key);
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            onKeyDown();
+        }
+    };
 
-export const EnterKeySubmitPlugin = ({ onKeyDown }: EnterKeySubmitPluginProps) => {
-  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      onKeyDown();
-    }
-  };
-
-  return <div onKeyDown={handleKeyDown} tabIndex={0}></div>;
+    return <div onKeyDown={handleKeyDown} tabIndex={0}></div>;
 };
 
 export const SendButtonPlugin = ({ onClick }: SendButtonProps) => {

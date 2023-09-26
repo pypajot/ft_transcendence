@@ -61,6 +61,7 @@ export const JoinChanel = () => {
     const errorPriv =
         !chatContext.error.noSuchChannelName &&
         chatContext.error.wrongPrivileges;
+    const banned = !errorPriv && !errorName && chatContext.error.Banned;
 
     return (
         <Box display="flex">
@@ -113,6 +114,13 @@ export const JoinChanel = () => {
                                 </Box>
                             )}
                         </>
+                    )}
+                    {banned && (
+                        <Box display="flex" columnGap="space40">
+                            <StatusBadge as="span" variant="ProcessError">
+                                You have been ban
+                            </StatusBadge>
+                        </Box>
                     )}
                     <Button variant="primary" onClick={joinChannel}>
                         Join !

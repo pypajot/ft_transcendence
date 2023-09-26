@@ -68,18 +68,23 @@ export const UserList = (props: UserListProps) => {
                             {chatContext.conversationInfo?.name}
                         </DialogTitle>
                         <List sx={{ pt: 0 }}>
-                            {members.map((member) => (
-                                <ListItem key={member.id}>
-                                    <ListItemButton
-                                        onClick={() =>
-                                            handleListItemClick(member)
-                                        }>
-                                        <ListItemText
-                                            primary={member.username}
-                                        />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
+                            {members.map((member) => {
+                                if (chatContext.isBlocked(member.id)) {
+                                    return;
+                                }
+                                return (
+                                    <ListItem key={member.id}>
+                                        <ListItemButton
+                                            onClick={() =>
+                                                handleListItemClick(member)
+                                            }>
+                                            <ListItemText
+                                                primary={member.username}
+                                            />
+                                        </ListItemButton>
+                                    </ListItem>
+                                );
+                            })}
                         </List>
                     </Dialog>
                 )}

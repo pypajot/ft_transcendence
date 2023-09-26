@@ -132,21 +132,27 @@ export class ChatGatewayService {
                 });
                 return msg;
             } else {
+                const userId = (
+                    await this.utilsService.findIdFromSocketId(socket_id)
+                )[0];
+                console.log(userId);
                 const channel = await this.prisma.channel.findUnique({
                     where: {
                         name: info.target,
                     },
+                    include: {
+                        info: true,
+                    },
                 });
+                if (this.utilsService.isMute(userId, channel)) {
+                    return null;
+                }
                 const msg = await this.prisma.message.create({
                     data: {
                         content: info.content,
                         author: {
                             connect: {
-                                id: (
-                                    await this.utilsService.findIdFromSocketId(
-                                        socket_id
-                                    )
-                                )[0],
+                                id: userId,
                             },
                         },
                         Channel: {
@@ -195,10 +201,6 @@ export class ChatGatewayService {
         } catch (error) {
             console.log(error);
         }
-    }
-
-    sendMessage(io: Server, message: Message) {
-        io.emit('message', message);
     }
 
     async sendToUser(io: Server, message: any, socket_id: string) {

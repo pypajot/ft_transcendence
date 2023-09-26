@@ -19,6 +19,7 @@ export interface Error {
     wrongPrivileges: boolean;
     wrongPassword: boolean;
     alreadyUsedChannelName: boolean;
+    Banned: boolean;
 }
 
 type ChatContext = {
@@ -37,6 +38,7 @@ type ChatContext = {
     isAdmin: () => boolean;
     setRenderConversation: (value: boolean) => void;
     renderConversation: boolean;
+    isBlocked: (id: number) => boolean;
 };
 
 type ChatContextProviderProps = {
@@ -64,6 +66,7 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
         wrongPrivileges: false,
         wrongPassword: false,
         alreadyUsedChannelName: false,
+        Banned: false,
     });
 
     React.useEffect(() => {
@@ -160,6 +163,22 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
         },
         [channels, arrayChannels, setArrayChannels]
     );
+
+    const isBlocked = React.useCallback(
+        (id: number) => {
+            for (
+                let i = 0;
+                user && user.blocked && i < user?.blocked?.length;
+                i++
+            ) {
+                if (user?.blocked[i] == id) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        [user]
+    );
     /*
     const initChannelsRequest = React.useCallback(
         (channels: Channel[]) => {
@@ -180,6 +199,7 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
             wrongPrivileges: false,
             wrongPassword: false,
             alreadyUsedChannelName: false,
+            Banned: false,
         });
     }, [setError]);
 
@@ -210,6 +230,7 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
             isAdmin,
             setRenderConversation,
             renderConversation,
+            isBlocked,
         }),
         [
             conversationInfo,
@@ -225,6 +246,7 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
             isAdmin,
             setRenderConversation,
             renderConversation,
+            isBlocked,
         ]
     );
     return (

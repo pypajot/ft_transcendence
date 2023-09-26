@@ -7,12 +7,13 @@ import {
     WebSocketGateway,
     WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { ServerToClientEvents } from 'src/types/events';
 import { ChatGatewayService } from './chat.service';
 import { channelInfo } from 'src/types/channelInfo.entity';
 import { MessageInfo } from 'src/types/message.info';
 import { ChannelService } from './channel.service';
+import { PrismaClient } from '@prisma/client';
 
 export interface joinChannelInfo {
     name: string;
@@ -23,15 +24,15 @@ export interface joinChannelInfo {
 class ChatGateway
     implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
-    public id = 0;
-    public id_msg = 0;
     public username = null;
+    public socket_arr: Socket[] = [];
     private readonly logger = new Logger(ChatGateway.name);
     constructor(
         private readonly chatService: ChatGatewayService,
         private readonly channelService: ChannelService
     ) {}
     @WebSocketServer() io: Server<any, ServerToClientEvents>;
+    prisma = new PrismaClient();
     afterInit() {
         this.logger.log('Websocket Initialized\n');
     }
@@ -47,6 +48,7 @@ class ChatGateway
                 client.handshake.query.username
             );
         }
+        this.socket_arr[client.id] = client;
         this.logger.log(
             `Client ${client.id} ${client.handshake.query.username} arrived`
         );
@@ -59,10 +61,10 @@ class ChatGateway
     }
     @SubscribeMessage('message')
     async handleEvent(client: any, data: MessageInfo): Promise<void> {
-        const newMsg = this.chatService.createMessage(client.id, data);
-        if (data.ToUser) {
+        const newMsg = await this.chatService.createMessage(client.id, data);
+        if (data.ToUser && newMsg) {
             this.chatService.sendToUser(this.io, await newMsg, client.id);
-        } else {
+        } else if (newMsg != null) {
             client.join(data.target);
             this.channelService.sendToChannel(
                 this.io,
@@ -107,6 +109,57 @@ class ChatGateway
     @SubscribeMessage('friendsRequest')
     handleFriendsRequest(client: any, target: string): void {
         this.chatService.requestFriends(this.io, client.id, target);
+    }
+
+    @SubscribeMessage('MuteUser')
+    handleMuteRequest(client: any, data: any) {
+        this.channelService.muteUser(client, data.targetId, data.channelName);
+    }
+
+    @SubscribeMessage('UnmuteUser')
+    async handleUnMuteRequest(client: any, data: any) {
+        const channel = await this.prisma.channel.findUnique({
+            where: {
+                name: data.channelName,
+            },
+            include: {
+                info: true,
+            },
+        });
+        if (channel) {
+            const moderation = channel.info;
+            if (moderation) {
+                moderation.map((elem) => {
+                    if (elem.type == 'mute' && elem.targetId == data.targetId) {
+                        this.channelService.unMute(
+                            data.targetId,
+                            channel,
+                            elem.id
+                        );
+                    }
+                });
+            }
+        }
+    }
+
+    @SubscribeMessage('KickUser')
+    handleKickRequest(client: any, data: any) {
+        this.channelService.KickUser(
+            this.io,
+            data.targetId,
+            data.channelName,
+            this.socket_arr
+        );
+    }
+
+    @SubscribeMessage('BanUser')
+    handleBanRequest(client: any, data: any) {
+        this.channelService.BanUser(this.io, data.targetId, data.channelName);
+    }
+
+    @SubscribeMessage('UnbanUser')
+    handleUnBanRequest(client: any, data: any) {
+        this.channelService.unBan(data.targetId, data.channelName);
     }
 }
 
