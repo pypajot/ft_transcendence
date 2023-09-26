@@ -230,4 +230,25 @@ export class UserService {
 		})
 		server.to(newUser.socketId).emit("updateUser", await this.getMe(newUser.id));
 	}
+
+	async unblockUser(content: any, server: any) {
+		const target = await this.prisma.user.findUnique({
+			where: { username: content.targetName },
+		});
+		if (!target)
+			throw new WsException({func: "unblockUser", msg: "No such user"});
+		const user = await this.prisma.user.findUnique({
+			where: { id: content.userId },
+		});
+		if (!user.blocked.includes(target.id))
+			throw new WsException({func: "unblockUser", msg: "User is not blocked"});
+		user.blocked.splice(user.blocked.indexOf(target.id), 1);
+		const newUser = await this.prisma.user.update({
+			where: { id: content.userId },
+			data: {
+				blocked: user.blocked
+			}
+		})
+		server.to(newUser.socketId).emit("updateUser", await this.getMe(newUser.id));
+	}
 }

@@ -10,6 +10,11 @@ const Friends = () => {
 	const { user } = useAuth()
 	const [friendError, setFriendError] = useState<string | null>(null);
 	const [blockError, setBlockError] = useState<string | null>(null);
+	const [unblockError, setUnblockError] = useState<string | null>(null);
+
+	useEffect(() => {
+		setSocketError(null);
+	}, [])
 
 	useEffect(() => {
 		console.log(socketError)
@@ -18,6 +23,8 @@ const Friends = () => {
 			setFriendError(socketError.msg);
 		if (socketError.func === "blockUser")
 			setBlockError(socketError.msg);
+		if (socketError.func === "unblockUser")
+			setUnblockError(socketError.msg);
 	}, [socketError])
 
 	async function SendFriendRequest(e: any) {
@@ -74,6 +81,33 @@ const Friends = () => {
 		)
 	}
 
+	async function UnblockUser(e: any) {
+		e.preventDefault();
+		setSocketError(null);
+		setUnblockError(null);
+		socket?.emit("unblockUser", {targetName: e.target.username.value, userId: user?.id});
+	}
+	
+	function UnblockUserForm() {
+		return (
+			<>
+			<form onSubmit={UnblockUser}>
+				<div>
+					<label>
+						Username: <input type="text" name="username" />
+						<HelperText errorText={unblockError} />
+					</label>
+				</div>
+				<div>
+					<button type="submit">
+						Unblock user
+					</button>
+				</div>
+			</form>
+		</>
+		)
+	}
+
 	function FriendRequestList() {
 		const { user, setUser } = useAuth();
 		const { socket } = useSocketContext()
@@ -105,6 +139,9 @@ const Friends = () => {
 		<Navbar />
 		<div>
 				<BlockUserForm />
+			</div>
+			<div>
+				<UnblockUserForm />
 			</div>
 			<div>
 				<FriendRequestForm />
