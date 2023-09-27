@@ -82,8 +82,7 @@ export default function SocketContextProvider(
     // };
 	// }, [])
 
-	const refresh = async (content: any) => {
-		console.log("refresh: ", content)
+	const refresh = async () => {
 		const response = await fetch('http://localhost:3333/auth/refresh', {
 			method: 'GET',
 			headers: {
@@ -100,6 +99,7 @@ export default function SocketContextProvider(
 	  if (!user) return;
 	  console.log(user);
     const newSocket = io("http://localhost:3333/", {
+		reconnectionDelay: 3000,
         query: {
           token: sessionStorage.getItem('access_token'),
           username: user.username,
@@ -124,9 +124,16 @@ export default function SocketContextProvider(
 	});
 	newSocket.on("updateStatus", (args) => {
 		console.log("args", args);
-		setUser((currentUser: any) => {
+		setUser(currentUser => {
+			if (!currentUser)
+				return null;
+			console.log("currentuser: ", currentUser);
 			let newUser = currentUser;
-			newUser.friends[newUser.friends.findIndex(((obj: any) => obj.id === args.id))].status = args.status;
+			const index = newUser?.friends.findIndex(((obj: any) => obj.id === args.id));
+			console.log("index: ", index);
+			newUser.friends[index].status = args.status;
+			console.log("newuser status: ", newUser.friends[index].status);
+			console.log("newUser: ", newUser);
 			return newUser;
 		})
 		console.log("status: ", user);

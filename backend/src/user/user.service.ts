@@ -158,7 +158,7 @@ export class UserService {
 				friendsRequest: user.friendsRequest
 			}
 		})
-		if (content.accept) {
+		if (!content.accept) {
 			server.to(user.socketId).emit("updateUser", await this.getMe(user.id));
 			return ;
 		}
@@ -174,7 +174,7 @@ export class UserService {
 				friends: { push: content.userId}
 			}
 		})
-		console.log()
+		console.log();
 		server.to(newFriend.socketId).emit("updateUser", await this.getMe(newFriend.id));
 		server.to(newUser.socketId).emit("updateUser", await this.getMe(newUser.id));
 	}
@@ -259,7 +259,8 @@ export class UserService {
 				status: status
 			}
 		})
-		server.to(user.socketId).emit("updateUser", await this.getMe(user.id));
+		if (status !== "offline")
+			server.to(user.socketId).emit("updateUser", await this.getMe(user.id));
 		for (const friendId of user.friends) {
 			let friend = await this.prisma.user.findUnique({ where: {id: friendId}});
 			server.to(friend.socketId).emit("updateStatus", {id: user.id, status: status});

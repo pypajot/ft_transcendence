@@ -5,14 +5,21 @@ import { useRef } from "react";
 
 export const useAuth = () => useContext(AuthContext);
 
+export interface Friend {
+	id: number
+	username: string
+	avatar: string
+	status: string
+}
+
 export interface User {
 	id: number
 	username: string
 	avatar: string
 	socketId?: string
 	twoFactorAuthActive: boolean
-	friends: {id: number, username: string}[]
-	friendsRequest: {id: number, username: string}[]
+	friends: Friend[]
+	friendsRequest: Friend[]
 	blocked: number[]
 
 }
