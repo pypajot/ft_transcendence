@@ -157,7 +157,6 @@ const Profile = () => {
 		)
 	}
 
-
 	const activate2FA = async () => {
 		await refreshFetch('http://localhost:3333/auth/2fa/activate', {
 			method: 'GET',
@@ -170,6 +169,55 @@ const Profile = () => {
 		.then((response: any) => setImagePath(response.imagePath.path));
 	}
 
+	type GameType = {
+		id: string;
+		winner: {
+		  username: string;
+		};
+		loser: {
+		  username: string;
+		};
+		winnerScore: number;
+		loserScore: number;
+	  };
+
+	function MatchHistoryDisplay() {
+		const run = useRef(false);
+		const [matchHistory, setMatchHistory] = useState<GameType[]>([]);
+	  
+		useEffect(() => {
+		  const fetchMatchHistory = async () => {
+			try {
+			  const response = await refreshFetch('http://localhost:3333/profile/match-history', {
+				headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` }
+			  });
+			  const games = await response.json();
+			  setMatchHistory(games);
+			} catch (error) {
+			  console.error('Error fetching match history:', error);
+			}
+		  };
+		  if (!run.current)
+			fetchMatchHistory();
+		  run.current = true;
+		}, []);
+	  
+		return (
+		  <div>
+			<h2>Match History</h2>
+			<ul>
+			  {matchHistory.map(game => (
+				<li key={game.id}>
+				  Opponent: {game.winner.username === user?.username ? game.loser.username : game.winner.username} - 
+				  {game.winner.username === user?.username ? 'Win' : 'Loss'} -
+				  Score: {game.winnerScore} - {game.loserScore}
+				</li>
+			  ))}
+			</ul>
+		  </div>
+		);
+	  }
+	  
 	return (
 		<>
 			<Navbar/>
@@ -205,6 +253,8 @@ const Profile = () => {
 				</Checkbox>
 				
 				<QrDisplay />
+
+				<MatchHistoryDisplay />
 			</div>
 			
 		</>

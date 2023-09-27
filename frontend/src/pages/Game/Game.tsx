@@ -3,21 +3,27 @@ import PongGame from './PongGame';
 import ModeSelection from './modeSelection';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useGameContext } from '../../context/GameContext';
+import { useLocation } from 'react-router-dom';
 
 // Game component to render ether the game or the select mode page
 
-const Game: React.FC = () => {
-    //const { socket } = useSocketContext(); // Access the WebSocket context
-    const { gameStart, setGameStart } = useGameContext();
+const Game : React.FC = () => {
+	const {gameStart, setGameStart} = useGameContext();
+	const location = useLocation();
 
-    useEffect(() => {
-        // reset gameStart state when component unmounts
-        return () => {
-            setGameStart(false);
-        };
-    }, []);
-
-    return <div>{gameStart ? <PongGame /> : <ModeSelection />}</div>;
+	useEffect(() => {
+		setGameStart(false);
+	}, []);
+	useEffect(() => {
+		if (location?.state) {
+			setGameStart(true);
+		}
+	}, [location]);
+	return (
+		<div>
+			{gameStart ? <PongGame /> : <ModeSelection />}
+		</div>
+	);
 };
 
 export default Game;

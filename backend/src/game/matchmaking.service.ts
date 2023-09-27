@@ -3,33 +3,33 @@ import { GameConfiguration, GameMode, GameService } from './game.service';
 import { Injectable } from '@nestjs/common';
 
 const classicGameConfig: GameConfiguration = {
-    mode: GameMode.Classic,
-    ballSpeed: 1,
-    ballSpeedIncreaseFactor: 1.2,
-    paddleWidth: 10,
-    paddleHeight: 50,
-    paddleMoveSpeed: 4,
-    goalLimit: 5,
+  mode: GameMode.Classic,
+  ballSpeed: 3,
+  ballSpeedIncreaseFactor: 1.1,
+  paddleWidth: 10,
+  paddleHeight: 50,
+  paddleMoveSpeed: 7,
+  goalLimit: 5,
 };
 
 const partyGameConfig: GameConfiguration = {
-    mode: GameMode.Party,
-    ballSpeed: 1,
-    ballSpeedIncreaseFactor: 1.2,
-    paddleWidth: 10,
-    paddleHeight: 50,
-    paddleMoveSpeed: 4,
-    goalLimit: 5,
+  mode: GameMode.Party,
+  ballSpeed: 3,
+  ballSpeedIncreaseFactor: 1.1,
+  paddleWidth: 10,
+  paddleHeight: 50,
+  paddleMoveSpeed: 7,
+  goalLimit: 5,
 };
 
 const hardcoreGameConfig: GameConfiguration = {
-    mode: GameMode.Hardcore,
-    ballSpeed: 1.75,
-    ballSpeedIncreaseFactor: 1.4,
-    paddleWidth: 10,
-    paddleHeight: 50,
-    paddleMoveSpeed: 5,
-    goalLimit: 1,
+  mode: GameMode.Hardcore,
+  ballSpeed: 5,
+  ballSpeedIncreaseFactor: 1.2,
+  paddleWidth: 10,
+  paddleHeight: 50,
+  paddleMoveSpeed: 10,
+  goalLimit: 1,
 };
 
 @Injectable()
@@ -83,40 +83,67 @@ export class MatchmakingService {
         }
     }
 
-    // Attempt to match players in the queue
-    tryMatchPlayers(mode: string): string {
-        // Select the appropriate queue based on the game mode
-        let queue: Player[];
-        let gameConfiguration: GameConfiguration;
-        let gameId: string;
-        if (mode === GameMode.Classic) {
-            queue = this.classicQueue;
-            gameConfiguration = classicGameConfig;
-        } else if (mode === GameMode.Party) {
-            queue = this.partyQueue;
-            gameConfiguration = partyGameConfig;
-        } else if (mode === GameMode.Hardcore) {
-            queue = this.hardcoreQueue;
-            gameConfiguration = hardcoreGameConfig;
-        }
-        if (queue.length >= 2) {
-            // Match the first two players and remove them from the queue
-            const player1 = queue.shift()!;
-            const player2 = queue.shift()!;
-            // tell the players that they are matched
-            player1.socket.emit('matched');
-            player2.socket.emit('matched');
-            // Initialize a new game session with these players
-            gameId = player1.socket.id + player2.socket.id;
-            this.gameService[gameId] = new GameService();
-            this.gameService[gameId].initGame(
-                gameConfiguration,
-                player1,
-                player2,
-                gameId
-            );
-            return gameId;
-        }
-        return undefined;
+  // Attempt to match players in the queue
+  tryMatchPlayers(mode: string): string {
+    // Select the appropriate queue based on the game mode
+    let queue: Player[];
+    let gameConfiguration: GameConfiguration;
+    let gameId: string;
+    if (mode === GameMode.Classic) {
+      queue = this.classicQueue;
+      gameConfiguration = classicGameConfig;
+    } 
+    else if (mode === GameMode.Party) {
+      queue = this.partyQueue;
+      gameConfiguration = partyGameConfig;
+    } 
+    else if (mode === GameMode.Hardcore) {
+      queue = this.hardcoreQueue;
+      gameConfiguration = hardcoreGameConfig;
     }
+    if (queue.length >= 2) {
+      // Match the first two players and remove them from the queue
+      const player1 = queue.shift()!;
+      const player2 = queue.shift()!;
+      // tell the players that they are matched
+      player1.socket.emit('matched');
+      player2.socket.emit('matched');
+      // Initialize a new game session with these players
+      gameId = player1.socket.id + player2.socket.id;
+      this.gameService[gameId] = new GameService();
+      this.gameService[gameId].initGame(
+        gameConfiguration,
+        player1,
+        player2,
+        gameId,
+      );
+      return gameId;
+    }
+    return undefined;
+  }
+
+  launchFromChat(player1: Player, player2: Player, mode: string): string {
+    let gameConfiguration: GameConfiguration;
+    if (mode === GameMode.Classic) {
+      gameConfiguration = classicGameConfig;
+    } 
+    else if (mode === GameMode.Party) {
+      gameConfiguration = partyGameConfig;
+    } 
+    else if (mode === GameMode.Hardcore) {
+      gameConfiguration = hardcoreGameConfig;
+    }
+    player1.socket.emit('matched');
+    player2.socket.emit('matched');
+    // Initialize a new game session with these players
+    const gameId = player1.socket.id + player2.socket.id;
+    this.gameService[gameId] = new GameService();
+    this.gameService[gameId].initGame(
+      gameConfiguration,
+      player1,
+      player2,
+      gameId,
+    );
+    return gameId;
+  }
 }

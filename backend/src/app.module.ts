@@ -11,6 +11,7 @@ import { GameGateway } from './game/game.gateway';
 import { UserGateway } from './user/user.gateway';
 import { GameService } from './game/game.service';
 import { MatchmakingService } from './game/matchmaking.service';
+import { MatchHistoryModule } from './match_history/match-history.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MatchmakingService } from './game/matchmaking.service';
     }),
     ChatModule,
     UserModule,
+    MatchHistoryModule,
     AuthModule,
     PrismaModule,
   ],

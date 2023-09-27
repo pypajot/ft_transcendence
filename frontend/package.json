@@ -38,6 +38,8 @@
     "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
+    "@swc/cli": "^0.1.62",
+    "@swc/core": "^1.3.88",
     "@types/draft-js": "^0.11.12",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
