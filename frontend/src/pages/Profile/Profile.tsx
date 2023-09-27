@@ -168,6 +168,7 @@ const Profile = () => {
 	  };
 
 	function MatchHistoryDisplay() {
+		const run = useRef(false);
 		const [matchHistory, setMatchHistory] = useState<GameType[]>([]);
 	  
 		useEffect(() => {
@@ -182,8 +183,10 @@ const Profile = () => {
 			  console.error('Error fetching match history:', error);
 			}
 		  };
-		  fetchMatchHistory();
-		}, [refreshFetch]);
+		  if (!run.current)
+			fetchMatchHistory();
+		  run.current = true;
+		}, []);
 	  
 		return (
 		  <div>
