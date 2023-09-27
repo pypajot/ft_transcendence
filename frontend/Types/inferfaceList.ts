@@ -39,4 +39,5 @@ export interface User {
     friends: Friend[];
     friendsRequest: Friend[];
     blocked: number[];
+	status: string;
 }

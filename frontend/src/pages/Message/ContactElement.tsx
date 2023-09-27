@@ -11,6 +11,7 @@ export const ContactElement = ({ content }: { content: ContactType }) => {
             ischannel: content.channel,
             isUser: content.user,
             name: content.name,
+			status: content.status
         };
         chatContext.setConversationInfo(conversationInfo);
     };
@@ -30,7 +31,7 @@ export const ContactElement = ({ content }: { content: ContactType }) => {
                 paddingTop="space50">
                 <SidebarBody>
                     <h3 color="white" onClick={() => handleContact(content)}>
-                        {content.name}
+                        {content.status === "" ? content.name : content.name + " " + content.status}
                     </h3>
                 </SidebarBody>
             </Box>

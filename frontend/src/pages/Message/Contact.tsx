@@ -81,6 +81,7 @@ export const Contact = () => {
                                         channel: true,
                                         user: false,
                                         name: channel.name,
+										status: "",
                                     }}></ContactElement>
                             </div>
                         );
@@ -100,6 +101,7 @@ export const Contact = () => {
                                     channel: false,
                                     user: true,
                                     name: user.username,
+									status: user.status,
                                 }}></ContactElement>
                         </div>
                     );

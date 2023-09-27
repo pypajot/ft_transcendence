@@ -300,10 +300,12 @@ export class UserService {
                 status: status,
             },
         });
-        if (status !== 'offline')
+        if (status !== 'offline') {
             server
                 .to(user.socketId)
                 .emit('updateUser', await this.getMe(user.id));
+			console.log("update online");
+		}
         for (const friendId of user.friends) {
             const friend = await this.prisma.user.findUnique({
                 where: { id: friendId },

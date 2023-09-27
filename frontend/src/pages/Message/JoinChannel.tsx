@@ -36,6 +36,7 @@ export const JoinChanel = () => {
                 ischannel: true,
                 isUser: false,
                 name: arg.name,
+				status: arg.name,
             };
             chatContext.setConversationInfo(convInfo);
         },
