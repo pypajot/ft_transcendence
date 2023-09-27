@@ -84,31 +84,31 @@ export class UserService {
         }
     }
 
-    async changeUsername(id: number, newName: string) {
-        if (newName === '')
-            throw new BadRequestException('Name cannot be empty');
+    async changeUsername(socketId: string, new_name: string, server: any) {
+        if (new_name === '')
+            throw new WsException('Name cannot be empty');
         let user = await this.prisma.user.findUnique({
-            where: { username: newName },
+            where: { username: new_name },
         });
-        if (user) throw new ForbiddenException('Name already in use');
+        if (user) throw new WsException('Name already in use');
         user = await this.prisma.user.update({
-            where: { id: id },
+            where: { socketId: socketId },
             data: {
-                username: newName,
+                username: new_name,
             },
         });
-        return { username: user.username };
+		await this.updateUserAndFriends(user, server);
     }
 
-    async changeAvatar(id: number, file: string) {
+    async changeAvatar(socketId: string, file: string, server: any) {
         const user = await this.prisma.user.update({
-            where: { id: id },
+            where: { socketId: socketId },
             data: {
                 avatar: file,
             },
         });
         if (!user) throw new ForbiddenException('No such user');
-        return user;
+		await this.updateUserAndFriends(user, server);
     }
 
     async addFriend(
@@ -293,6 +293,20 @@ export class UserService {
             .emit('updateUser', await this.getMe(newUser.id));
     }
 
+	async updateUserAndFriends(user: any, server: any) {
+		server
+			.to(user.socketId)
+			.emit('updateUser', await this.getMe(user.id));
+        for (const friendId of user.friends) {
+            const friend = await this.prisma.user.findUnique({
+                where: { id: friendId },
+            });
+            server
+                .to(friend.socketId)
+                .emit('updateUser', await this.getMe(friend.id));
+        }
+	}
+
     async changeStatus(socketId: string, status: string, server: any) {
         const user = await this.prisma.user.update({
             where: { socketId: socketId },
@@ -300,19 +314,6 @@ export class UserService {
                 status: status,
             },
         });
-        if (status !== 'offline') {
-            server
-                .to(user.socketId)
-                .emit('updateUser', await this.getMe(user.id));
-			console.log("update online");
-		}
-        for (const friendId of user.friends) {
-            const friend = await this.prisma.user.findUnique({
-                where: { id: friendId },
-            });
-            server
-                .to(friend.socketId)
-                .emit('updateStatus', { id: user.id, status: status });
-        }
+        await this.updateUserAndFriends(user, server);
     }
 }

@@ -44,16 +44,17 @@ const Profile = () => {
 			console.log(fileUrl);
 			if (!fileUrl)
 				return ;
-			const response = await refreshFetch("http://localhost:3333/user/avatar", {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
-				},
-				body: JSON.stringify({file: fileUrl})
-			});
-			if (response.status === 201)
-				user && setUser({...user, avatar: fileUrl});
+			socket?.emit("changeAvatar", fileUrl);
+			// const response = await refreshFetch("http://localhost:3333/user/avatar", {
+			// 	method: 'POST',
+			// 	headers: {
+			// 		'Content-Type': 'application/json',
+			// 		'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
+			// 	},
+			// 	body: JSON.stringify({file: fileUrl})
+			// });
+			// if (response.status === 201)
+			// 	user && setUser({...user, avatar: fileUrl});
 		}
 		return (
 			<>
@@ -97,18 +98,20 @@ const Profile = () => {
 		async function HandleChangeUsername(e: any) {
 			e.preventDefault();
 			setUsernameError(null);
-			const response = await refreshFetch('http://localhost:3333/user/username', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
-				},
-				body: JSON.stringify({newName: e.target.username.value})
-			});
-			if (response.status === 201)
-				user && setUser({...user, username: e.target.username.value})
-			else if (response.status !== 401)
-				setUsernameError((await response.json()).message);
+			socket?.emit("changeUsername", e.target.username.value);
+
+			// const response = await refreshFetch('http://localhost:3333/user/username', {
+			// 	method: 'POST',
+			// 	headers: {
+			// 		'Content-Type': 'application/json',
+			// 		'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
+			// 	},
+			// 	body: JSON.stringify({newName: e.target.username.value})
+			// });
+			// if (response.status === 201)
+			// 	user && setUser({...user, username: e.target.username.value})
+			// else if (response.status !== 401)
+			// 	setUsernameError((await response.json()).message);
 		}
 
 		return (

@@ -1,0 +1,8 @@
+.contact {
+	display: flex;
+	justify-content: space-between;
+}
+
+img {
+	border-radius: 50%;
+}

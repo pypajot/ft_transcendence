@@ -140,19 +140,15 @@ export default function SocketContextProvider(
         newSocket.on('updateStatus', (args) => {
             console.log('args', args);
 			console.log("update status: ", user);
-            setUser((currentUser) => {
-                if (!currentUser) return null;
-                console.log('currentuser: ', currentUser);
-                let newUser = currentUser;
-                const index = newUser?.friends.findIndex(
-                    (obj: any) => obj.id === args.id
-                );
-                console.log('index: ', index);
-                newUser.friends[index].status = args.status;
-                console.log('newuser status: ', newUser.friends[index].status);
-                console.log('newUser: ', newUser);
-                return newUser;
-            });
+			let newUser = user;
+			const index = newUser?.friends.findIndex(
+				(obj: any) => obj.id === args.id
+			);
+			console.log('index: ', index);
+			newUser.friends[index].status = args.status;
+			console.log('newuser status: ', newUser.friends[index].status);
+			console.log('newUser: ', newUser);
+            setUser(newUser);
             console.log('status: ', user);
         });
         newSocket.on('error', (msg) => console.log('error: ', msg));

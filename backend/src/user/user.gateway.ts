@@ -26,6 +26,16 @@ export class UserGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		await this.userService.updateUser(user);
 	}
 
+	@SubscribeMessage('changeAvatar')
+	async handleChangeAvatar(client: Socket, path: string) {
+		await this.userService.changeAvatar(client.id, path, this.server);
+	}
+
+	@SubscribeMessage('changeUsername')
+	async handleChangeUsername(client: Socket, new_name: string) {
+		await this.userService.changeUsername(client.id, new_name, this.server);
+	}
+
 	@SubscribeMessage('addFriend')
 	async handleAddFriend(client: Socket, content: any) {
 		await this.userService.addFriend(content, this.server);
