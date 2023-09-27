@@ -152,7 +152,7 @@ export default function ChannelContextProvider(
                     ?.info.map((moderation) => {
                         if (
                             moderation.type == 'ban' &&
-                            userId == moderation.target.id
+                            userId == moderation.targetId
                         ) {
                             res = true;
                         }
@@ -188,13 +188,15 @@ export default function ChannelContextProvider(
     const isMute = React.useCallback(
         (userId: number) => {
             let res = false;
+            console.log('ISMUTE:');
             if (chatContext.conversationInfo && channels) {
                 channels
                     .get(chatContext.conversationInfo.name)
                     ?.info.map((moderation) => {
+                        console.log(moderation, userId);
                         if (
                             moderation.type == 'mute' &&
-                            userId == moderation.target.id
+                            userId == moderation.targetId
                         ) {
                             res = true;
                         }

@@ -152,11 +152,11 @@ export const Conversation = () => {
             if (user && message.senderName != user.username) {
                 message.sent = false;
             }
-            if (
-                message.channel &&
-                message.channel.name == chatContext.conversationInfo?.name
-            )
+            if (message?.channel?.name == chatContext.conversationInfo?.name) {
+                console.log([...conversationMsg, message]);
                 setConversationMsg([...conversationMsg, message]);
+            }
+            console.log(conversationMsg);
         },
         [setConversationMsg, conversationMsg, user]
     );

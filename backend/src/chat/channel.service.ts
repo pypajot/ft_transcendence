@@ -146,7 +146,7 @@ export class ChannelService {
                     },
                 },
             });
-            io.to(user.socketId).emit('Kicked', channel);
+            io.to(user.socketId).emit('Kicked', channel.name);
         } catch (error) {
             console.log(error);
         }
@@ -389,7 +389,6 @@ export class ChannelService {
                 },
             });
             channel.members.map((user) => {
-                console.log(` teasssee : ${user.id}`);
                 io.to(user.socketId).emit('updateChannel', channel);
             });
         } catch (error) {
@@ -455,7 +454,7 @@ export class ChannelService {
                         members: true,
                     },
                 });
-                console.log(newUpdatedChannel);
+                client.join(newUpdatedChannel.name);
                 client.emit('successfullyJoinedChannel', newUpdatedChannel);
                 this.updateChannel(io, info.name);
             } else {
@@ -489,6 +488,7 @@ export class ChannelService {
                 ...message,
                 senderName: sender.username,
                 sent: true,
+                channel: message.Channel,
             };
             io.to(channel_name).emit('messageChannel', msgRes);
         } catch (error) {

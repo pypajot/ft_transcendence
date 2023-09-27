@@ -95,13 +95,10 @@ export class ChatControllerService {
             ) {
                 if (channel.messages[i].authorId != user.id) {
                     const msg: Message = {
-                        id: channel.messages[i].id,
-                        content: channel.messages[i].content,
-                        createdAt: channel.messages[i].createdAt,
+                        ...channel.messages[i],
                         senderName: await this.serviceUtils.findUsernameFromId(
                             channel.messages[i].authorId
                         ),
-                        authorId: channel.messages[i].authorId,
                         sent: false,
                     };
                     res.push(msg);
@@ -135,12 +132,11 @@ export class ChatControllerService {
                 for (let i = 0; i < channel.messages.length; i++) {
                     if (channel.messages[i].authorId == user.id) {
                         const msg: Message = {
-                            id: channel.messages[i].id,
-                            content: channel.messages[i].content,
-                            createdAt: channel.messages[i].createdAt,
-                            senderName: user_name,
-                            authorId: channel.messages[i].authorId,
-                            targetId: channel.messages[i].targetId,
+                            ...channel.messages[i],
+                            senderName:
+                                await this.serviceUtils.findUsernameFromId(
+                                    channel.messages[i].authorId
+                                ),
                             sent: true,
                         };
                         res.push(msg);
@@ -167,7 +163,18 @@ export class ChatControllerService {
                     targetId: receiver.id,
                 },
             });
-            return JSON.stringify(messages);
+            const res: Message[] = [];
+            for (let i = 0; i < messages.length; i++) {
+                const msg: Message = {
+                    ...messages[i],
+                    senderName: await this.serviceUtils.findUsernameFromId(
+                        messages[i].authorId
+                    ),
+                    sent: true,
+                };
+                res.push(msg);
+            }
+            return JSON.stringify(res);
         } catch (error) {
             console.log(error);
         }

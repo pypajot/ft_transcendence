@@ -25,7 +25,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
 
     const handleMute = () => {
         if (target) {
-            socket.emit('MuteUser', {
+            socket?.emit('MuteUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });
@@ -33,7 +33,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     };
     const handleBan = () => {
         if (target) {
-            socket.emit('BanUser', {
+            socket?.emit('BanUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });
@@ -42,7 +42,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
 
     const handleKick = () => {
         if (target) {
-            socket.emit('KickUser', {
+            socket?.emit('KickUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });
@@ -59,7 +59,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
 
     const handleBlock = () => {
         if (target) {
-            socket.emit('BlockUser', {
+            socket?.emit('BlockUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });

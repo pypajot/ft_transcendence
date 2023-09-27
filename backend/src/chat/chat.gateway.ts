@@ -65,14 +65,14 @@ class ChatGateway
         if (data.ToUser && newMsg) {
             this.chatService.sendToUser(this.io, await newMsg, client.id);
         } else if (newMsg != null) {
-            client.join(data.target);
             this.channelService.sendToChannel(
                 this.io,
-                await newMsg,
+                newMsg,
                 client.id,
                 data.target
             );
         }
+        this.logger.log(newMsg);
         //		this.chatService.sendMessage(this.io, message_obj);
     }
 
@@ -84,7 +84,7 @@ class ChatGateway
 
     @SubscribeMessage('ChannelMessage')
     handleChannelMessage(client: any, data: string[]): void {
-        console.log(`${data[0]}, ${data[1]}`);
+        console.log(`this is life ${data[0]}, ${data[1]}`);
         this.channelService.sendToChannel(this.io, data[0], data[1], client.id);
     }
     @SubscribeMessage('ChannelCreation')
@@ -154,6 +154,8 @@ class ChatGateway
 
     @SubscribeMessage('BanUser')
     handleBanRequest(client: any, data: any) {
+        console.log('salut');
+        console.log(data.targetId, data.channelName);
         this.channelService.BanUser(this.io, data.targetId, data.channelName);
     }
 

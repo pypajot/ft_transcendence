@@ -33,6 +33,7 @@ export const UserList = (props: UserListProps) => {
     };
 
     React.useEffect(() => {
+        setTarget(undefined);
         const buff: User[] = [];
         if (channelContext.channels && chatContext.conversationInfo) {
             const memberList = channelContext.channels.get(
