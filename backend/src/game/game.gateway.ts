@@ -220,18 +220,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (lobbyId === undefined) {
       return;
     }
-    const gameService = this.matchmakingService.gameService[lobbyId];
-    let gameState = gameService.getGameState();
-    const player1 = gameService.player1;
-    const player2 = gameService.player2;
-    const gameId = gameService.gameId;
     // create a loop with a delay of 50ms
     this.intervals[lobbyId] = setInterval(async () => {
+      const gameService = this.matchmakingService.gameService[lobbyId];
       // check if the game service still exists
-      if (gameService === undefined) {
+      if (gameService === undefined || gameService === null) {
         clearInterval(this.intervals[lobbyId]);
         return;
       }
+      let gameState = gameService.getGameState();
+      const player1 = gameService.player1;
+      const player2 = gameService.player2;
+      const gameId = gameService.gameId;
       gameService.updateGameState(); // Update the game state
       gameState = gameService.getGameState(); // Get the updated game state
       // check for game end

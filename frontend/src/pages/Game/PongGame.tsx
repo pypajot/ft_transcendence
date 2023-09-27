@@ -20,7 +20,7 @@ const PongGame : React.FC = () => {
   const [userName2, setUserName2] = useState<string>('');
 
   useEffect(() => {
-    // Send custom event to request game state from the server
+    // Send event to request game state from the server
     socket?.on('createLobby', (lobbyId: string, userName1: string, userName2: string) => {
       setLobbyId(lobbyId);
       setUserName1(userName1);
@@ -68,7 +68,6 @@ const PongGame : React.FC = () => {
   };
 
   const handleGameEnd = (data: any, forfait: boolean) => {
-    // display game end message
     setGameEnd(true);
     setShowBall(false);
     if (data === socket?.id) {
