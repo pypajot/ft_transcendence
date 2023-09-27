@@ -173,7 +173,7 @@ const Profile = () => {
 		useEffect(() => {
 		  const fetchMatchHistory = async () => {
 			try {
-			  const response = await refreshFetch('http://localhost:3333/user/match-history', {
+			  const response = await refreshFetch('http://localhost:3333/profile/match-history', {
 				headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` }
 			  });
 			  const games = await response.json();

@@ -65,6 +65,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleForfait(client: any, id: {lobbyId: string}): Promise<void> {
+    console.log ('forfait detected');
     const lobbyId = id.lobbyId;
     const forfait = true;
     if (lobbyId === undefined) {
@@ -216,51 +217,59 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client: any,
     id: { lobbyId: string },
   ): Promise<void> {
+    console.log('game state requested');
     const lobbyId = id.lobbyId;
-    if (lobbyId === undefined) {
+    if (lobbyId === undefined || lobbyId === null) {
       return;
     }
+    if (this.intervals[lobbyId]) {
+      clearInterval(this.intervals[lobbyId]);
+      delete this.intervals[lobbyId];
+    }
+    const gameService = this.matchmakingService.gameService[lobbyId];
+    let   gameState = gameService.getGameState();
+    const player1 = gameService.player1;
+    const player2 = gameService.player2;
+    const gameId = gameService.gameId;
     // create a loop with a delay of 50ms
     this.intervals[lobbyId] = setInterval(async () => {
-      const gameService = this.matchmakingService.gameService[lobbyId];
-      // check if the game service still exists
-      if (gameService === undefined || gameService === null) {
+      if (lobbyId === undefined || lobbyId === null) {
         clearInterval(this.intervals[lobbyId]);
+        delete this.intervals[lobbyId];
         return;
       }
-      let gameState = gameService.getGameState();
-      const player1 = gameService.player1;
-      const player2 = gameService.player2;
-      const gameId = gameService.gameId;
+      if (gameService === undefined || gameService === null) {
+        clearInterval(this.intervals[lobbyId]);
+        delete this.intervals[lobbyId];
+        return;
+      }
       gameService.updateGameState(); // Update the game state
       gameState = gameService.getGameState(); // Get the updated game state
       // check for game end
       if (gameService.player1.score === gameService.goalLimit) {
-        if (client.id === player1.socket.id)
-          this.handleUpdateDB(player1, player2, gameId);
-        client.emit('gameEnd', player1.socket.id, false);
+        this.handleUpdateDB(player1, player2, gameId);
+        player1.socket.emit('gameEnd', player1.socket.id, false);
+        player2.socket.emit('gameEnd', player1.socket.id, false);
         clearInterval(this.intervals[lobbyId]);
+        delete this.intervals[lobbyId];
       } 
       else if ( gameService.player2.score === gameService.goalLimit) {
-        if (client.id === player1.socket.id)
-          this.handleUpdateDB(player2, player1, gameId);
-        client.emit('gameEnd', player2.socket.id, false);
+        this.handleUpdateDB(player2, player1, gameId);
+        player1.socket.emit('gameEnd', player2.socket.id, false);
+        player2.socket.emit('gameEnd', player2.socket.id, false);
         clearInterval(this.intervals[lobbyId]);
+        delete this.intervals[lobbyId];
       }
       // Send the game state to the client
-      client.emit('gameState', gameState);
+      player1.socket.emit('gameState', gameState);
+      player2.socket.emit('gameState', gameState);
     }, 1000 / 60);
   }
-  
-  // @SubscribeMessage('forfait')
-  // handleForfaitEvent(client: Socket, id: {lobbyId: string}): void {
-  //   this.handleForfait(client, id);
-  // }
 
   @SubscribeMessage('destroyLobby')
   handleDestroyLobby(client: Socket, id: { lobbyId: string }): void {
     const lobbyId = id.lobbyId;
-    if (lobbyId === undefined) {
+    if (lobbyId === undefined || lobbyId === null) {
       return;
     }
     console.log(`Lobby ${lobbyId} destroyed`);

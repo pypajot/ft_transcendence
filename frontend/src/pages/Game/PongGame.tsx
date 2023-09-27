@@ -44,6 +44,7 @@ const PongGame : React.FC = () => {
     });
 
     socket?.on('gameEnd', (data: any, forfait: boolean) => {
+      console.log('Game end received');
       handleGameEnd(data, forfait);
     });
 
