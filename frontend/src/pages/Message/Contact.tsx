@@ -1,102 +1,109 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useSocketContext } from "../../context/WebSocketContext";
-import {
-  Box,
-  Button,
-  Sidebar,
-  SidebarBody,
-  SidebarCollapseButton,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarHeaderIconButton,
-  SidebarHeaderLabel,
-  SidebarNavigation,
-  SidebarOverlayContentWrapper,
-} from "@twilio-paste/core";
-import { User } from "../../../public/Types/user.entity";
-import { ContactElement } from "./ContactElement";
-import { getFriendsList } from "./Hooks/GetFriendsList";
-import { useAuth } from "../../context/AuthContext";
-import { ContactType } from "../../../public/Types/contact.entity";
-import { ConversationInformation } from "../../../public/Types/conversationInformation.entity";
+import React, { useContext, useEffect, useState } from 'react';
+import { ContactElement } from './ContactElement';
+import { useAuth } from '../../context/AuthContext';
+import { useChatContext } from '../../context/ChatContext';
+import { ProfileContext } from '../../context/ProfileContext';
+import { Channel } from '../../../Types/inferfaceList';
+import { useChannelContext } from '../../context/ChannelContext';
 
-//Possible to have channel Or People
+export const Contact = () => {
+    const [username, setUsername] = useState<string>('');
 
-//Should display the name of the people with his picture
-//Or the Channel Name if it is a channel
+    const { user } = useAuth();
+    const chatContext = useChatContext();
+    const channelContext = useChannelContext();
+    const friends = useContext(ProfileContext).friendList;
+    //  const [dataLoaded, setDataLoaded] = useState(false);
+    /*
+    useEffect(() => {
+        // Simulate data loading
+        setTimeout(() => {
+            setDataLoaded(true);
+        }, 200);
+    }, []);*/
 
-//How to list all contact ?
-
-//I should get all friends of the User Logs in the DB
-
-//For the moment i will just display all user
-
-interface ContactProps {
-  setConversation: (val: ConversationInformation) => void;
-}
-
-export const Contact: React.FC<ContactProps> = ({ setConversation }) => {
-  const [friends, setFriends] = useState<ContactType[]>();
-  const [username, setUsername] = useState<string>("");
-  const [newFriend, setnewFriend] = useState<boolean>(false);
-
-  const { user } = useAuth();
-
-  const getName = () => {
-    if (!user) {
-      return "";
-    } else {
-      return user.username;
-    }
-  };
-
+    const getName = () => {
+        if (!user) {
+            return '';
+        } else {
+            return user.username;
+        }
+    };
+    /*
   useEffect(() => {
-    const res = getName();
+    socket?.on("goodFriendsRequest", refreshContacts);
+    return () => {
+      socket?.off("goodFriendsRequest", refreshContacts);
+    };
+  }, [socket]);
+  */
 
-    if (res == "") {
-      return;
-    } else {
-      setUsername(res);
-    }
-  }, [user, setFriends]);
+    useEffect(() => {
+        const res = getName();
 
-  //Request the back (Should Get all Message from a certain User)
-  //Then check on all message to list all conversation / Channel Or nOt
-  //If not channel then link to the user
-  //Return a list of string Channel And User
+        if (res == '') {
+            return;
+        } else {
+            setUsername(res);
+        }
+    }, [user]);
+    //Request the back (Should Get all Message from a certain User)
+    //Then check on all message to list all conversation / Channel Or nOt
+    //If not channel then link to the user
+    //Return a list of string Channel And User
 
-  useEffect(() => {
-    if (username === "") return;
-    getFriendsList(username).then((res: ContactType[]) => {
-      setFriends(res);
-      console.log(res);
-    });
-  }, [newFriend, username]);
-  //Ask the back for the userList
-//   const contactList = friendList?.map(function (user, i) {
-// 	return (
-// 	  <div key={i}>
-// 		<ContactElement
-// 		  content={user.username}
-// 		  setConversation={setConversation}
-// 		></ContactElement>
-// 	  </div>
-// 	);
-//   })
-  return (
-    <>
-      {username &&
-        friends != undefined &&
-        friends.map(function (user, i) {
-          return (
-            <div key={i}>
-              <ContactElement
-                content={user}
-                setConversation={setConversation}
-              ></ContactElement>
+    //Ask the back for the userList
+    //   const contactList = friendList?.map(function (user, i) {
+    // 	return (
+    // 	  <div key={i}>
+    // 		<ContactElement
+    // 		  content={user.username}
+    // 		  setConversation={setConversation}
+    // 		></ContactElement>
+    // 	  </div>
+    // 	);
+    //   })
+    const [conversationList, setConversationList] = useState<Channel[]>([]);
+
+    useEffect(() => {
+        setConversationList(channelContext.arrayChannels);
+    }, [channelContext.arrayChannels]);
+    return (
+        <>
+            <div>
+                <h1> Channel </h1>
+                {username &&
+                    conversationList.map((channel) => {
+                        return (
+                            <div key={channel.id}>
+                                <ContactElement
+                                    content={{
+                                        channel: true,
+                                        user: false,
+                                        name: channel.name,
+                                    }}></ContactElement>
+                            </div>
+                        );
+                    })}
             </div>
-          );
-        })}
-    </>
-  );
+            <h1> Friend </h1>
+            {username &&
+                user?.friends &&
+                user.friends.map((user, i) => {
+                    if (chatContext.isBlocked(user.id)) {
+                        return;
+                    }
+                    return (
+                        <div key={i}>
+                            <ContactElement
+                                content={{
+                                    channel: false,
+                                    user: true,
+                                    name: user.username,
+                                }}></ContactElement>
+                        </div>
+                    );
+                })}
+        </>
+    );
 };

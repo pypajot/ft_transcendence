@@ -17,9 +17,9 @@ model User {
   updatedAt       DateTime  @updatedAt
   avatar          String    @default("https://i.imgur.com/WxNkK7J.png")
   status          String    @default("offline")
-  friends         Int[]
-  friendsRequest  Int[]
-  blocked         Int[]
+  friends         Int[]     
+  friendsRequest  Int[]     
+  blocked         Int[]     
   socketId        String?   @unique
   channels        Channel[] @relation("Memberships")
   messagesSent    Message[] @relation("Author")
@@ -34,6 +34,7 @@ model User {
 
   twoFactorAuthActive Boolean @default(false)
   twoFactorAuthSecret Bytes?
+  ManagementChannel   ManagementChannel[]
 
   @@map("users")
 }
@@ -50,15 +51,27 @@ model Message {
   channelId Int?
 }
 
+model ManagementChannel {
+  id        Int      @id @default(autoincrement())
+  type      String
+  target    User     @relation(fields: [targetId], references: [id])
+  targetId  Int
+  createdAt DateTime @default(now())
+  channel   Channel? @relation(fields: [channelName], references: [name])
+  channelName String?
+}
+
 model Channel {
-  id       Int       @id @default(autoincrement())
+  id       Int                 @id @default(autoincrement())
   name     String
   public   Boolean
   password String?
   messages Message[]
-  members  User[]    @relation("Memberships")
-  creator  String
+  members  User[]              @relation("Memberships")
+  owner    Int
+  admins   Int[]
   invited  Int[]
+  info     ManagementChannel[]
 
   @@unique([name])
   @@unique([id])

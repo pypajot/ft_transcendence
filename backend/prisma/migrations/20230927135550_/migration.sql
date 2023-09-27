@@ -33,12 +33,24 @@ CREATE TABLE "Message" (
 );
 
 -- CreateTable
+CREATE TABLE "ManagementChannel" (
+    "id" SERIAL NOT NULL,
+    "type" TEXT NOT NULL,
+    "targetId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "channelName" TEXT,
+
+    CONSTRAINT "ManagementChannel_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Channel" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "public" BOOLEAN NOT NULL,
     "password" TEXT,
-    "creator" TEXT NOT NULL,
+    "owner" INTEGER NOT NULL,
+    "admins" INTEGER[],
     "invited" INTEGER[],
 
     CONSTRAINT "Channel_pkey" PRIMARY KEY ("id")
@@ -118,6 +130,12 @@ ALTER TABLE "Message" ADD CONSTRAINT "Message_targetId_fkey" FOREIGN KEY ("targe
 
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_channelId_fkey" FOREIGN KEY ("channelId") REFERENCES "Channel"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ManagementChannel" ADD CONSTRAINT "ManagementChannel_targetId_fkey" FOREIGN KEY ("targetId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ManagementChannel" ADD CONSTRAINT "ManagementChannel_channelName_fkey" FOREIGN KEY ("channelName") REFERENCES "Channel"("name") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "usertokens" ADD CONSTRAINT "usertokens_UserId_fkey" FOREIGN KEY ("UserId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

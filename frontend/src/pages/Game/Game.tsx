@@ -6,23 +6,18 @@ import { useGameContext } from '../../context/GameContext';
 
 // Game component to render ether the game or the select mode page
 
-const Game : React.FC = () => {
-	//const socket = useSocketContext(); // Access the WebSocket context
-	const {gameStart, setGameStart} = useGameContext();
+const Game: React.FC = () => {
+    //const { socket } = useSocketContext(); // Access the WebSocket context
+    const { gameStart, setGameStart } = useGameContext();
 
-	useEffect(() => {
-		// reset gameStart state when component unmounts
-		return () => {
-			setGameStart(false);
-		};
-	}
-	, []);
+    useEffect(() => {
+        // reset gameStart state when component unmounts
+        return () => {
+            setGameStart(false);
+        };
+    }, []);
 
-	return (
-		<div>
-			{gameStart ? <PongGame /> : <ModeSelection />}
-		</div>
-	);
+    return <div>{gameStart ? <PongGame /> : <ModeSelection />}</div>;
 };
 
 export default Game;

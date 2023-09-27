@@ -46,6 +46,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin : auto;
+  margin: auto;
   width: 120%; /*temporary : increases the size of the game board*/
 }

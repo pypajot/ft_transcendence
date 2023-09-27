@@ -1,10 +1,10 @@
-import { Channel } from '@prisma/client';
+import { Channel } from './inferfaceList';
 
 export interface Message {
     id: number;
     content: string;
     createdAt: Date;
-    authorId: number;
+    autorId: number;
     targetId?: number;
     senderName: string;
     sent: boolean;
