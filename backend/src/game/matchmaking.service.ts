@@ -92,10 +92,12 @@ export class MatchmakingService {
     if (mode === GameMode.Classic) {
       queue = this.classicQueue;
       gameConfiguration = classicGameConfig;
-    } else if (mode === GameMode.Party) {
+    } 
+    else if (mode === GameMode.Party) {
       queue = this.partyQueue;
       gameConfiguration = partyGameConfig;
-    } else if (mode === GameMode.Hardcore) {
+    } 
+    else if (mode === GameMode.Hardcore) {
       queue = this.hardcoreQueue;
       gameConfiguration = hardcoreGameConfig;
     }
@@ -118,5 +120,30 @@ export class MatchmakingService {
       return gameId;
     }
     return undefined;
+  }
+
+  launchFromChat(player1: Player, player2: Player, mode: string): string {
+    let gameConfiguration: GameConfiguration;
+    if (mode === GameMode.Classic) {
+      gameConfiguration = classicGameConfig;
+    } 
+    else if (mode === GameMode.Party) {
+      gameConfiguration = partyGameConfig;
+    } 
+    else if (mode === GameMode.Hardcore) {
+      gameConfiguration = hardcoreGameConfig;
+    }
+    player1.socket.emit('matched');
+    player2.socket.emit('matched');
+    // Initialize a new game session with these players
+    const gameId = player1.socket.id + player2.socket.id;
+    this.gameService[gameId] = new GameService();
+    this.gameService[gameId].initGame(
+      gameConfiguration,
+      player1,
+      player2,
+      gameId,
+    );
+    return gameId;
   }
 }

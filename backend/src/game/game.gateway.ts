@@ -182,6 +182,25 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('launchGameFromChat')
+  async handleLaunchGameFromChat(client: Socket, data: { opponent: Socket; mode: string }): Promise<void> {
+    const { opponent, mode } = data;
+    const player1 = await this.createPlayer(client, mode);
+    const player2 = await this.createPlayer(opponent, mode);
+    const lobbyId = this.matchmakingService.launchFromChat(player1, player2, mode);
+    if (lobbyId !== undefined) {
+      const gameService = this.matchmakingService.gameService[lobbyId];
+      // wait for 1/2 second before emitting the createLobby event
+      setTimeout(() => {
+        const username1 = gameService.player1.username;
+        const username2 = gameService.player2.username;
+        client.emit('createLobby', lobbyId, username1, username2);
+        gameService.player1.socket.emit('createLobby', lobbyId, username1, username2);
+        console.log(`Lobby ${lobbyId} created`);
+      }, 500);
+    }
+  }
+
   @SubscribeMessage('launchBall')
   handleLaunchGame(client: Socket, data: { lobbyId: string }): void {
     const { lobbyId } = data;
@@ -210,7 +229,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
   
-
   // Event to start game loop emitting game state to the client every 50ms
   @SubscribeMessage('getGameState')
   async handleGetGameState(
