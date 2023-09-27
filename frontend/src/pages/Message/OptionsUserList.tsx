@@ -1,20 +1,11 @@
-import { SimpleDialogProps } from './InviteToChannel';
-import {
-    Dialog,
-    DialogTitle,
-    ListItem,
-    ListItemAvatar,
-    ListItemText,
-} from '@mui/material';
+import { Dialog, DialogTitle, ListItem, ListItemText } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useChatContext } from '../../context/ChatContext';
-import { blue } from 'material-ui-colors';
-import Avatar from '@mui/material/Avatar';
-import { User } from '../../context/AuthContext';
-import { useContext, useEffect, useState } from 'react';
-import { ProfileContext } from '../../context/ProfileContext';
+import { useEffect, useState } from 'react';
 import List from '@mui/material/List';
+import { User } from '../../../Types/inferfaceList';
+import { useChannelContext } from '../../context/ChannelContext';
 
 interface OptionUserListProps {
     open: boolean;
@@ -25,6 +16,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     const { onClose, target, open } = props;
     const [options, setOptions] = useState<string[]>([]);
     const chatContext = useChatContext();
+    const channelContext = useChannelContext();
     const socket = useSocketContext();
 
     const handleClose = () => {
@@ -95,6 +87,22 @@ export const OptionsUserList = (props: OptionUserListProps) => {
             case 'Block':
                 handleBlock();
                 break;
+            case 'Unban':
+                if (target) {
+                    socket?.emit('UnbanUser', {
+                        targetId: target.id,
+                        channelName: chatContext.conversationInfo?.name,
+                    });
+                }
+                break;
+            case 'Unmute':
+                if (target) {
+                    socket?.emit('UnmuteUser', {
+                        targetId: target.id,
+                        channelName: chatContext.conversationInfo?.name,
+                    });
+                }
+                break;
             default:
                 break;
         }
@@ -112,32 +120,51 @@ export const OptionsUserList = (props: OptionUserListProps) => {
             'Block',
         ];
         const choices2: string[] = ['Add', 'Play with', 'Profile', 'Block'];
-        if (chatContext.isChannelOwner()) {
+        if (channelContext.isChannelOwner()) {
             setOptions([...choices, 'Sudo ']);
-        } else if (chatContext.isAdmin()) {
+        } else if (channelContext.isAdmin()) {
             setOptions(choices);
         } else {
             setOptions(choices2);
         }
-    }, [chatContext, chatContext.channels]);
+    }, [chatContext, channelContext]);
 
     return (
         <Dialog onClose={handleClose} open={open}>
             <DialogTitle>Choose an option below</DialogTitle>
             <List sx={{ pt: 0 }}>
                 {' '}
-                {options.map((choice, i) => (
-                    <ListItem key={i}>
-                        <ListItemButton
-                            onClick={() => {
-                                handleOptionClick(choice);
-                            }}>
-                            <ListItemText
-                                primary={choice + ' ' + target?.username}
-                            />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
+                {options.map((choice, i) => {
+                    if (
+                        target &&
+                        channelContext.isBan(target.id) &&
+                        choice == 'Ban'
+                    ) {
+                        choice = 'Unban';
+                    }
+                    if (
+                        target &&
+                        channelContext.isMute(target.id) &&
+                        choice == 'Mute'
+                    ) {
+                        choice = 'Unmute';
+                    }
+                    return (
+                        <ListItem key={i}>
+                            <ListItemButton
+                                onClick={() => {
+                                    //If Ban Unban
+                                    //If Mute Unmute
+
+                                    handleOptionClick(choice);
+                                }}>
+                                <ListItemText
+                                    primary={choice + ' ' + target?.username}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                    );
+                })}
             </List>
         </Dialog>
     );

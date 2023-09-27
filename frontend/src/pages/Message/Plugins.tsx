@@ -1,11 +1,8 @@
 import {
     useLexicalComposerContext,
     CLEAR_EDITOR_COMMAND,
-    EditorState,
 } from '@twilio-paste/lexical-library';
 import { Box, Button } from '@twilio-paste/core';
-import { func } from 'prop-types';
-import { useEffect, useLayoutEffect } from 'react';
 
 interface SendButtonProps {
     onClick: () => void;

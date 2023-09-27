@@ -5,15 +5,15 @@ import {
     MenuSeparator,
     useMenuState,
 } from '@twilio-paste/core';
-import { ContactType } from '../../../public/Types/contact.entity';
 import { MoreIcon } from '@twilio-paste/icons/esm/MoreIcon';
 import { useState } from 'react';
 import { InviteToChannel } from './InviteToChannel';
-import { User, useAuth } from '../../context/AuthContext';
-import { ConversationInformation } from '../../../public/Types/conversationInformation.entity';
-import { useChatContext } from '../../context/ChatContext';
+import { useAuth } from '../../context/AuthContext';
+import { ConversationInformation } from '../../../Types/conversationInformation.entity';
 import { UserList } from './UserList';
 import { OptionsUserList } from './OptionsUserList';
+import { User } from '../../../Types/inferfaceList';
+import { useChannelContext } from '../../context/ChannelContext';
 
 export const OptionMenu = ({
     info,
@@ -26,7 +26,7 @@ export const OptionMenu = ({
     const [displayOptionUserList, setDisplayOptionUserList] =
         useState<boolean>(false);
     const [target, setTarget] = useState<User | undefined>(undefined);
-    const chatContext = useChatContext();
+    const channelContext = useChannelContext();
     const { user } = useAuth();
     const handleCloseUserList = (user: User | undefined) => {
         if (user) {
@@ -68,7 +68,7 @@ export const OptionMenu = ({
                             {...menu}
                             onClick={() => {
                                 user &&
-                                    chatContext.leaveChannel(
+                                    channelContext.leaveChannel(
                                         info?.name,
                                         user?.username
                                     );
@@ -92,7 +92,7 @@ export const OptionMenu = ({
                             {' '}
                             User List{' '}
                         </MenuItem>
-                        {chatContext.isChannelOwner() && (
+                        {channelContext.isChannelOwner() && (
                             <div>
                                 <MenuSeparator {...menu} />
                                 <MenuItem {...menu}>Delete Channel</MenuItem>

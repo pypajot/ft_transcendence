@@ -1,19 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useSocketContext } from '../../context/WebSocketContext';
 import { ContactElement } from './ContactElement';
-import { getFriendsList } from './Hooks/GetFriendsList';
 import { useAuth } from '../../context/AuthContext';
-import { ContactType } from '../../../public/Types/contact.entity';
-import { Channel, useChatContext } from '../../context/ChatContext';
+import { useChatContext } from '../../context/ChatContext';
 import { ProfileContext } from '../../context/ProfileContext';
-import { channel } from 'diagnostics_channel';
-import { Socket } from 'socket.io-client';
+import { Channel } from '../../../Types/inferfaceList';
+import { useChannelContext } from '../../context/ChannelContext';
 
 export const Contact = () => {
     const [username, setUsername] = useState<string>('');
 
     const { user } = useAuth();
     const chatContext = useChatContext();
+    const channelContext = useChannelContext();
     const friends = useContext(ProfileContext).friendList;
     //  const [dataLoaded, setDataLoaded] = useState(false);
     /*
@@ -49,7 +47,6 @@ export const Contact = () => {
             setUsername(res);
         }
     }, [user]);
-    console.log(chatContext.channels);
     //Request the back (Should Get all Message from a certain User)
     //Then check on all message to list all conversation / Channel Or nOt
     //If not channel then link to the user
@@ -69,9 +66,8 @@ export const Contact = () => {
     const [conversationList, setConversationList] = useState<Channel[]>([]);
 
     useEffect(() => {
-        setConversationList(chatContext.arrayChannels);
-        console.log(chatContext.arrayChannels);
-    }, [chatContext.arrayChannels]);
+        setConversationList(channelContext.arrayChannels);
+    }, [channelContext.arrayChannels]);
     return (
         <>
             <div>

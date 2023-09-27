@@ -148,6 +148,9 @@ export class ChatGatewayService {
                     return null;
                 }
                 const msg = await this.prisma.message.create({
+                    include: {
+                        Channel: true,
+                    },
                     data: {
                         content: info.content,
                         author: {
@@ -192,11 +195,11 @@ export class ChatGatewayService {
                         },
                         include: {
                             members: true,
+                            info: true,
                         },
                     })
                 );
             }
-            console.log(channelArr);
             client.emit('InitChannels', channelArr);
         } catch (error) {
             console.log(error);

@@ -8,16 +8,11 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
-import PersonIcon from '@mui/icons-material/Person';
-import AddIcon from '@mui/icons-material/Add';
-import Typography from '@mui/material/Typography';
 import { blue } from '@mui/material/colors';
 import { useChatContext } from '../../context/ChatContext';
-import { User } from '../../context/AuthContext';
-import { UserDTO } from '../Signup/api/dto/user.dto';
 import { ProfileContext } from '../../context/ProfileContext';
-import { ContactType } from '../../../public/Types/contact.entity';
 import { useSocketContext } from '../../context/WebSocketContext';
+import { User } from '../../../Types/inferfaceList';
 
 export interface SimpleDialogProps {
     open: boolean;

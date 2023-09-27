@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "users" ALTER COLUMN "friends" DROP DEFAULT,
+ALTER COLUMN "friendsRequest" DROP DEFAULT,
+ALTER COLUMN "blocked" DROP DEFAULT;

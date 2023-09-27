@@ -1,32 +1,17 @@
 import { ChatComposer } from '@twilio-paste/chat-composer';
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     $getRoot,
     EditorState,
     ClearEditorPlugin,
-    useLexicalComposerContext,
 } from '@twilio-paste/lexical-library';
-import {
-    Box,
-    ChatBookend,
-    ChatBookendItem,
-    Flex,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuSeparator,
-    secureExternalLink,
-    useChatLogger,
-    useMenuState,
-} from '@twilio-paste/core';
-import SendButton from './SendButton';
+import { Box, Flex } from '@twilio-paste/core';
 import getMessageSent from './Hooks/GetUserMessageSent';
-import { Message } from '../../../public/Types/message.entity';
-import { MessageInfo } from '../../../public/Types/messageInfo.entity';
+import { Message } from '../../../Types/message.entity';
+import { MessageInfo } from '../../../Types/messageInfo.entity';
 import { BasicInMessage, BasicOutMessage } from './BasicMessage';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useAuth } from '../../context/AuthContext';
-import { MoreIcon } from '@twilio-paste/icons/esm/MoreIcon';
 import { useChatContext } from '../../context/ChatContext';
 import { OptionMenu } from './OptionMenu';
 import { EnterKeySubmitPlugin, SendButtonPlugin } from './Plugins';
@@ -49,7 +34,6 @@ export const Conversation = () => {
     const [receivedMessage, setReceivedMessage] = useState<Message[]>();
     const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
     const [username, setUsername] = useState<string>('');
-    const menu = useMenuState();
 
     const chatContext = useChatContext();
     //Make a component to get the previous messsage
@@ -165,11 +149,14 @@ export const Conversation = () => {
 
     const channelMessage = useCallback(
         (message: Message) => {
-            console.log(message);
             if (user && message.senderName != user.username) {
                 message.sent = false;
             }
-            setConversationMsg([...conversationMsg, message]);
+            if (
+                message.channel &&
+                message.channel.name == chatContext.conversationInfo?.name
+            )
+                setConversationMsg([...conversationMsg, message]);
         },
         [setConversationMsg, conversationMsg, user]
     );

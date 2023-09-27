@@ -4,26 +4,9 @@ import { useEffect } from 'react';
 import { useRef } from 'react';
 import { useSocketContext } from './WebSocketContext';
 import { Socket } from 'socket.io-client';
+import { User, AuthContextData } from '../../Types/inferfaceList';
 
 export const useAuth = () => useContext(AuthContext);
-
-export interface User {
-    id: number;
-    username: string;
-    avatar: string;
-    socketId?: string;
-    blocked?: number[];
-    twoFactorAuthActive: boolean;
-}
-
-export interface AuthContextData {
-    user: User | null;
-    setUser: (user: User | null) => void;
-    accessToken: string | null;
-    setAccessToken: (token: string | null) => void;
-    logout: () => void;
-    refreshFetch: (address: any, params?: any) => any;
-}
 
 export const AuthContext = createContext<AuthContextData>(
     {} as AuthContextData

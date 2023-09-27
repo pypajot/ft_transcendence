@@ -104,7 +104,7 @@ class ChatGateway
 
     @SubscribeMessage('userLeavingChannel')
     handleUserLeavingchannel(client: any, data: any): void {
-        this.channelService.leaveChannel(client, data);
+        this.channelService.leaveChannel(this.io, client, data);
     }
     @SubscribeMessage('friendsRequest')
     handleFriendsRequest(client: any, target: string): void {

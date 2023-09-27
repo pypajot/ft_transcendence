@@ -17,9 +17,9 @@ model User {
   updatedAt       DateTime  @updatedAt
   avatar          String    @default("https://i.imgur.com/WxNkK7J.png")
   status          String    @default("offline")
-  friends         Int[]
-  friendsRequest  Int[]
-  blocked         Int[]
+  friends         Int[]     
+  friendsRequest  Int[]     
+  blocked         Int[]     
   socketId        String?   @unique
   channels        Channel[] @relation("Memberships")
   messagesSent    Message[] @relation("Author")

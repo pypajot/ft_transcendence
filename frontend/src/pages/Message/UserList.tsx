@@ -1,15 +1,14 @@
 import * as React from 'react';
-import Button from '@mui/material/Button';
-import Avatar from '@mui/material/Avatar';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import { useChatContext } from '../../context/ChatContext';
-import { User, useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
+import { User } from '../../../Types/inferfaceList';
+import { useChannelContext } from '../../context/ChannelContext';
 
 interface UserListProps {
     onClose: (user: User | undefined) => void;
@@ -19,6 +18,7 @@ interface UserListProps {
 export const UserList = (props: UserListProps) => {
     const { onClose, open } = props;
     const chatContext = useChatContext();
+    const channelContext = useChannelContext();
     const [members, setMembers] = React.useState<User[]>([]);
     const [target, setTarget] = React.useState<User | undefined>(undefined);
     const { user } = useAuth();
@@ -33,34 +33,31 @@ export const UserList = (props: UserListProps) => {
     };
 
     React.useEffect(() => {
-        let isAlreadyThere = false;
-        if (
-            chatContext &&
-            chatContext.channels &&
-            chatContext.conversationInfo
-        ) {
-            const memberList = chatContext.channels.get(
+        const buff: User[] = [];
+        if (channelContext.channels && chatContext.conversationInfo) {
+            const memberList = channelContext.channels.get(
                 chatContext.conversationInfo.name
             )?.members;
             if (memberList) {
                 memberList.map((member) => {
-                    members.map((user) => {
-                        if (user.id == member.id) {
-                            isAlreadyThere = true;
-                            return;
-                        }
-                    });
-                    if (user?.username != member.username && !isAlreadyThere)
-                        setMembers([...members, member]);
+                    if (user?.username != member.username) {
+                        buff.push(member);
+                    }
                 });
+                setMembers(buff);
             }
         }
-    }, [chatContext, user]);
+    }, [
+        chatContext,
+        channelContext.channels,
+        channelContext.arrayChannels,
+        user,
+    ]);
 
     return (
         <>
             {chatContext &&
-                chatContext.channels &&
+                channelContext.channels &&
                 chatContext.conversationInfo && (
                     <Dialog onClose={handleClose} open={open}>
                         <DialogTitle>

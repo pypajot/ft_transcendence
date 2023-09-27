@@ -1,3 +1,5 @@
+import { Channel } from './inferfaceList';
+
 export interface Message {
     id: number;
     content: string;
@@ -6,4 +8,5 @@ export interface Message {
     targetId?: number;
     senderName: string;
     sent: boolean;
+    channel?: Channel;
 }

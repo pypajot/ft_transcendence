@@ -6,15 +6,11 @@ import {
     PopoverButton,
     PopoverContainer,
     StatusBadge,
-    usePopoverState,
 } from '@twilio-paste/core';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
-import { ConversationInformation } from '../../../public/Types/conversationInformation.entity';
-import ChatContextProvider, {
-    ChatContext,
-    useChatContext,
-} from '../../context/ChatContext';
+import { ConversationInformation } from '../../../Types/conversationInformation.entity';
+import { useChatContext } from '../../context/ChatContext';
 
 export const JoinChanel = () => {
     const [password, setPassword] = useState('');

@@ -70,29 +70,7 @@ export class ChannelService {
                     id: targetId,
                 },
             });
-            const channel = await this.prisma.channel.findUnique({
-                where: {
-                    name: channelName,
-                },
-            });
-            if (user) {
-                await this.prisma.user.update({
-                    where: {
-                        id: targetId,
-                    },
-                    include: {
-                        channels: true,
-                    },
-                    data: {
-                        channels: {
-                            disconnect: { id: channel.id },
-                        },
-                    },
-                });
-                io.to(user.socketId).emit('Kicked', channel);
-                //Emit to the user.socketIdA
-                socketArr[user.socketId].leave(channelName);
-            }
+            io.to(user.socketId).emit('Kicked', channelName);
         } catch (error) {
             console.log(error);
         }
@@ -287,15 +265,34 @@ export class ChannelService {
         client.emit('InitChannelsRequest', channelReqList);
     }
 
-    async leaveChannel(client: any, info: any) {
+    async leaveChannel(io, client: any, info: any) {
         try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    username: info.user,
+                },
+            });
             const channelToLeave = await this.prisma.channel.findUnique({
                 where: {
                     name: info.channelName,
                 },
+                include: {
+                    members: true,
+                },
+            });
+            const print = await this.prisma.channel.update({
+                where: {
+                    name: info.channelName,
+                },
+                include: { members: true },
+                data: {
+                    members: {
+                        disconnect: { id: user.id },
+                    },
+                },
             });
 
-            const userLeaving = await this.prisma.user.update({
+            const leavingUser = await this.prisma.user.update({
                 where: {
                     username: info.user,
                 },
@@ -309,6 +306,7 @@ export class ChannelService {
                 },
             });
             client.leave(info.channelName);
+            this.updateChannel(io, info.channelName);
         } catch (error) {
             console.log(error);
         }
@@ -368,11 +366,32 @@ export class ChannelService {
                     },
                     include: {
                         members: true,
+                        info: true,
                     },
                 });
                 client.join(data_chan.name);
                 client.emit('successfullyJoinedChannel', newchannel);
             }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async updateChannel(io: Server, channel_name) {
+        try {
+            const channel = await this.prisma.channel.findUnique({
+                where: {
+                    name: channel_name,
+                },
+                include: {
+                    members: true,
+                    info: true,
+                },
+            });
+            channel.members.map((user) => {
+                console.log(` teasssee : ${user.id}`);
+                io.to(user.socketId).emit('updateChannel', channel);
+            });
         } catch (error) {
             console.log(error);
         }
@@ -385,6 +404,7 @@ export class ChannelService {
                 },
                 include: {
                     info: true,
+                    members: true,
                 },
             });
             const user = await this.prisma.user.findUnique({
@@ -437,6 +457,7 @@ export class ChannelService {
                 });
                 console.log(newUpdatedChannel);
                 client.emit('successfullyJoinedChannel', newUpdatedChannel);
+                this.updateChannel(io, info.name);
             } else {
                 client.emit('Error', { noSuchChannelName: true });
             }
@@ -465,12 +486,9 @@ export class ChannelService {
                 },
             });
             const msgRes: Message = {
-                id: message.id,
-                authorId: message.authorId,
+                ...message,
                 senderName: sender.username,
                 sent: true,
-                content: message.content,
-                createdAt: message.createdAt,
             };
             io.to(channel_name).emit('messageChannel', msgRes);
         } catch (error) {
