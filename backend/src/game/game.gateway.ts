@@ -171,6 +171,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('sendInviteToPlay')
+  async handleInviteToPlay(client: Socket, data: { target_socketId: string }): Promise<void> {
+    const { target_socketId } = data;
+    this.server.to(target_socketId).emit('invitedToPlay', client.id);
+  }
+
   @SubscribeMessage('launchGameFromChat')
   async handleLaunchGameFromChat(client: Socket, data: { opponent: Socket; mode: string }): Promise<void> {
     const { opponent, mode } = data;

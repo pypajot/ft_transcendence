@@ -14,6 +14,8 @@ import { UserList } from './UserList';
 import { OptionsUserList } from './OptionsUserList';
 import { User } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
+import { useNavigate } from 'react-router-dom';
+import { useSocketContext } from '../../context/WebSocketContext';
 
 export const OptionMenu = ({
     info,
@@ -40,6 +42,16 @@ export const OptionMenu = ({
     const handleCloseOptionUserList = () => {
         setDisplayOptionUserList(false);
     };
+    const navigate = useNavigate();
+    const {socket} = useSocketContext();
+
+    const handleInviteGame = (target: User | undefined) => {
+        console.log('you invited someone to play');
+        navigate('/game', { state: { mode: true } });
+        // notify the other user that he has been invited to play
+        socket?.emit('sendInviteToPlay', {target_socketId: target?.socketId});
+    }
+
     //do we set the invite to play to any member of a channel ?
     return (
         <div>
@@ -106,7 +118,9 @@ export const OptionMenu = ({
                     <Menu {...menu} aria-label="Preferences">
                         <MenuItem {...menu}>Block</MenuItem>
                         <MenuSeparator {...menu} />
-                        <MenuItem {...menu}>Invite to Play </MenuItem>
+                        <MenuItem {...menu}
+                            onClick={() => {handleInviteGame(target);}}>
+                            Invite to Play </MenuItem>
                         <MenuSeparator {...menu} />
                         <MenuItem {...menu}>Profile</MenuItem>
                     </Menu>{' '}

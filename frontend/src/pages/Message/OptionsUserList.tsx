@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import List from '@mui/material/List';
 import { User } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
+import { useNavigate } from 'react-router-dom';
 
 interface OptionUserListProps {
     open: boolean;
@@ -18,6 +19,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     const chatContext = useChatContext();
     const channelContext = useChannelContext();
     const { socket } = useSocketContext();
+    const navigate = useNavigate();
 
     const handleClose = () => {
         onClose();
@@ -25,7 +27,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
 
     const handleMute = () => {
         if (target) {
-            socket.emit('MuteUser', {
+            socket?.emit('MuteUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });
@@ -33,7 +35,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     };
     const handleBan = () => {
         if (target) {
-            socket.emit('BanUser', {
+            socket?.emit('BanUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });
@@ -42,15 +44,18 @@ export const OptionsUserList = (props: OptionUserListProps) => {
 
     const handleKick = () => {
         if (target) {
-            socket.emit('KickUser', {
+            socket?.emit('KickUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });
         }
     };
 
-    const handleInviteGame = () => {
-        console.log('invited You to Play');
+    const handleInviteGame = (target: User | undefined) => {
+        console.log('you invited someone to play');
+        navigate('/game', {state: { mode: true }});
+        // notify the other user that he has been invited to play
+        socket?.emit('sendInviteToPlay', {target_socketId: target?.socketId});
     };
 
     const handleProfile = () => {
@@ -59,7 +64,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
 
     const handleBlock = () => {
         if (target) {
-            socket.emit('BlockUser', {
+            socket?.emit('BlockUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });
@@ -79,7 +84,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 handleKick();
                 break;
             case 'Play with':
-                handleInviteGame();
+                handleInviteGame(target);
                 break;
             case 'Profile':
                 handleProfile();
@@ -155,7 +160,6 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                                 onClick={() => {
                                     //If Ban Unban
                                     //If Mute Unmute
-
                                     handleOptionClick(choice);
                                 }}>
                                 <ListItemText
