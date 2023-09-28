@@ -38,7 +38,6 @@ export const OptionMenu = ({
         setDisplayUserList(false);
         console.log(user);
     };
-
     const handleCloseOptionUserList = () => {
         setDisplayOptionUserList(false);
     };
@@ -46,9 +45,9 @@ export const OptionMenu = ({
     const {socket} = useSocketContext();
 
     const handleInviteGame = () => {
-        console.log('you invited someone to play' + target?.username);
+        console.log('you invited someone to play: ', target?.username, target?.socketId);
         // notify the other user that he has been invited to play
-        socket?.emit('sendInviteToPlay', {target_socketId: target?.socketId});
+        socket?.emit('sendInviteToPlay', {socketId: target?.socketId, from: user?.username, mode: 'Classic'});
         navigate('/game', { state: { mode: true } });
     }
 

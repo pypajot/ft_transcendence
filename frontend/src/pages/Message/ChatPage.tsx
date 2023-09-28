@@ -1,30 +1,37 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Conversation } from './Conversation';
 import { Box, Flex } from '@twilio-paste/core';
 import { Contact } from './Contact';
 import { TopbarMenu } from './TopMenu';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useNavigate } from 'react-router-dom';
+import { PopUpInvite } from './PopUpInvite';
 
 const ChatComponent = () => {
     const { socket } = useSocketContext();
+    const [gameInvite, setGameInvite] = useState<boolean>(false);
+    const [inviter, setInviter] = useState<string>('');
     const navigate = useNavigate();
 
     useEffect(() => {
-        socket?.on('invitedToPlay', (data: any) => {
+        socket?.on('invitedToPlay', (opp_SocketId:string, opp_username:string, mode: string) => {
+
             console.log('you have been invited to play');
-            socket?.emit('launchGameFromChat', { opp_SocketId: data, mode: 'Classic' });
-            navigate('/game', { state: { mode: true } });
+            setGameInvite(true);
+            setInviter(opp_username);
+            socket?.emit('launchGameFromChat', { opp_SocketId, mode});
+            //navigate('/game', { state: { mode: true } });
         });
     
         return () => {
             socket?.off('invitedToPlay');
         };
-    }, [socket]);    
+    }, [socket]);
 
     return (
         <>
             <TopbarMenu />
+            { gameInvite && (<PopUpInvite from={inviter}/>)}
             <Flex>
                 <Flex>
                     <Box
