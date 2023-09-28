@@ -163,7 +163,8 @@ export const Conversation = () => {
 
     const messageListener = useCallback(
         (message: Message) => {
-            setConversationMsg([...conversationMsg, message]);
+			if (info?.isUser && (message.senderName === info.name || message.senderName === user?.username))
+				setConversationMsg([...conversationMsg, message]);
         },
         [setConversationMsg, conversationMsg]
     );
