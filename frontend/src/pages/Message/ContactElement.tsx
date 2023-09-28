@@ -32,7 +32,7 @@ export const ContactElement = ({ content }: { content: ContactType }) => {
 		)
 		return (
 			<div className='contact'>
-				<img src={content.picture} width={50} height={50}/>
+				<img className='contact-image' src={content.picture} width={50} height={50}/>
 				<h3 className='contact-name' color="white" onClick={() => handleContact(content)}>
                     {content.name.length > 12 ? content.name.substring(12,0) + "..." : content.name}
                 </h3>
