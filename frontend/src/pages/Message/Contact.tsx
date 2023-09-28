@@ -105,6 +105,7 @@ export const Contact = () => {
                                     name: user.username,
 									status: user.status,
 									picture: user.avatar,
+									id: user.id,
                                 }}></ContactElement>
                         </div>
                     );

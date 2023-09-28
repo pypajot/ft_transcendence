@@ -26,7 +26,18 @@ export class UserService {
                 id: Number(params.id),
             },
         });
-        return { ...user, hash: undefined, twoFactorAuthSecret: undefined };
+		if (!user)
+			throw new BadRequestException('Invalid user id');
+		const matchHistory = await this.getMatchHistory(Number(params.id));
+        return {
+            ...user,
+            hash: undefined,
+            twoFactorAuthSecret: undefined,
+            friends: undefined,
+            friendsRequest: undefined,
+			blocked: undefined,
+			matchHistory: matchHistory,
+        };
     }
 
     async getUsersbyId(ids: number[]) {
@@ -43,6 +54,25 @@ export class UserService {
         });
         return users;
     }
+
+	async getMatchHistory(id: number) {
+		return this.prisma.game.findMany({
+		  where: {
+			OR: [
+			  { winnerId: id },
+			  { loserId: id },
+			],
+		  },
+		  orderBy: {
+			createdAt: 'desc',
+		  },
+		  take: 5,
+		  include: {
+			winner: true,
+			loser: true,
+		  },
+		});
+	}
 
     async getMe(id: number) {
         const user = await this.prisma.user.findUnique({

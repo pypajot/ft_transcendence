@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import List from '@mui/material/List';
 import { User } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
+import { useNavigate } from 'react-router-dom';
 
 interface OptionUserListProps {
     open: boolean;
@@ -18,6 +19,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     const chatContext = useChatContext();
     const channelContext = useChannelContext();
     const { socket } = useSocketContext();
+	const navigate = useNavigate();
 
     const handleClose = () => {
         onClose();
@@ -54,6 +56,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     };
 
     const handleProfile = () => {
+		navigate(`/profile?id=${target?.id}`);
         console.log(`Want to see profile of ${target?.username}`);
     };
 

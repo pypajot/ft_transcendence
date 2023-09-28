@@ -18,6 +18,7 @@ export const ContactElement = ({ content }: { content: ContactType }) => {
             ischannel: content.channel,
             isUser: content.user,
             name: content.name,
+			id: content.id,
         };
         chatContext.setConversationInfo(conversationInfo);
     };

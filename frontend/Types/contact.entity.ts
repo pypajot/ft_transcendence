@@ -5,6 +5,7 @@ export interface ContactType {
     user: boolean;
     name: string;
 	status?: string;
+	id?: number;
     picture?: string;
     lastMessage?: Message;
 }

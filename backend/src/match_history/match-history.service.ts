@@ -5,12 +5,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class MatchHistoryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getMatchHistory(username: string) {
+  async getMatchHistory(id: string) {
     return this.prisma.game.findMany({
       where: {
         OR: [
-          { winner: { username } },
-          { loser: { username } },
+          { winnerId: Number(id)  },
+          { loserId: Number(id) },
         ],
       },
       orderBy: {

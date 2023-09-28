@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Param } from '@nestjs/common';
 import { MatchHistoryService } from './match-history.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
@@ -6,10 +6,9 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 export class MatchHistoryController {
   constructor(private readonly matchHistoryService: MatchHistoryService) {}
 
-  @Get('match-history')
+  @Get('match-history/:id')
   @UseGuards(JwtAuthGuard)
-  async getMatchHistory(@Request() req) {
-    const user = req.user;
-    return this.matchHistoryService.getMatchHistory(user.username);
+  async getMatchHistory(@Param() params: any) {
+    return this.matchHistoryService.getMatchHistory(params);
   }
 }

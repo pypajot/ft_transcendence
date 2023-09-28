@@ -14,6 +14,7 @@ import { UserList } from './UserList';
 import { OptionsUserList } from './OptionsUserList';
 import { User } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
+import { useNavigate } from 'react-router-dom';
 
 export const OptionMenu = ({
     info,
@@ -28,6 +29,7 @@ export const OptionMenu = ({
     const [target, setTarget] = useState<User | undefined>(undefined);
     const channelContext = useChannelContext();
     const { user } = useAuth();
+	const navigate = useNavigate();
     const handleCloseUserList = (user: User | undefined) => {
         if (user) {
             setDisplayOptionUserList(true);
@@ -108,7 +110,7 @@ export const OptionMenu = ({
                         <MenuSeparator {...menu} />
                         <MenuItem {...menu}>Invite to Play </MenuItem>
                         <MenuSeparator {...menu} />
-                        <MenuItem {...menu}>Profile</MenuItem>
+                        <MenuItem {...menu} onClick={() => {navigate(`/profile?id=${info.id}`)}}>Profile</MenuItem>
                     </Menu>{' '}
                 </div>
             )}
