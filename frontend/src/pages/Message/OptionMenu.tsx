@@ -45,11 +45,11 @@ export const OptionMenu = ({
     const navigate = useNavigate();
     const {socket} = useSocketContext();
 
-    const handleInviteGame = (target: User | undefined) => {
-        console.log('you invited someone to play');
-        navigate('/game', { state: { mode: true } });
+    const handleInviteGame = () => {
+        console.log('you invited someone to play' + target?.username);
         // notify the other user that he has been invited to play
         socket?.emit('sendInviteToPlay', {target_socketId: target?.socketId});
+        navigate('/game', { state: { mode: true } });
     }
 
     //do we set the invite to play to any member of a channel ?
@@ -119,7 +119,7 @@ export const OptionMenu = ({
                         <MenuItem {...menu}>Block</MenuItem>
                         <MenuSeparator {...menu} />
                         <MenuItem {...menu}
-                            onClick={() => {handleInviteGame(target);}}>
+                            onClick={() => {handleInviteGame();}}>
                             Invite to Play </MenuItem>
                         <MenuSeparator {...menu} />
                         <MenuItem {...menu}>Profile</MenuItem>

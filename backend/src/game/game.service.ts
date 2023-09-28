@@ -185,7 +185,6 @@ export class GameService {
 
         if (collisionPaddle1 || collisionPaddle2) {
             // console log informations about the ball, paddle and collision
-            console.log('ballX: ' + this.ballX);
             // Reverse the X-direction and increase the ball speed after hitting a paddle
             this.ballSpeedXDirection *= -1;
             this.ballSpeedX *= this.ballSpeedIncreaseFactor;

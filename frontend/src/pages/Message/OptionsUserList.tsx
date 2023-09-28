@@ -53,9 +53,9 @@ export const OptionsUserList = (props: OptionUserListProps) => {
 
     const handleInviteGame = (target: User | undefined) => {
         console.log('you invited someone to play');
-        navigate('/game', {state: { mode: true }});
         // notify the other user that he has been invited to play
         socket?.emit('sendInviteToPlay', {target_socketId: target?.socketId});
+        navigate('/game', {state: { mode: true }});
     };
 
     const handleProfile = () => {

@@ -174,12 +174,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('sendInviteToPlay')
   async handleInviteToPlay(client: Socket, data: { target_socketId: string }): Promise<void> {
     const { target_socketId } = data;
+    console.log(`Sending invite to ${target_socketId}`);
     this.server.to(target_socketId).emit('invitedToPlay', client.id);
   }
 
   @SubscribeMessage('launchGameFromChat')
-  async handleLaunchGameFromChat(client: Socket, data: { opponent: Socket; mode: string }): Promise<void> {
-    const { opponent, mode } = data;
+  async handleLaunchGameFromChat(client: Socket, data: { opp_SocketId: string; mode: string }): Promise<void> {
+    console.log('launching game from chat between ' + client.id + ' and ' + data.opp_SocketId)
+    const { opp_SocketId, mode } = data;
+    const opponent = this.server.sockets.sockets.get(opp_SocketId);
     const player1 = await this.createPlayer(client, mode);
     const player2 = await this.createPlayer(opponent, mode);
     const lobbyId = this.matchmakingService.launchFromChat(player1, player2, mode);
@@ -189,8 +192,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       setTimeout(() => {
         const username1 = gameService.player1.username;
         const username2 = gameService.player2.username;
-        client.emit('createLobby', lobbyId, username1, username2);
-        gameService.player1.socket.emit('createLobby', lobbyId, username1, username2);
+        console.log (`${username1} vs ${username2} lets goooo`);
+        player1.socket.emit('createLobby', lobbyId, username1, username2);
+        player2.socket.emit('createLobby', lobbyId, username1, username2);
         console.log(`Lobby ${lobbyId} created`);
       }, 500);
     }
