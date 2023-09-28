@@ -59,7 +59,17 @@ export const OptionsUserList = (props: OptionUserListProps) => {
 
     const handleBlock = () => {
         if (target) {
-            socket?.emit('BlockUser', {
+            socket?.emit('blockUser', {
+                targetName: target.username,
+                userId: target.id,
+            });
+        }
+    };
+
+    const handleSudo = () => {
+        console.log('SuDO HANDLE');
+        if (target) {
+            socket?.emit('SudoUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });
@@ -86,6 +96,9 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 break;
             case 'Block':
                 handleBlock();
+                break;
+            case 'Sudo':
+                handleSudo();
                 break;
             case 'Unban':
                 if (target) {
@@ -121,7 +134,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         ];
         const choices2: string[] = ['Add', 'Play with', 'Profile', 'Block'];
         if (channelContext.isChannelOwner()) {
-            setOptions([...choices, 'Sudo ']);
+            setOptions([...choices, 'Sudo']);
         } else if (channelContext.isAdmin()) {
             setOptions(choices);
         } else {

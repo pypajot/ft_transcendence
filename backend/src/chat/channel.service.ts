@@ -58,6 +58,32 @@ export class ChannelService {
         }
     }
 
+    async sudoUser(io: Server, targetId, channelName) {
+        try {
+            const target = await this.prisma.user.findUnique({
+                where: {
+                    id: targetId,
+                },
+            });
+            const channel = await this.prisma.channel.findUnique({
+                where: {
+                    name: channelName,
+                },
+            });
+            await this.prisma.channel.update({
+                where: {
+                    name: channelName,
+                },
+                data: {
+                    admins: [...channel.admins, targetId],
+                },
+            });
+            this.updateChannel(io, channel.name);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     async KickUser(
         io: Server,
         targetId,

@@ -201,6 +201,7 @@ export const Conversation = () => {
                 </Flex>
             )}
             {conversationMsg &&
+                chatContext.renderConversation &&
                 conversationMsg.map(function (message, i) {
                     if (message.sent) {
                         return (

@@ -67,24 +67,10 @@ export default function ChannelContextProvider(
             });
             if (buffChannel) {
                 buffChannel.delete(channelName);
-                /*
-                const actualChannel = channels?.get(channelName);
-                if (actualChannel) {
-                    const newMemberList = actualChannel?.members.filter(
-                        (members) => {
-                            if (members.username != username) {
-                                return true;
-                            }
-                            return false;
-                        }
-                    );
-                    actualChannel.members = newMemberList;
-                    channels.set(actualChannel?.name, actualChannel);
-                }*/
-                //Do we ask the back to assure that we correctly leaved the channel or not
                 setChannels(buffChannel);
                 chatContext.setRenderConversation(false);
             }
+            chatContext.setConversationInfo(undefined);
         },
         [socket, channels, setChannels, chatContext.setRenderConversation]
     );
@@ -188,12 +174,10 @@ export default function ChannelContextProvider(
     const isMute = React.useCallback(
         (userId: number) => {
             let res = false;
-            console.log('ISMUTE:');
             if (chatContext.conversationInfo && channels) {
                 channels
                     .get(chatContext.conversationInfo.name)
                     ?.info.map((moderation) => {
-                        console.log(moderation, userId);
                         if (
                             moderation.type == 'mute' &&
                             userId == moderation.targetId

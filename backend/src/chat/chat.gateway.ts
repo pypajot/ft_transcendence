@@ -110,6 +110,10 @@ class ChatGateway
     handleFriendsRequest(client: any, target: string): void {
         this.chatService.requestFriends(this.io, client.id, target);
     }
+    @SubscribeMessage('SudoUser')
+    handleSudoUser(client: any, data: any) {
+        this.channelService.sudoUser(this.io, data.targetId, data.channelName);
+    }
 
     @SubscribeMessage('MuteUser')
     handleMuteRequest(client: any, data: any) {
