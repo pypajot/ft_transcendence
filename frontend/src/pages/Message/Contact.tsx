@@ -5,6 +5,8 @@ import { useChatContext } from '../../context/ChatContext';
 import { ProfileContext } from '../../context/ProfileContext';
 import { Channel } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
+import { ContactType } from '../../../Types/contact.entity';
+import { ConversationInformation } from '../../../Types/conversationInformation.entity';
 
 export const Contact = () => {
     const [username, setUsername] = useState<string>('');
@@ -68,6 +70,7 @@ export const Contact = () => {
     useEffect(() => {
         setConversationList(channelContext.arrayChannels);
     }, [channelContext.arrayChannels]);
+
     return (
         <>
             <div>
@@ -89,17 +92,19 @@ export const Contact = () => {
             <h1> Friend </h1>
             {username &&
                 user?.friends &&
-                user.friends.map((user, i) => {
+                user.friends.map((user) => {
                     if (chatContext.isBlocked(user.id)) {
                         return;
                     }
                     return (
-                        <div key={i}>
+                        <div key={user.id}>
                             <ContactElement
                                 content={{
                                     channel: false,
                                     user: true,
                                     name: user.username,
+									status: user.status,
+									picture: user.avatar,
                                 }}></ContactElement>
                         </div>
                     );

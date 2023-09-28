@@ -124,37 +124,34 @@ export default function SocketContextProvider(
         newSocket.on('exception', (msg) => {
             setSocketError(msg);
         });
-        newSocket.on('updateUser', (user) => {
+        newSocket.on('updateUser', (newUser) => {
             setUser((currentUser: any) => ({
                 ...currentUser,
-                username: user.username,
-                avatar: user.avatar,
-                socketId: user.socketId,
-                twoFactorAuthActive: user.twoFactorAuthActive,
-                friends: user.friends,
-                friendsRequest: user.friendsRequest,
-                blocked: user.blocked,
+                username: newUser.username,
+                avatar: newUser.avatar,
+                socketId: newUser.socketId,
+                twoFactorAuthActive: newUser.twoFactorAuthActive,
+                friends: newUser.friends,
+                friendsRequest: newUser.friendsRequest,
+                blocked: newUser.blocked,
+				status: newUser.status,
             }));
         });
         newSocket.on('updateStatus', (args) => {
             console.log('args', args);
-            setUser((currentUser) => {
-                if (!currentUser) return null;
-                console.log('currentuser: ', currentUser);
-                const newUser = currentUser;
-                const index = newUser?.friends.findIndex(
-                    (obj: any) => obj.id === args.id
-                );
-                console.log('index: ', index);
-                newUser.friends[index].status = args.status;
-                console.log('newuser status: ', newUser.friends[index].status);
-                console.log('newUser: ', newUser);
-                return newUser;
-            });
+			console.log("update status: ", user);
+			let newUser = user;
+			const index = newUser?.friends.findIndex(
+				(obj: any) => obj.id === args.id
+			);
+			console.log('index: ', index);
+			newUser.friends[index].status = args.status;
+			console.log('newuser status: ', newUser.friends[index].status);
+			console.log('newUser: ', newUser);
+            setUser(newUser);
             console.log('status: ', user);
         });
         newSocket.on('error', (msg) => console.log('error: ', msg));
-        console.log('socket context: ', user);
 
         return () => {
             newSocket.off('error');

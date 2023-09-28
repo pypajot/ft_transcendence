@@ -14,6 +14,7 @@ import { channelInfo } from 'src/types/channelInfo.entity';
 import { MessageInfo } from 'src/types/message.info';
 import { ChannelService } from './channel.service';
 import { PrismaClient } from '@prisma/client';
+import { UserService } from 'src/user/user.service';
 
 export interface joinChannelInfo {
     name: string;
@@ -29,7 +30,8 @@ class ChatGateway
     private readonly logger = new Logger(ChatGateway.name);
     constructor(
         private readonly chatService: ChatGatewayService,
-        private readonly channelService: ChannelService
+        private readonly channelService: ChannelService,
+		private readonly userService: UserService
     ) {}
     @WebSocketServer() io: Server<any, ServerToClientEvents>;
     prisma = new PrismaClient();
@@ -42,8 +44,9 @@ class ChatGateway
         );
         if (client.handshake.query.username !== 'null') {
             this.username = client.handshake.query.username;
-            this.chatService.new_cli(client, client.handshake.query.username);
-            this.channelService.responsePendingRequest(
+            await  this.chatService.new_cli(client, client.handshake.query.username);
+			await this.userService.changeStatus(client.id, "online", this.io);
+            await this.channelService.responsePendingRequest(
                 client,
                 client.handshake.query.username
             );
@@ -57,6 +60,7 @@ class ChatGateway
     handleDisconnect(client: any) {
         //Remove the client.id and the username
         client.emit('disconnection');
+		this.userService.changeStatus(client.id, "offline", this.io);
         this.logger.log(`Client ${client.id} left`);
     }
     @SubscribeMessage('message')
