@@ -1,13 +1,10 @@
 import './Profile.css';
 import { useAuth } from '../../context/AuthContext';
-import Navbar, { Navbar2 } from '../../components/Navbar';
-import { Button, Checkbox, HelpText } from '@twilio-paste/core';
-import { User } from '../../context/AuthContext';
-import { useContext, useEffect, useRef } from 'react';
+import Navbar from '../../components/Navbar';
+import { Checkbox } from '@twilio-paste/core';
+import { useEffect, useRef } from 'react';
 import { useState } from 'react';
-import { isAbsolute } from 'path';
 import { useSocketContext } from '../../context/WebSocketContext';
-import { ProfileContext } from '../../context/ProfileContext';
 
 import {Uploader} from "uploader"
 import { UploadButton } from "react-uploader";
@@ -44,6 +41,10 @@ const Profile = () => {
 	const run = useRef(true);
 
 	useEffect(() => {
+		run.current = true;
+	}, [searchParams.get("id")])
+
+	useEffect(() => {
 		const getCurrentUser = async (id: string | null) => {
 			const response = await refreshFetch('http://localhost:3333/user/' + id, {
 				headers: {
@@ -51,15 +52,13 @@ const Profile = () => {
 					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
 				},
 			});
-			if (response.status !== 200) {
+			if (response.status === 400) {
 				navigate("/error");
 				return ;
 			}
 			setCurrentUser(await response.json());
-			if (id !== user?.id.toString())
-				setDisplayMyProfile(false);
+			setDisplayMyProfile(id === user?.id.toString());
 		}
-
 		if (!user || !run.current)
 			return ;
 		if (!searchParams.get("id") || searchParams.get("id") === user?.id.toString())
@@ -67,7 +66,7 @@ const Profile = () => {
 		else
 			getCurrentUser(searchParams.get("id"));
 		run.current = false;
-	}, [user])
+	}, [user, searchParams.get("id")])
 	
 	if (!currentUser || !user)
 		return ;
