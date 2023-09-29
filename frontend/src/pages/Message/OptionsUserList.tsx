@@ -12,14 +12,21 @@ interface OptionUserListProps {
     open: boolean;
     onClose: () => void;
     target: User | undefined;
+    me: User | null;
 }
 export const OptionsUserList = (props: OptionUserListProps) => {
-    const { onClose, target, open } = props;
+    const { onClose, target, open, me } = props;
     const [options, setOptions] = useState<string[]>([]);
     const chatContext = useChatContext();
     const channelContext = useChannelContext();
     const { socket } = useSocketContext();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        //print infos about me, the user
+        console.log('me, user infos in user list: ' + me?.username + ' ' + me?.id);
+    }
+    , [target]);
 
     const handleClose = () => {
         onClose();
@@ -53,11 +60,11 @@ export const OptionsUserList = (props: OptionUserListProps) => {
 
     const handleInviteGame = (target: User | undefined) => {
         const targetSocketId = target?.socketId;
-        const from = 'mpignet';
+        // get the username of the user who sent the invite
         const mode = 'Classic';
         console.log('you invited someone to play: ', target?.username, target?.socketId);
         // notify the other user that he has been invited to play
-        socket?.emit('sendInviteToPlay', {targetSocketId, from, mode});
+        socket?.emit('sendInviteToPlay', {targetSocketId, mode});
         //navigate('/game', { state: { mode: true } });
     }
 

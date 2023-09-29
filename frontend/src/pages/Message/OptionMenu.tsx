@@ -6,7 +6,7 @@ import {
     useMenuState,
 } from '@twilio-paste/core';
 import { MoreIcon } from '@twilio-paste/icons/esm/MoreIcon';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { InviteToChannel } from './InviteToChannel';
 import { useAuth } from '../../context/AuthContext';
 import { ConversationInformation } from '../../../Types/conversationInformation.entity';
@@ -44,6 +44,15 @@ export const OptionMenu = ({
     const navigate = useNavigate();
     const {socket} = useSocketContext();
 
+    useEffect(() => {
+        //print infos about the me, the user
+        console.log('me, the user infos: ' + user?.username + ' ' + user?.id);
+        // print infos about the target, the user
+        console.log('target infos: ' + target?.username + ' ' + target?.socketId);
+
+    }
+    , [user, target]);
+
     const handleInviteGame = () => {
         console.log('you invited someone to play: ', target?.username, target?.socketId);
         // notify the other user that he has been invited to play
@@ -73,6 +82,7 @@ export const OptionMenu = ({
                         onClose={handleCloseOptionUserList}
                         target={target}
                         open={displayOptionUserList}
+                        me={user}
                     />
                     <Menu {...menu} aria-label="Preferences">
                         <MenuItem

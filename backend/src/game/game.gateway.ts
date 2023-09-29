@@ -172,16 +172,36 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('sendInviteToPlay')
-  async handleInviteToPlay(client: Socket, data: { targetSocketId: string, from: string, mode: string }): Promise<void> {
-    const { targetSocketId, from, mode } = data;
+  async handleInviteToPlay(client: Socket, data: { targetSocketId: string, mode: string }): Promise<void> {
+    const { targetSocketId, mode } = data;
+    // get the inviter client username in db
+    const inviter = await this.prisma.user.findFirst({
+      where: {
+        socketId: client.id,
+      },
+    });
     // print the data received from the client
-    console.log('invite to play received from ' + from + ' to ' + targetSocketId + ' in mode ' + mode);
-    this.server.to(targetSocketId).emit('invitedToPlay', client.id, from, mode);
+    console.log('invite to play received from ' + inviter.username + ' to ' + targetSocketId + ' in mode ' + mode);
+    this.server.to(targetSocketId).emit('invitedToPlay', inviter.username, inviter.id, mode);
+  }
+
+  @SubscribeMessage('replyGameInvite')
+  async handleReplyGameInvite(client: Socket, data: { reply: boolean, from_id: number, mode: string}): Promise<void> {
+    const { reply, from_id, mode } = data;
+    // send the reply to the client who sent the invite
+    // get the 'from' client socket id in db
+    const inviter = await this.prisma.user.findFirst({
+      where: {
+        id: from_id,
+      },
+    });
+    console.log('replyGameInvite received from ' + client.id + ' to ' + inviter.username + ' in mode ' + mode);
+    this.server.to(inviter.socketId).emit('repliedGameInvite', reply, client.id, mode);
   }
 
   @SubscribeMessage('launchGameFromChat')
-  async handleLaunchGameFromChat(client: Socket, data: { opp_SocketId: string; mode: string }): Promise<void> {
-    console.log('launching game from chat between ' + client.id + ' and ' + data.opp_SocketId)
+  async handleLaunchGameFromChat(client: Socket, data: { opp_SocketId: string, mode: string }): Promise<void> {
+    console.log('launching game from chat between ' + client.id + ' and ' + data.opp_SocketId + ' in mode ' + data.mode)
     const { opp_SocketId, mode } = data;
     const opponent = this.server.sockets.sockets.get(opp_SocketId);
     const player1 = await this.createPlayer(client, mode);
