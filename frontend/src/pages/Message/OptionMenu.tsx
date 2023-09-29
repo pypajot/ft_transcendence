@@ -16,18 +16,15 @@ import { User } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
 import { useNavigate } from 'react-router-dom';
 import { useSocketContext } from '../../context/WebSocketContext';
+import { ChatContext, useChatContext } from '../../context/ChatContext';
+import Chat from '../Chat/Chat';
 
-export const OptionMenu = ({
-    info,
-}: {
-    info: ConversationInformation | undefined;
-}) => {
+export const OptionMenu = () => {
     const menu = useMenuState();
     const [displayInviteList, setDisplayInviteList] = useState<boolean>(false);
     const [displayUserList, setDisplayUserList] = useState<boolean>(false);
     const [displayOptionUserList, setDisplayOptionUserList] =
         useState<boolean>(false);
-    const [target, setTarget] = useState<User | undefined>(undefined);
     const channelContext = useChannelContext();
     const { user } = useAuth();
     const handleCloseUserList = (user: User | undefined) => {
@@ -42,23 +39,40 @@ export const OptionMenu = ({
         setDisplayOptionUserList(false);
     };
     const navigate = useNavigate();
-    const {socket} = useSocketContext();
+    const { socket } = useSocketContext();
+    const chatContext = useChatContext();
+    const info = chatContext.conversationInfo;
+    const [target, setTarget] = useState<User | undefined>(info?.user);
 
     useEffect(() => {
+        if (info && info.isUser) {
+            console.log(info.user);
+            setTarget(info.user);
+        } else {
+            setTarget(undefined);
+        }
         //print infos about the me, the user
         console.log('me, the user infos: ' + user?.username + ' ' + user?.id);
         // print infos about the target, the user
-        console.log('target infos: ' + target?.username + ' ' + target?.socketId);
-
-    }
-    , [user, target]);
+        console.log(
+            'target infos: ' + target?.username + ' ' + target?.socketId
+        );
+    }, [chatContext, info]);
 
     const handleInviteGame = () => {
-        console.log('you invited someone to play: ', target?.username, target?.socketId);
+        console.log(
+            'you invited someone to play: ',
+            target?.username,
+            target?.socketId
+        );
         // notify the other user that he has been invited to play
-        socket?.emit('sendInviteToPlay', {socketId: target?.socketId, from: user?.username, mode: 'Classic'});
+        socket?.emit('sendInviteToPlay', {
+            socketId: target?.socketId,
+            from: user?.username,
+            mode: 'Classic',
+        });
         navigate('/game', { state: { mode: true } });
-    }
+    };
 
     //do we set the invite to play to any member of a channel ?
     return (
@@ -66,7 +80,7 @@ export const OptionMenu = ({
             <MenuButton {...menu} variant="reset" size="reset">
                 <MoreIcon decorative={false} title="More options" />
             </MenuButton>
-            {info?.ischannel && (
+            {info?.isChannel && (
                 <div>
                     <InviteToChannel
                         open={displayInviteList}
@@ -89,8 +103,10 @@ export const OptionMenu = ({
                             {...menu}
                             onClick={() => {
                                 user &&
+                                    info &&
+                                    info.channel &&
                                     channelContext.leaveChannel(
-                                        info?.name,
+                                        info.channel.name,
                                         user?.username
                                     );
                             }}>
@@ -127,9 +143,13 @@ export const OptionMenu = ({
                     <Menu {...menu} aria-label="Preferences">
                         <MenuItem {...menu}>Block</MenuItem>
                         <MenuSeparator {...menu} />
-                        <MenuItem {...menu}
-                            onClick={() => {handleInviteGame();}}>
-                            Invite to Play </MenuItem>
+                        <MenuItem
+                            {...menu}
+                            onClick={() => {
+                                handleInviteGame();
+                            }}>
+                            Invite to Play{' '}
+                        </MenuItem>
                         <MenuSeparator {...menu} />
                         <MenuItem {...menu}>Profile</MenuItem>
                     </Menu>{' '}

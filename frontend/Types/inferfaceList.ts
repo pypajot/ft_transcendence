@@ -36,7 +36,7 @@ export interface User {
     avatar: string;
     socketId?: string;
     twoFactorAuthActive: boolean;
-    friends: Friend[];
+    friends: User[];
     friendsRequest: Friend[];
     blocked: number[];
 }

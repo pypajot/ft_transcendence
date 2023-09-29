@@ -3,18 +3,16 @@ import { ConversationInformation } from '../../../Types/conversationInformation.
 import { ContactType } from '../../../Types/contact.entity';
 import { useChatContext } from '../../context/ChatContext';
 
-export const ContactElement = ({ content }: { content: ContactType }) => {
+export const ContactElement = ({ info }: { info: ConversationInformation }) => {
     const chatContext = useChatContext();
 
-    const handleContact = (content: ContactType) => {
-        const conversationInfo: ConversationInformation = {
-            ischannel: content.channel,
-            isUser: content.user,
-            name: content.name,
-        };
-        chatContext.setConversationInfo(conversationInfo);
-    };
     const menu = useMenuState();
+
+    const handleClick = () => {
+        chatContext.setConversationInfo(info);
+        console.log(info);
+        chatContext.setRenderConversation(true);
+    };
 
     return (
         <div>
@@ -29,9 +27,16 @@ export const ContactElement = ({ content }: { content: ContactType }) => {
                 paddingX="space70"
                 paddingTop="space50">
                 <SidebarBody>
-                    <h3 color="white" onClick={() => handleContact(content)}>
-                        {content.name}
-                    </h3>
+                    {info.isChannel && (
+                        <h3 color="white" onClick={handleClick}>
+                            {info?.channel?.name}
+                        </h3>
+                    )}
+                    {info.isUser && (
+                        <h3 color="white" onClick={handleClick}>
+                            {info?.user?.username}
+                        </h3>
+                    )}
                 </SidebarBody>
             </Box>
         </div>
