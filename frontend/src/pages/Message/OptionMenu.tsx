@@ -92,7 +92,7 @@ export const OptionMenu = ({
                             {' '}
                             User List{' '}
                         </MenuItem>
-                        {channelContext.isChannelOwner() && (
+                        {user && channelContext.isChannelOwner(user.id) && (
                             <div>
                                 <MenuSeparator {...menu} />
                                 <MenuItem {...menu}>Delete Channel</MenuItem>

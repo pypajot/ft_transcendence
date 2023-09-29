@@ -145,6 +145,7 @@ export class ChatGatewayService {
                     },
                 });
                 if (this.utilsService.isMute(userId, channel)) {
+                    console.log('Muteed message creation fail');
                     return null;
                 }
                 const msg = await this.prisma.message.create({
@@ -217,13 +218,9 @@ export class ChatGatewayService {
                 },
             });
             const msgRes: Message = {
-                id: message.id,
-                authorId: message.authorId,
-                targetId: message.targetId,
+                ...message,
                 senderName: sender.username,
                 sent: true,
-                content: message.content,
-                createdAt: message.createdAt,
             };
             io.to(socket_id).emit('messageSent', msgRes);
             msgRes.sent = false;

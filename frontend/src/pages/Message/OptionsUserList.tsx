@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import List from '@mui/material/List';
 import { User } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface OptionUserListProps {
     open: boolean;
@@ -18,6 +19,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     const chatContext = useChatContext();
     const channelContext = useChannelContext();
     const { socket } = useSocketContext();
+    const { user } = useAuth();
 
     const handleClose = () => {
         onClose();
@@ -25,7 +27,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
 
     const handleMute = () => {
         if (target) {
-            socket.emit('MuteUser', {
+            socket?.emit('MuteUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });
@@ -33,7 +35,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     };
     const handleBan = () => {
         if (target) {
-            socket.emit('BanUser', {
+            socket?.emit('BanUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });
@@ -42,7 +44,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
 
     const handleKick = () => {
         if (target) {
-            socket.emit('KickUser', {
+            socket?.emit('KickUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });
@@ -58,8 +60,17 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     };
 
     const handleBlock = () => {
+        if (target && user) {
+            socket?.emit('blockUser', {
+                targetName: target.username,
+                userId: user.id,
+            });
+        }
+    };
+
+    const handleSudo = () => {
         if (target) {
-            socket.emit('BlockUser', {
+            socket?.emit('SudoUser', {
                 targetId: target.id,
                 channelName: chatContext.conversationInfo?.name,
             });
@@ -86,6 +97,9 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 break;
             case 'Block':
                 handleBlock();
+                break;
+            case 'Sudo':
+                handleSudo();
                 break;
             case 'Unban':
                 if (target) {
@@ -120,9 +134,13 @@ export const OptionsUserList = (props: OptionUserListProps) => {
             'Block',
         ];
         const choices2: string[] = ['Add', 'Play with', 'Profile', 'Block'];
-        if (channelContext.isChannelOwner()) {
-            setOptions([...choices, 'Sudo ']);
-        } else if (channelContext.isAdmin()) {
+        if (user && channelContext.isChannelOwner(user.id)) {
+            setOptions([...choices, 'Sudo']);
+        } else if (
+            target &&
+            channelContext.isAdmin() &&
+            !channelContext.isChannelOwner(target.id)
+        ) {
             setOptions(choices);
         } else {
             setOptions(choices2);

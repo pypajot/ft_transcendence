@@ -7,7 +7,7 @@ import { useAuth } from './AuthContext';
 
 type ChannelContext = {
     isAdmin: () => boolean;
-    isChannelOwner: () => boolean;
+    isChannelOwner: (targetId: number) => boolean;
     leaveChannel: (channelName: string, username: string) => void;
     channels: Map<string, Channel> | undefined;
     arrayChannels: Channel[];
@@ -67,24 +67,10 @@ export default function ChannelContextProvider(
             });
             if (buffChannel) {
                 buffChannel.delete(channelName);
-                /*
-                const actualChannel = channels?.get(channelName);
-                if (actualChannel) {
-                    const newMemberList = actualChannel?.members.filter(
-                        (members) => {
-                            if (members.username != username) {
-                                return true;
-                            }
-                            return false;
-                        }
-                    );
-                    actualChannel.members = newMemberList;
-                    channels.set(actualChannel?.name, actualChannel);
-                }*/
-                //Do we ask the back to assure that we correctly leaved the channel or not
                 setChannels(buffChannel);
                 chatContext.setRenderConversation(false);
             }
+            chatContext.setConversationInfo(undefined);
         },
         [socket, channels, setChannels, chatContext.setRenderConversation]
     );
@@ -152,7 +138,7 @@ export default function ChannelContextProvider(
                     ?.info.map((moderation) => {
                         if (
                             moderation.type == 'ban' &&
-                            userId == moderation.target.id
+                            userId == moderation.targetId
                         ) {
                             res = true;
                         }
@@ -163,13 +149,18 @@ export default function ChannelContextProvider(
         [chatContext.conversationInfo, channels]
     );
 
-    const isChannelOwner = React.useCallback(() => {
-        if (channels && chatContext.conversationInfo) {
-            const channel = channels.get(chatContext.conversationInfo?.name);
-            if (channel && channel.owner == user?.id) return true;
-        }
-        return false;
-    }, [channels, chatContext.conversationInfo, user]);
+    const isChannelOwner = React.useCallback(
+        (targetId: number) => {
+            if (channels && chatContext.conversationInfo) {
+                const channel = channels.get(
+                    chatContext.conversationInfo?.name
+                );
+                if (channel && channel.owner == targetId) return true;
+            }
+            return false;
+        },
+        [channels, chatContext.conversationInfo, user]
+    );
 
     const isAdmin = React.useCallback(() => {
         if (channels && chatContext.conversationInfo) {
@@ -194,7 +185,7 @@ export default function ChannelContextProvider(
                     ?.info.map((moderation) => {
                         if (
                             moderation.type == 'mute' &&
-                            userId == moderation.target.id
+                            userId == moderation.targetId
                         ) {
                             res = true;
                         }

@@ -58,6 +58,37 @@ export class ChannelService {
         }
     }
 
+    async sudoUser(io: Server, targetId, channelName) {
+        try {
+            const target = await this.prisma.user.findUnique({
+                where: {
+                    id: targetId,
+                },
+            });
+            const channel = await this.prisma.channel.findUnique({
+                where: {
+                    name: channelName,
+                },
+            });
+            for (const id of channel.admins) {
+                if (id == targetId) {
+                    return;
+                }
+            }
+            await this.prisma.channel.update({
+                where: {
+                    name: channelName,
+                },
+                data: {
+                    admins: [...channel.admins, targetId],
+                },
+            });
+            this.updateChannel(io, channel.name);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     async KickUser(
         io: Server,
         targetId,
@@ -146,7 +177,7 @@ export class ChannelService {
                     },
                 },
             });
-            io.to(user.socketId).emit('Kicked', channel);
+            io.to(user.socketId).emit('Kicked', channel.name);
         } catch (error) {
             console.log(error);
         }
@@ -389,7 +420,6 @@ export class ChannelService {
                 },
             });
             channel.members.map((user) => {
-                console.log(` teasssee : ${user.id}`);
                 io.to(user.socketId).emit('updateChannel', channel);
             });
         } catch (error) {
@@ -455,7 +485,7 @@ export class ChannelService {
                         members: true,
                     },
                 });
-                console.log(newUpdatedChannel);
+                client.join(newUpdatedChannel.name);
                 client.emit('successfullyJoinedChannel', newUpdatedChannel);
                 this.updateChannel(io, info.name);
             } else {
@@ -489,6 +519,7 @@ export class ChannelService {
                 ...message,
                 senderName: sender.username,
                 sent: true,
+                channel: message.Channel,
             };
             io.to(channel_name).emit('messageChannel', msgRes);
         } catch (error) {

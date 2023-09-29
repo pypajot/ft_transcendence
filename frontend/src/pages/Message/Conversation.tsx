@@ -152,11 +152,11 @@ export const Conversation = () => {
             if (user && message.senderName != user.username) {
                 message.sent = false;
             }
-            if (
-                message.channel &&
-                message.channel.name == chatContext.conversationInfo?.name
-            )
+            if (message?.channel?.name == chatContext.conversationInfo?.name) {
+                console.log([...conversationMsg, message]);
                 setConversationMsg([...conversationMsg, message]);
+            }
+            console.log(conversationMsg);
         },
         [setConversationMsg, conversationMsg, user]
     );
@@ -202,7 +202,14 @@ export const Conversation = () => {
                 </Flex>
             )}
             {conversationMsg &&
+                chatContext.renderConversation &&
                 conversationMsg.map(function (message, i) {
+                    if (
+                        message.targetId &&
+                        chatContext.conversationInfo?.ischannel
+                    ) {
+                        return;
+                    }
                     if (message.sent) {
                         return (
                             <div key={i}>
@@ -211,7 +218,7 @@ export const Conversation = () => {
                             </div>
                         );
                     } else {
-                        if (chatContext.isBlocked(message.autorId)) {
+                        if (chatContext.isBlocked(message.authorId)) {
                             return;
                         }
                         return (
