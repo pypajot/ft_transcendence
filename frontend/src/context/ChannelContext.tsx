@@ -7,7 +7,7 @@ import { useAuth } from './AuthContext';
 
 type ChannelContext = {
     isAdmin: () => boolean;
-    isChannelOwner: () => boolean;
+    isChannelOwner: (targetId: number) => boolean;
     leaveChannel: (channelName: string, username: string) => void;
     channels: Map<string, Channel> | undefined;
     arrayChannels: Channel[];
@@ -149,13 +149,18 @@ export default function ChannelContextProvider(
         [chatContext.conversationInfo, channels]
     );
 
-    const isChannelOwner = React.useCallback(() => {
-        if (channels && chatContext.conversationInfo) {
-            const channel = channels.get(chatContext.conversationInfo?.name);
-            if (channel && channel.owner == user?.id) return true;
-        }
-        return false;
-    }, [channels, chatContext.conversationInfo, user]);
+    const isChannelOwner = React.useCallback(
+        (targetId: number) => {
+            if (channels && chatContext.conversationInfo) {
+                const channel = channels.get(
+                    chatContext.conversationInfo?.name
+                );
+                if (channel && channel.owner == targetId) return true;
+            }
+            return false;
+        },
+        [channels, chatContext.conversationInfo, user]
+    );
 
     const isAdmin = React.useCallback(() => {
         if (channels && chatContext.conversationInfo) {

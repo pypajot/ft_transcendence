@@ -70,6 +70,11 @@ export class ChannelService {
                     name: channelName,
                 },
             });
+            for (const id of channel.admins) {
+                if (id == targetId) {
+                    return;
+                }
+            }
             await this.prisma.channel.update({
                 where: {
                     name: channelName,

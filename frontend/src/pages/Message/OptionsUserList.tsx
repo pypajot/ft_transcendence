@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import List from '@mui/material/List';
 import { User } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface OptionUserListProps {
     open: boolean;
@@ -18,6 +19,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     const chatContext = useChatContext();
     const channelContext = useChannelContext();
     const { socket } = useSocketContext();
+    const { user } = useAuth();
 
     const handleClose = () => {
         onClose();
@@ -58,16 +60,15 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     };
 
     const handleBlock = () => {
-        if (target) {
+        if (target && user) {
             socket?.emit('blockUser', {
                 targetName: target.username,
-                userId: target.id,
+                userId: user.id,
             });
         }
     };
 
     const handleSudo = () => {
-        console.log('SuDO HANDLE');
         if (target) {
             socket?.emit('SudoUser', {
                 targetId: target.id,
@@ -133,9 +134,13 @@ export const OptionsUserList = (props: OptionUserListProps) => {
             'Block',
         ];
         const choices2: string[] = ['Add', 'Play with', 'Profile', 'Block'];
-        if (channelContext.isChannelOwner()) {
+        if (user && channelContext.isChannelOwner(user.id)) {
             setOptions([...choices, 'Sudo']);
-        } else if (channelContext.isAdmin()) {
+        } else if (
+            target &&
+            channelContext.isAdmin() &&
+            !channelContext.isChannelOwner(target.id)
+        ) {
             setOptions(choices);
         } else {
             setOptions(choices2);

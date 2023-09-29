@@ -203,6 +203,12 @@ export const Conversation = () => {
             {conversationMsg &&
                 chatContext.renderConversation &&
                 conversationMsg.map(function (message, i) {
+                    if (
+                        message.targetId &&
+                        chatContext.conversationInfo?.ischannel
+                    ) {
+                        return;
+                    }
                     if (message.sent) {
                         return (
                             <div key={i}>
@@ -211,7 +217,7 @@ export const Conversation = () => {
                             </div>
                         );
                     } else {
-                        if (chatContext.isBlocked(message.autorId)) {
+                        if (chatContext.isBlocked(message.authorId)) {
                             return;
                         }
                         return (
