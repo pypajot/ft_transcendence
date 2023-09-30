@@ -77,17 +77,28 @@ export default function ChannelContextProvider(
 
     const addChannel = React.useCallback(
         (channel: Channel) => {
+            console.log('ahah');
+            console.log(channel);
             const buffChannel = new Map(channels);
 
             buffChannel.set(channel.name, channel);
-            chatContext.setConversationInfo({
-                ischannel: true,
+            chatContext.conversationInfo = {
+                isChannel: true,
                 isUser: false,
                 channel: channel,
-            });
+            };
             setChannels(buffChannel);
+            console.log('ther');
+            console.log(chatContext.conversationInfo);
+            chatContext.setConversationInfo(chatContext.conversationInfo);
+            chatContext.setRenderConversation(true);
         },
-        [channels, chatContext.setConversationInfo]
+        [
+            channels,
+            chatContext.setConversationInfo,
+            setChannels,
+            chatContext.conversationInfo,
+        ]
     );
 
     const updateChannel = React.useCallback(
@@ -132,9 +143,9 @@ export default function ChannelContextProvider(
     const isBan = React.useCallback(
         (userId: number) => {
             let res = false;
-            if (chatContext.conversationInfo && channels) {
+            if (chatContext.conversationInfo?.channel && channels) {
                 channels
-                    .get(chatContext.conversationInfo.name)
+                    .get(chatContext.conversationInfo.channel.name)
                     ?.info.map((moderation) => {
                         if (
                             moderation.type == 'ban' &&
@@ -151,9 +162,9 @@ export default function ChannelContextProvider(
 
     const isChannelOwner = React.useCallback(
         (targetId: number) => {
-            if (channels && chatContext.conversationInfo) {
+            if (channels && chatContext.conversationInfo?.channel) {
                 const channel = channels.get(
-                    chatContext.conversationInfo?.name
+                    chatContext.conversationInfo?.channel.name
                 );
                 if (channel && channel.owner == targetId) return true;
             }
@@ -163,8 +174,10 @@ export default function ChannelContextProvider(
     );
 
     const isAdmin = React.useCallback(() => {
-        if (channels && chatContext.conversationInfo) {
-            const channel = channels.get(chatContext.conversationInfo?.name);
+        if (channels && chatContext.conversationInfo?.channel) {
+            const channel = channels.get(
+                chatContext.conversationInfo?.channel.name
+            );
             if (channel) {
                 for (let i = 0; i < channel.admins.length; i++) {
                     if (channel.admins[i] == user?.id) {
@@ -179,9 +192,9 @@ export default function ChannelContextProvider(
     const isMute = React.useCallback(
         (userId: number) => {
             let res = false;
-            if (chatContext.conversationInfo && channels) {
+            if (chatContext.conversationInfo?.channel && channels) {
                 channels
-                    .get(chatContext.conversationInfo.name)
+                    .get(chatContext.conversationInfo.channel.name)
                     ?.info.map((moderation) => {
                         if (
                             moderation.type == 'mute' &&

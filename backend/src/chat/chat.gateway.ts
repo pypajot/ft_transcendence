@@ -31,7 +31,7 @@ class ChatGateway
     constructor(
         private readonly chatService: ChatGatewayService,
         private readonly channelService: ChannelService,
-		private readonly userService: UserService
+        private readonly userService: UserService
     ) {}
     @WebSocketServer() io: Server<any, ServerToClientEvents>;
     prisma = new PrismaClient();
@@ -44,8 +44,11 @@ class ChatGateway
         );
         if (client.handshake.query.username !== 'null') {
             this.username = client.handshake.query.username;
-            await  this.chatService.new_cli(client, client.handshake.query.username);
-			await this.userService.changeStatus(client.id, "online", this.io);
+            await this.chatService.new_cli(
+                client,
+                client.handshake.query.username
+            );
+            await this.userService.changeStatus(client.id, 'online', this.io);
             await this.channelService.responsePendingRequest(
                 client,
                 client.handshake.query.username
@@ -60,14 +63,14 @@ class ChatGateway
     handleDisconnect(client: any) {
         //Remove the client.id and the username
         client.emit('disconnection');
-		this.userService.changeStatus(client.id, "offline", this.io);
+        this.userService.changeStatus(client.id, 'offline', this.io);
         this.logger.log(`Client ${client.id} left`);
     }
     @SubscribeMessage('message')
     async handleEvent(client: any, data: MessageInfo): Promise<void> {
         const newMsg = await this.chatService.createMessage(client.id, data);
         if (data.ToUser && newMsg) {
-            this.chatService.sendToUser(this.io, await newMsg, client.id);
+            this.chatService.sendToUser(this.io, newMsg, client.id);
         } else if (newMsg != null) {
             this.channelService.sendToChannel(
                 this.io,

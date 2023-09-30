@@ -401,6 +401,7 @@ export class ChannelService {
                     },
                 });
                 client.join(data_chan.name);
+                console.log(newchannel);
                 client.emit('successfullyJoinedChannel', newchannel);
             }
         } catch (error) {

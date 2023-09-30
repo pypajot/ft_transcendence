@@ -49,15 +49,6 @@ export const Conversation = () => {
         }
     }, [user]);
 
-    useEffect(() => {
-        const info = chatContext.conversationInfo;
-        if (info && info.isChannel && info.channel) {
-            setConvName(info.channel.name);
-        } else if (info && info.user) {
-            setConvName(info.user.username);
-        }
-    }, [chatContext, chatContext.conversationInfo]);
-
     const getMessageReceived = async (obj: {
         sender: string;
         receiver: string;
@@ -91,9 +82,17 @@ export const Conversation = () => {
         }
     };
 
+    useEffect(() => {}, [info, username]);
+
     useEffect(() => {
+        const info = chatContext.conversationInfo;
         if (!info) {
             return;
+        }
+        if (info && info.isChannel && info.channel) {
+            setConvName(info.channel.name);
+        } else if (info && info.isUser && info.user) {
+            setConvName(info.user.username);
         }
         if (username != '') {
             getMessageReceived({
@@ -106,12 +105,6 @@ export const Conversation = () => {
         } else {
             chatContext.setRenderConversation(false);
         }
-    }, [info, username]);
-
-    useEffect(() => {
-        if (!info) {
-            return;
-        }
         if (username != '') {
             getMessageSent({
                 sender: username,
@@ -122,7 +115,13 @@ export const Conversation = () => {
                 setSentMessage(res);
             });
         }
-    }, [info, user, username]);
+    }, [
+        chatContext,
+        chatContext.conversationInfo,
+        chatContext.renderConversation,
+        convName,
+        username,
+    ]);
 
     useEffect(() => {
         //if (info && info.ischannel) {

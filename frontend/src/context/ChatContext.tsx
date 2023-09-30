@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { ConversationInformation } from '../../Types/conversationInformation.entity';
 import { createContext, useContext, useMemo, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { useSocketContext } from './WebSocketContext';
 import { ErrorType } from '../../Types/inferfaceList';
+import { ConversationInformation } from '../../Types/conversationInformation.entity';
 
 type ChatContext = {
     conversationInfo: ConversationInformation | undefined;

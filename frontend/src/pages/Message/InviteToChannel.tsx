@@ -33,7 +33,7 @@ export function InviteToChannel(props: SimpleDialogProps) {
     const handleListItemClick = (target: Friend) => {
         socket?.emit('ChannelInvitation', {
             target: target.username,
-            channel: chatContext.conversationInfo?.name,
+            channel: chatContext.conversationInfo?.channel?.name,
         });
         onClose();
     };
@@ -41,7 +41,7 @@ export function InviteToChannel(props: SimpleDialogProps) {
     return (
         <Dialog onClose={handleClose} open={open}>
             <DialogTitle>
-                Add friends to {chatContext.conversationInfo?.name}
+                Add friends to {chatContext.conversationInfo?.channel?.name}
             </DialogTitle>
             <List sx={{ pt: 0 }}>
                 {user &&

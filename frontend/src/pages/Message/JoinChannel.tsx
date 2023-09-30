@@ -33,7 +33,7 @@ export const JoinChanel = () => {
     const enterConversation = useCallback(
         (arg: any) => {
             const convInfo: ConversationInformation = {
-                ischannel: true,
+                isChannel: true,
                 isUser: false,
                 channel: arg,
             };
