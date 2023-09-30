@@ -83,7 +83,7 @@ export default function ChannelContextProvider(
             chatContext.setConversationInfo({
                 ischannel: true,
                 isUser: false,
-                name: channel.name,
+                channel: channel,
             });
             setChannels(buffChannel);
         },

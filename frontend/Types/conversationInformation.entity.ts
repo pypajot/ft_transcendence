@@ -1,5 +1,8 @@
+import { Channel, User } from './inferfaceList';
+
 export interface ConversationInformation {
-  ischannel: boolean;
-  isUser: boolean;
-  name: string;
+    isChannel: boolean;
+    isUser: boolean;
+    user?: User | undefined;
+    channel?: Channel | undefined;
 }

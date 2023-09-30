@@ -171,9 +171,39 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('sendInviteToPlay')
+  async handleInviteToPlay(client: Socket, data: { targetSocketId: string, mode: string }): Promise<void> {
+    const { targetSocketId, mode } = data;
+    // get the inviter client username in db
+    const inviter = await this.prisma.user.findFirst({
+      where: {
+        socketId: client.id,
+      },
+    });
+    // print the data received from the client
+    console.log('invite to play received from ' + inviter.username + ' to ' + targetSocketId + ' in mode ' + mode);
+    this.server.to(targetSocketId).emit('invitedToPlay', inviter.username, inviter.id, mode);
+  }
+
+  @SubscribeMessage('replyGameInvite')
+  async handleReplyGameInvite(client: Socket, data: { reply: boolean, from_id: number, mode: string}): Promise<void> {
+    const { reply, from_id, mode } = data;
+    // send the reply to the client who sent the invite
+    // get the 'from' client socket id in db
+    const inviter = await this.prisma.user.findFirst({
+      where: {
+        id: from_id,
+      },
+    });
+    console.log('replyGameInvite received from ' + client.id + ' to ' + inviter.username + ' in mode ' + mode);
+    this.server.to(inviter.socketId).emit('repliedGameInvite', reply, client.id, mode);
+  }
+
   @SubscribeMessage('launchGameFromChat')
-  async handleLaunchGameFromChat(client: Socket, data: { opponent: Socket; mode: string }): Promise<void> {
-    const { opponent, mode } = data;
+  async handleLaunchGameFromChat(client: Socket, data: { opp_SocketId: string, mode: string }): Promise<void> {
+    console.log('launching game from chat between ' + client.id + ' and ' + data.opp_SocketId + ' in mode ' + data.mode)
+    const { opp_SocketId, mode } = data;
+    const opponent = this.server.sockets.sockets.get(opp_SocketId);
     const player1 = await this.createPlayer(client, mode);
     const player2 = await this.createPlayer(opponent, mode);
     const lobbyId = this.matchmakingService.launchFromChat(player1, player2, mode);
@@ -183,8 +213,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       setTimeout(() => {
         const username1 = gameService.player1.username;
         const username2 = gameService.player2.username;
-        client.emit('createLobby', lobbyId, username1, username2);
-        gameService.player1.socket.emit('createLobby', lobbyId, username1, username2);
+        console.log (`${username1} vs ${username2} lets goooo`);
+        player1.socket.emit('createLobby', lobbyId, username1, username2);
+        player2.socket.emit('createLobby', lobbyId, username1, username2);
         console.log(`Lobby ${lobbyId} created`);
       }, 500);
     }

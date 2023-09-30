@@ -133,8 +133,6 @@ export class MatchmakingService {
     else if (mode === GameMode.Hardcore) {
       gameConfiguration = hardcoreGameConfig;
     }
-    player1.socket.emit('matched');
-    player2.socket.emit('matched');
     // Initialize a new game session with these players
     const gameId = player1.socket.id + player2.socket.id;
     this.gameService[gameId] = new GameService();

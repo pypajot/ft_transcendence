@@ -34,6 +34,7 @@ export const Conversation = () => {
     const [receivedMessage, setReceivedMessage] = useState<Message[]>();
     const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
     const [username, setUsername] = useState<string>('');
+    const [convName, setConvName] = useState<string>('undefined');
 
     const chatContext = useChatContext();
     //Make a component to get the previous messsage
@@ -47,6 +48,15 @@ export const Conversation = () => {
             setUsername(user.username);
         }
     }, [user]);
+
+    useEffect(() => {
+        const info = chatContext.conversationInfo;
+        if (info && info.isChannel && info.channel) {
+            setConvName(info.channel.name);
+        } else if (info && info.user) {
+            setConvName(info.user.username);
+        }
+    }, [chatContext, chatContext.conversationInfo]);
 
     const getMessageReceived = async (obj: {
         sender: string;
@@ -86,9 +96,8 @@ export const Conversation = () => {
             return;
         }
         if (username != '') {
-            chatContext.setRenderConversation(true);
             getMessageReceived({
-                sender: info.name,
+                sender: convName,
                 receiver: username,
                 isUser: info.isUser,
             }).then((res: any) => {
@@ -106,7 +115,7 @@ export const Conversation = () => {
         if (username != '') {
             getMessageSent({
                 sender: username,
-                receiver: info.name,
+                receiver: convName,
                 isUser: info.isUser,
             }).then((res) => {
                 console.log(res);
@@ -152,10 +161,12 @@ export const Conversation = () => {
             if (user && message.senderName != user.username) {
                 message.sent = false;
             }
-            if (message?.channel?.name == chatContext.conversationInfo?.name) {
-                console.log([...conversationMsg, message]);
+            if (
+                message.channel &&
+                message.channel.name ==
+                    chatContext.conversationInfo?.channel?.name
+            )
                 setConversationMsg([...conversationMsg, message]);
-            }
             console.log(conversationMsg);
         },
         [setConversationMsg, conversationMsg, user]
@@ -163,8 +174,12 @@ export const Conversation = () => {
 
     const messageListener = useCallback(
         (message: Message) => {
-			if (info?.isUser && (message.senderName === info.name || message.senderName === user?.username))
-				setConversationMsg([...conversationMsg, message]);
+            if (
+                info?.isUser &&
+                (message.senderName === info?.user?.username ||
+                    message.senderName === user?.username)
+            )
+                setConversationMsg([...conversationMsg, message]);
         },
         [setConversationMsg, conversationMsg]
     );
@@ -173,7 +188,7 @@ export const Conversation = () => {
         if (content && content != '' && info) {
             const message_content: MessageInfo = {
                 content: content,
-                target: info.name,
+                target: convName,
                 ToUser: info.isUser,
             };
             socket?.emit('message', message_content);
@@ -196,9 +211,9 @@ export const Conversation = () => {
             {chatContext.renderConversation && (
                 <Flex>
                     <Flex grow shrink basis="1px">
-                        <Flex>{info?.name}</Flex>
+                        <Flex>{convName}</Flex>
                     </Flex>
-                    <OptionMenu info={info} />
+                    <OptionMenu />
                 </Flex>
             )}
             {conversationMsg &&
@@ -206,7 +221,7 @@ export const Conversation = () => {
                 conversationMsg.map(function (message, i) {
                     if (
                         message.targetId &&
-                        chatContext.conversationInfo?.ischannel
+                        chatContext.conversationInfo?.isChannel
                     ) {
                         return;
                     }

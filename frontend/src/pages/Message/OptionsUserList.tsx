@@ -7,19 +7,29 @@ import List from '@mui/material/List';
 import { User } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface OptionUserListProps {
     open: boolean;
     onClose: () => void;
     target: User | undefined;
+    me: User | null;
 }
 export const OptionsUserList = (props: OptionUserListProps) => {
-    const { onClose, target, open } = props;
+    const { onClose, target, open, me } = props;
     const [options, setOptions] = useState<string[]>([]);
     const chatContext = useChatContext();
     const channelContext = useChannelContext();
     const { socket } = useSocketContext();
     const { user } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        //print infos about me, the user
+        console.log(
+            'me, user infos in user list: ' + me?.username + ' ' + me?.id
+        );
+    }, [target]);
 
     const handleClose = () => {
         onClose();
@@ -29,7 +39,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         if (target) {
             socket?.emit('MuteUser', {
                 targetId: target.id,
-                channelName: chatContext.conversationInfo?.name,
+                channelName: chatContext.conversationInfo?.channel?.name,
             });
         }
     };
@@ -37,7 +47,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         if (target) {
             socket?.emit('BanUser', {
                 targetId: target.id,
-                channelName: chatContext.conversationInfo?.name,
+                channelName: chatContext.conversationInfo?.channel?.name,
             });
         }
     };
@@ -46,13 +56,23 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         if (target) {
             socket?.emit('KickUser', {
                 targetId: target.id,
-                channelName: chatContext.conversationInfo?.name,
+                channelName: chatContext.conversationInfo?.channel?.name,
             });
         }
     };
 
-    const handleInviteGame = () => {
-        console.log('invited You to Play');
+    const handleInviteGame = (target: User | undefined) => {
+        const targetSocketId = target?.socketId;
+        // get the username of the user who sent the invite
+        const mode = 'Classic';
+        console.log(
+            'you invited someone to play: ',
+            target?.username,
+            target?.socketId
+        );
+        // notify the other user that he has been invited to play
+        socket?.emit('sendInviteToPlay', { targetSocketId, mode });
+        //navigate('/game', { state: { mode: true } });
     };
 
     const handleProfile = () => {
@@ -72,7 +92,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         if (target) {
             socket?.emit('SudoUser', {
                 targetId: target.id,
-                channelName: chatContext.conversationInfo?.name,
+                channelName: chatContext.conversationInfo?.channel?.name,
             });
         }
     };
@@ -90,7 +110,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 handleKick();
                 break;
             case 'Play with':
-                handleInviteGame();
+                handleInviteGame(target);
                 break;
             case 'Profile':
                 handleProfile();
@@ -105,7 +125,8 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 if (target) {
                     socket?.emit('UnbanUser', {
                         targetId: target.id,
-                        channelName: chatContext.conversationInfo?.name,
+                        channelName:
+                            chatContext.conversationInfo?.channel?.name,
                     });
                 }
                 break;
@@ -113,7 +134,8 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 if (target) {
                     socket?.emit('UnmuteUser', {
                         targetId: target.id,
-                        channelName: chatContext.conversationInfo?.name,
+                        channelName:
+                            chatContext.conversationInfo?.channel?.name,
                     });
                 }
                 break;
@@ -173,7 +195,6 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                                 onClick={() => {
                                     //If Ban Unban
                                     //If Mute Unmute
-
                                     handleOptionClick(choice);
                                 }}>
                                 <ListItemText

@@ -80,10 +80,10 @@ export const Contact = () => {
                         return (
                             <div key={channel.id}>
                                 <ContactElement
-                                    content={{
-                                        channel: true,
-                                        user: false,
-                                        name: channel.name,
+                                    info={{
+                                        isChannel: true,
+                                        isUser: false,
+                                        channel: channel,
                                     }}></ContactElement>
                             </div>
                         );
@@ -99,12 +99,10 @@ export const Contact = () => {
                     return (
                         <div key={user.id}>
                             <ContactElement
-                                content={{
-                                    channel: false,
-                                    user: true,
-                                    name: user.username,
-									status: user.status,
-									picture: user.avatar,
+                                info={{
+                                    isChannel: false,
+                                    isUser: true,
+                                    user: user,
                                 }}></ContactElement>
                         </div>
                     );
