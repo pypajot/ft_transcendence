@@ -7,13 +7,13 @@ import { useSocketContext } from '../../context/WebSocketContext';
 import { useNavigate } from 'react-router-dom';
 
 interface PopUpProps {
-	mykey: number;
+	key: number;
 	from: string;
 	from_id: number;
 	mode: string;
 }
 
-export const PopUpInvite: React.FC<PopUpProps> = ({mykey, from, from_id, mode}) => {
+export const PopUpInvite: React.FC<PopUpProps> = ({key, from, from_id, mode}) => {
 	// Modal properties
 	const [isOpen, setIsOpen] = useState(true);
 	const handleClose = () => setIsOpen(false);

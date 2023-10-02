@@ -50,7 +50,7 @@ const ChatComponent = () => {
     return (
         <>
             <TopbarMenu />
-            { gameInvite && (<PopUpInvite mykey={key} from={inviter} from_id={inviter_id} mode={mode}/>)}
+            { gameInvite && (<PopUpInvite key={key} from={inviter} from_id={inviter_id} mode={mode}/>)}
             <Flex>
                 <Flex>
                     <Box

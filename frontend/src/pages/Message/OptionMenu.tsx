@@ -61,7 +61,7 @@ export const OptionMenu = () => {
         //const targetSocketId = target?.socketId;
         // get the username of the user who sent the invite
         const mode = 'Classic';
-        console.log('you invited someone to play: ', target?.username, target?.socketId);
+        console.log('you invited someone to play: ', target?.username);
         // notify the other user that he has been invited to play
         socket?.emit('sendInviteToPlay', {targetId, mode});
         //navigate('/game', { state: { mode: true } });
