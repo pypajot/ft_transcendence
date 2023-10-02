@@ -51,21 +51,4 @@ const Navbar = () => {
 	);
 };
 
-export const Navbar2 = () => {
-	return (
-		<div>
-		<Link to='/home'>
-			<button>
-				Home
-			</button>
-		</Link>
-		<Link to='/profile'>
-			<button>
-				Profile
-			</button>
-		</Link>
-		</div>
-	)
-}
-
 export default Navbar;

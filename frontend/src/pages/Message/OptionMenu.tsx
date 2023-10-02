@@ -31,7 +31,7 @@ export const OptionMenu = () => {
             setTarget(user);
         }
         setDisplayUserList(false);
-        console.log(user);
+        // console.log(user);
     };
     const handleCloseOptionUserList = () => {
         setDisplayOptionUserList(false);
@@ -43,17 +43,17 @@ export const OptionMenu = () => {
 
     useEffect(() => {
         if (info && info.isUser) {
-            console.log(info.user);
+            // console.log(info.user);
             setTarget(info.user);
         } else {
             setTarget(undefined);
         }
         //print infos about the me, the user
-        console.log('me, the user infos: ' + user?.username + ' ' + user?.id);
+        // console.log('me, the user infos: ' + user?.username + ' ' + user?.id);
         // print infos about the target, the user
-        console.log(
-            'target infos: ' + target?.username + ' ' + target?.socketId
-        );
+        // console.log(
+            // 'target infos: ' + target?.username + ' ' + target?.socketId
+        // );
     }, [chatContext, info]);
 
     const handleInviteGame = () => {
@@ -61,7 +61,7 @@ export const OptionMenu = () => {
         //const targetSocketId = target?.socketId;
         // get the username of the user who sent the invite
         const mode = 'Classic';
-        console.log('you invited someone to play: ', target?.username);
+        // console.log('you invited someone to play: ', target?.username);
         // notify the other user that he has been invited to play
         socket?.emit('sendInviteToPlay', {targetId, mode});
         //navigate('/game', { state: { mode: true } });

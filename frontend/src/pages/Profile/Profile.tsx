@@ -1,6 +1,6 @@
 import './Profile.css';
 import { useAuth } from '../../context/AuthContext';
-import Navbar, { Navbar2 } from '../../components/Navbar';
+import Navbar from '../../components/Navbar';
 import { Button, Checkbox, HelpText } from '@twilio-paste/core';
 import { User } from '../../context/AuthContext';
 import { useContext, useEffect, useRef } from 'react';

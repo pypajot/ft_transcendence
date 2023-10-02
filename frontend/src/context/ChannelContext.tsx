@@ -77,8 +77,8 @@ export default function ChannelContextProvider(
 
     const addChannel = React.useCallback(
         (channel: Channel) => {
-            console.log('ahah');
-            console.log(channel);
+            // console.log('ahah');
+            // console.log(channel);
             const buffChannel = new Map(channels);
 
             buffChannel.set(channel.name, channel);
@@ -88,8 +88,8 @@ export default function ChannelContextProvider(
                 channel: channel,
             };
             setChannels(buffChannel);
-            console.log('ther');
-            console.log(chatContext.conversationInfo);
+            // console.log('ther');
+            // console.log(chatContext.conversationInfo);
             chatContext.setConversationInfo(chatContext.conversationInfo);
             chatContext.setRenderConversation(true);
         },
@@ -113,7 +113,7 @@ export default function ChannelContextProvider(
             });
             newArrayChannels.push(channel);
             setArrayChannels(newArrayChannels);
-            console.log(user, channels);
+            // console.log(user, channels);
         },
         [user, channels, setChannels, arrayChannels, setArrayChannels]
     );

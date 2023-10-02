@@ -6,7 +6,6 @@ import {
     ClearEditorPlugin,
 } from '@twilio-paste/lexical-library';
 import { Box, Flex } from '@twilio-paste/core';
-import getMessageSent from './Hooks/GetUserMessageSent';
 import { Message } from '../../../Types/message.entity';
 import { MessageInfo } from '../../../Types/messageInfo.entity';
 import { BasicInMessage, BasicOutMessage } from './BasicMessage';
@@ -34,7 +33,7 @@ export const Conversation = () => {
     const [receivedMessage, setReceivedMessage] = useState<Message[]>();
     const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
     const [username, setUsername] = useState<string>('');
-    const [convName, setConvName] = useState<string>('undefined');
+    const [convName, setConvName] = useState<string>('');
 
     const chatContext = useChatContext();
     //Make a component to get the previous messsage
@@ -55,6 +54,7 @@ export const Conversation = () => {
         isUser: boolean;
     }) => {
         const url = 'http://localhost:3333/chat/getMessageReceived';
+		console.log("received: ", obj);
 
         try {
             const response = await refreshFetch(url, {
@@ -82,6 +82,36 @@ export const Conversation = () => {
         }
     };
 
+	const getMessageSent = async (obj: {
+        sender: string;
+        receiver: string;
+        isUser: boolean;
+    }) => {
+        const url = 'http://localhost:3333/chat/getMessageSent';
+		console.log("sent: ", obj);
+        try {
+			const response = await refreshFetch(url, {
+			  method: "POST",
+			  headers: {
+				"Content-Type": "application/json",
+			  },
+			  body: JSON.stringify({
+				sender: obj.sender,
+				receiver: obj.receiver,
+				isUser: obj.isUser,
+			  }),
+			});
+		
+			if (!response.ok) {
+			  throw new Error(`HTTP error! Status: ${response.status}`);
+			}
+		
+			return await response.json();
+		  } catch (error) {
+			console.error("There was an error fetching the data", error);
+		  }
+    };
+
     useEffect(() => {}, [info, username]);
 
     useEffect(() => {
@@ -94,27 +124,25 @@ export const Conversation = () => {
         } else if (info && info.isUser && info.user) {
             setConvName(info.user.username);
         }
-        if (username != '') {
-            getMessageReceived({
-                sender: convName,
-                receiver: username,
-                isUser: info.isUser,
-            }).then((res: any) => {
-                setReceivedMessage(res);
-            });
-        } else {
-            chatContext.setRenderConversation(false);
-        }
-        if (username != '') {
-            getMessageSent({
-                sender: username,
-                receiver: convName,
-                isUser: info.isUser,
-            }).then((res) => {
-                console.log(res);
-                setSentMessage(res);
-            });
-        }
+		if (username === '' || convName === '') {
+			chatContext.setRenderConversation(false);
+			return ;
+		}
+		getMessageReceived({
+			sender: convName,
+			receiver: username,
+			isUser: info.isUser,
+		}).then((res: any) => {
+			setReceivedMessage(res);
+		});
+		getMessageSent({
+			sender: username,
+			receiver: convName,
+			isUser: info.isUser,
+		}).then((res) => {
+			// console.log(res);
+			setSentMessage(res);
+		});
     }, [
         chatContext,
         chatContext.conversationInfo,
@@ -166,7 +194,7 @@ export const Conversation = () => {
                     chatContext.conversationInfo?.channel?.name
             )
                 setConversationMsg([...conversationMsg, message]);
-            console.log(conversationMsg);
+            // console.log(conversationMsg);
         },
         [setConversationMsg, conversationMsg, user]
     );

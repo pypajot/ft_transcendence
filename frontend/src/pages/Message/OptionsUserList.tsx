@@ -24,9 +24,9 @@ export const OptionsUserList = (props: OptionUserListProps) => {
 
     useEffect(() => {
         //print infos about me, the user
-        console.log(
-            'me, user infos in user list: ' + me?.username + ' ' + me?.id
-        );
+        // console.log(
+        //     'me, user infos in user list: ' + me?.username + ' ' + me?.id
+        // );
     }, [target]);
 
     const handleClose = () => {
@@ -64,14 +64,14 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         //const targetSocketId = target?.socketId;
         // get the username of the user who sent the invite
         const mode = 'Classic';
-        console.log('you invited someone to play: ', target?.username);
+        // console.log('you invited someone to play: ', target?.username);
         // notify the other user that he has been invited to play
         socket?.emit('sendInviteToPlay', {targetId, mode});
         //navigate('/game', { state: { mode: true } });
     };
 
     const handleProfile = () => {
-        console.log(`Want to see profile of ${target?.username}`);
+        // console.log(`Want to see profile of ${target?.username}`);
     };
 
     const handleBlock = () => {

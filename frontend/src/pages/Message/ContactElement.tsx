@@ -45,7 +45,7 @@ export const ContactElement = ({ info }: { info: ConversationInformation }) => {
     };
     const handleClick = () => {
         chatContext.setConversationInfo(info);
-        console.log(info);
+        // console.log(info);
         chatContext.setRenderConversation(true);
     };
 

@@ -6,6 +6,7 @@ import { TopbarMenu } from './TopMenu';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useNavigate } from 'react-router-dom';
 import { PopUpInvite } from './PopUpInvite';
+import Navbar from '../../components/Navbar';
 
 
 const ChatComponent = () => {
@@ -49,6 +50,7 @@ const ChatComponent = () => {
 
     return (
         <>
+			<Navbar />
             <TopbarMenu />
             { gameInvite && (<PopUpInvite key={key} from={inviter} from_id={inviter_id} mode={mode}/>)}
             <Flex>

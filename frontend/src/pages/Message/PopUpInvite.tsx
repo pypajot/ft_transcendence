@@ -22,7 +22,7 @@ export const PopUpInvite: React.FC<PopUpProps> = ({key, from, from_id, mode}) =>
 	const navigate = useNavigate();
 
 	const handleAccept = () => {
-		console.log('you accepted the game');
+		// console.log('you accepted the game');
 		const reply = true;
 		socket?.emit('replyGameInvite', {reply, from_id, mode});
 		localStorage.setItem('gameInProgress', 'false');
@@ -31,7 +31,7 @@ export const PopUpInvite: React.FC<PopUpProps> = ({key, from, from_id, mode}) =>
 	}
 
 	const handleDecline = () => {
-		console.log('you declined the game');
+		// console.log('you declined the game');
 		const reply = false;
 		socket?.emit('replyGameInvite', {reply, from_id, mode});
 		handleClose();

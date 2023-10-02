@@ -51,7 +51,7 @@ function Login() {
 		  setAccessToken(sessionStorage.getItem("access_token"));
 		}
 	} catch(err) {
-		console.log("test", err)
+		console.log(err)
 	}
     // .then(response => response.json())
     // .then(response => sessionStorage.setItem("access_token",response.access_token))

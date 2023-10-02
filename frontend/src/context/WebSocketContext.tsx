@@ -111,8 +111,7 @@ export default function SocketContextProvider(
 
     useEffect(() => {
         if (!user) return;
-        console.log(user);
-        const newSocket = io('http://localhost:3333/', {
+		const newSocket = io('http://localhost:3333/', {
             reconnectionDelay: 3000,
             query: {
                 token: sessionStorage.getItem('access_token'),
@@ -138,18 +137,14 @@ export default function SocketContextProvider(
             }));
         });
         newSocket.on('updateStatus', (args) => {
-            console.log('args', args);
-			console.log("update status: ", user);
+            
 			let newUser = user;
 			const index = newUser?.friends.findIndex(
 				(obj: any) => obj.id === args.id
 			);
-			console.log('index: ', index);
 			newUser.friends[index].status = args.status;
-			console.log('newuser status: ', newUser.friends[index].status);
-			console.log('newUser: ', newUser);
+
             setUser(newUser);
-            console.log('status: ', user);
         });
         newSocket.on('error', (msg) => console.log('error: ', msg));
 
