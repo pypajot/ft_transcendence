@@ -14,12 +14,33 @@ const Game : React.FC = () => {
 		setGameStart(false);
 	}, []);
 	// we use location to check if the user is coming from the chat invite
-	// if so, set gameStart to true to render the game
+	// if so, render the game
+	// if reload from game page, render the mode selection no matter what
 	useEffect(() => {
-		if (location?.state) {
+		const gameInProgress = localStorage.getItem('gameInProgress');
+		if (gameInProgress !== 'true' && location?.state) {
 			setGameStart(true);
+		} 
+		else { 
+			setGameStart(false);
 		}
 	}, [location]);
+
+	// we use beforeunload for the case where the user reloads the page
+	// during game : it must not be able to reload the game
+	useEffect(() => {
+		window.addEventListener('beforeunload', handleBeforeUnload);
+	
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		};
+	}, []);
+	
+	const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+		setGameStart(false);
+		localStorage.setItem('gameInProgress', 'true');
+	};
+	
 	return (
 		<div>
 			{gameStart ? <PongGame /> : <ModeSelection />}

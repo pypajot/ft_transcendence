@@ -30,6 +30,7 @@ const PongGame : React.FC = () => {
       setLobbyId(lobbyId);
       setUserName1(userName1);
       setUserName2(userName2);
+      localStorage.setItem('gameInProgress', 'true');
       socket?.emit('getGameState', { lobbyId });
       setCountdown(3);
       setTimeout(() => { if (!gameEndRef.current) setCountdown(2)}, 1000);

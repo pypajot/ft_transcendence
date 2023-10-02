@@ -25,6 +25,7 @@ export const PopUpInvite: React.FC<PopUpProps> = ({mykey, from, from_id, mode}) 
 		console.log('you accepted the game');
 		const reply = true;
 		socket?.emit('replyGameInvite', {reply, from_id, mode});
+		localStorage.setItem('gameInProgress', 'false');
 		navigate('/game', { state: { mode: true } });
 		handleClose();
 	}

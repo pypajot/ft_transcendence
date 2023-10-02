@@ -33,6 +33,7 @@ const ChatComponent = () => {
                 const opp_SocketId = from;
                 console.log(from + ' accepted the game');
                 socket?.emit('launchGameFromChat', { opp_SocketId, mode });
+                localStorage.setItem('gameInProgress', 'false');
                 navigate('/game', { state: { mode: true } });
             } 
             else {
