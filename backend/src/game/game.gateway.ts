@@ -172,17 +172,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('sendInviteToPlay')
-  async handleInviteToPlay(client: Socket, data: { targetSocketId: string, mode: string }): Promise<void> {
-    const { targetSocketId, mode } = data;
+  async handleInviteToPlay(client: Socket, data: { targetId: number, mode: string }): Promise<void> {
+    const { targetId, mode } = data;
     // get the inviter client username in db
     const inviter = await this.prisma.user.findFirst({
       where: {
         socketId: client.id,
       },
     });
+    // get the target client socket id in db
+    const target = await this.prisma.user.findFirst({
+      where: {
+        id: targetId,
+      },
+    });
     // print the data received from the client
-    console.log('invite to play received from ' + inviter.username + ' to ' + targetSocketId + ' in mode ' + mode);
-    this.server.to(targetSocketId).emit('invitedToPlay', inviter.username, inviter.id, mode);
+    console.log('invite to play received from ' + inviter.username + ' to ' + target.socketId + ' in mode ' + mode);
+    this.server.to(target.socketId).emit('invitedToPlay', inviter.username, inviter.id, mode);
   }
 
   @SubscribeMessage('replyGameInvite')
@@ -224,7 +230,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('launchBall')
   handleLaunchGame(client: Socket, data: { lobbyId: string }): void {
     const { lobbyId } = data;
-    if (lobbyId === undefined) {
+    if (lobbyId === undefined || lobbyId === null) {
       return;
     }
     this.matchmakingService.gameService[lobbyId].resetBall();

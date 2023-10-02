@@ -21,7 +21,6 @@ export const PopUpInvite: React.FC<PopUpProps> = ({mykey, from, from_id, mode}) 
 	const {socket} = useSocketContext();
 	const navigate = useNavigate();
 
-
 	const handleAccept = () => {
 		console.log('you accepted the game');
 		const reply = true;

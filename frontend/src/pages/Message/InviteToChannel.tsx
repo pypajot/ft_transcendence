@@ -1,5 +1,3 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -10,9 +8,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import { blue } from '@mui/material/colors';
 import { useChatContext } from '../../context/ChatContext';
-import { ProfileContext } from '../../context/ProfileContext';
 import { useSocketContext } from '../../context/WebSocketContext';
-import { Friend } from '../../../Types/inferfaceList';
+import { User } from '../../../Types/inferfaceList';
 import { useAuth } from '../../context/AuthContext';
 
 export interface SimpleDialogProps {
@@ -30,10 +27,10 @@ export function InviteToChannel(props: SimpleDialogProps) {
         onClose();
     };
 
-    const handleListItemClick = (target: Friend) => {
+    const handleListItemClick = (target: User) => {
         socket?.emit('ChannelInvitation', {
             target: target.username,
-            channel: chatContext.conversationInfo?.name,
+            channel: chatContext.conversationInfo?.channel?.name,
         });
         onClose();
     };
@@ -41,7 +38,7 @@ export function InviteToChannel(props: SimpleDialogProps) {
     return (
         <Dialog onClose={handleClose} open={open}>
             <DialogTitle>
-                Add friends to {chatContext.conversationInfo?.name}
+                Add friends to {chatContext.conversationInfo?.channel?.name}
             </DialogTitle>
             <List sx={{ pt: 0 }}>
                 {user &&

@@ -42,7 +42,7 @@ const ChatComponent = () => {
     
         return () => {
             socket?.off('invitedToPlay');
-            socket?.off('replyGameInvite');
+            socket?.off('repliedGameInvite');
         };
     }, [socket, key, mode]);
 
@@ -53,7 +53,7 @@ const ChatComponent = () => {
             <Flex>
                 <Flex>
                     <Box
-                        backgroundColor="colorBackgroundDecorativWeakest"
+                        backgroundColor="colorBackgroundDecorative10Weakest"
                         padding="space40"
                         width="100%">
                         <Contact />
@@ -61,7 +61,7 @@ const ChatComponent = () => {
                 </Flex>
                 <Flex grow>
                     <Box
-                        backgroundColor="colorBackgroundDecorativWeakest"
+                        backgroundColor="colorBackgroundDecorative10Weakest"
                         padding="space40"
                         width="100%">
                         <Conversation />

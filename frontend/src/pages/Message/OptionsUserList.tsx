@@ -36,7 +36,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         if (target) {
             socket?.emit('MuteUser', {
                 targetId: target.id,
-                channelName: chatContext.conversationInfo?.name,
+                channelName: chatContext.conversationInfo?.channel?.name,
             });
         }
     };
@@ -44,7 +44,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         if (target) {
             socket?.emit('BanUser', {
                 targetId: target.id,
-                channelName: chatContext.conversationInfo?.name,
+                channelName: chatContext.conversationInfo?.channel?.name,
             });
         }
     };
@@ -53,18 +53,19 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         if (target) {
             socket?.emit('KickUser', {
                 targetId: target.id,
-                channelName: chatContext.conversationInfo?.name,
+                channelName: chatContext.conversationInfo?.channel?.name,
             });
         }
     };
 
     const handleInviteGame = (target: User | undefined) => {
-        const targetSocketId = target?.socketId;
+        const targetId = target?.id;
+        //const targetSocketId = target?.socketId;
         // get the username of the user who sent the invite
         const mode = 'Classic';
         console.log('you invited someone to play: ', target?.username, target?.socketId);
         // notify the other user that he has been invited to play
-        socket?.emit('sendInviteToPlay', {targetSocketId, mode});
+        socket?.emit('sendInviteToPlay', {targetId, mode});
         //navigate('/game', { state: { mode: true } });
     }
 
@@ -76,7 +77,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         if (target) {
             socket?.emit('BlockUser', {
                 targetId: target.id,
-                channelName: chatContext.conversationInfo?.name,
+                channelName: chatContext.conversationInfo?.channel?.name,
             });
         }
     };
@@ -106,7 +107,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 if (target) {
                     socket?.emit('UnbanUser', {
                         targetId: target.id,
-                        channelName: chatContext.conversationInfo?.name,
+                        channelName: chatContext.conversationInfo?.channel?.name,
                     });
                 }
                 break;
@@ -114,7 +115,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 if (target) {
                     socket?.emit('UnmuteUser', {
                         targetId: target.id,
-                        channelName: chatContext.conversationInfo?.name,
+                        channelName: chatContext.conversationInfo?.channel?.name,
                     });
                 }
                 break;

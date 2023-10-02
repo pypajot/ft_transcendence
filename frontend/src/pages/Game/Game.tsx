@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PongGame from './PongGame';
 import ModeSelection from './modeSelection';
-import { useSocketContext } from '../../context/WebSocketContext';
 import { useGameContext } from '../../context/GameContext';
 import { useLocation } from 'react-router-dom';
 
@@ -10,10 +9,12 @@ import { useLocation } from 'react-router-dom';
 const Game : React.FC = () => {
 	const {gameStart, setGameStart} = useGameContext();
 	const location = useLocation();
-
+	
 	useEffect(() => {
 		setGameStart(false);
 	}, []);
+	// we use location to check if the user is coming from the chat invite
+	// if so, set gameStart to true to render the game
 	useEffect(() => {
 		if (location?.state) {
 			setGameStart(true);
