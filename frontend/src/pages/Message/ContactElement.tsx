@@ -1,6 +1,5 @@
 import { Box, SidebarBody, useMenuState } from '@twilio-paste/core';
 import { ConversationInformation } from '../../../Types/conversationInformation.entity';
-import { ContactType } from '../../../Types/contact.entity';
 import { useChatContext } from '../../context/ChatContext';
 import './ContactElement.css';
 

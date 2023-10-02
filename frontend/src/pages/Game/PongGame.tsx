@@ -7,17 +7,22 @@ import { Link } from 'react-router-dom';
 import { useGameContext } from '../../context/GameContext.tsx';
 
 const PongGame : React.FC = () => {
-  const {socket} = useSocketContext(); // Access the WebSocket context
-  const [lobbyId, setLobbyId] = useState<string>(''); // The lobby ID to join
-  const {gameStart, setGameStart} = useGameContext();
-  const [gameState, setGameState] = useState<GameState | null>(null);
-  const [countdown, setCountdown] = useState<number | null>(null);
-  const [showGo, setShowGo] = useState(false);
-  const [showBall, setShowBall] = useState(true);
-  const [gameEnd, setGameEnd] = useState(false);
-  const [gameEndMessage, setGameEndMessage] = useState('');
-  const [userName1, setUserName1] = useState<string>('');
-  const [userName2, setUserName2] = useState<string>('');
+    const {socket} = useSocketContext(); // Access the WebSocket context
+    const [lobbyId, setLobbyId] = useState<string>(''); // The lobby ID to join
+    const {gameStart, setGameStart} = useGameContext();
+    const [gameState, setGameState] = useState<GameState | null>(null);
+    const [countdown, setCountdown] = useState<number | null>(null);
+    const [showGo, setShowGo] = useState(false);
+    const [showBall, setShowBall] = useState(true);
+    const [gameEnd, setGameEnd] = useState(false);
+    const [gameEndMessage, setGameEndMessage] = useState('');
+    const [userName1, setUserName1] = useState<string>('');
+    const [userName2, setUserName2] = useState<string>('');
+    const gameEndRef = useRef(gameEnd);
+
+  useEffect(() => {
+    gameEndRef.current = gameEnd; // update the ref value when gameEnd changes
+  }, [gameEnd]);
 
   useEffect(() => {
     // Send custom event to request game state from the server
@@ -25,12 +30,13 @@ const PongGame : React.FC = () => {
       setLobbyId(lobbyId);
       setUserName1(userName1);
       setUserName2(userName2);
+      localStorage.setItem('gameInProgress', 'true');
       socket?.emit('getGameState', { lobbyId });
       setCountdown(3);
-      setTimeout(() => { setCountdown(2)}, 1000);
-      setTimeout(() => { setCountdown(1)}, 2000);
-      setTimeout(() => { setShowGo(true), setCountdown(null)}, 3000);
-      setTimeout(() => { socket?.emit('launchBall', { lobbyId })}, 3000);
+      setTimeout(() => { if (!gameEndRef.current) setCountdown(2)}, 1000);
+      setTimeout(() => { if (!gameEndRef.current) setCountdown(1)}, 2000);
+      setTimeout(() => { if (!gameEndRef.current) { setShowGo(true), setCountdown(null)}}, 3000);
+      setTimeout(() => { if (!gameEndRef.current) socket?.emit('launchBall', { lobbyId })}, 3000);
     },);
     // Set up WebSocket event listener to receive the game state from the server
     socket?.on('gameState', (data) => {
@@ -70,17 +76,24 @@ const PongGame : React.FC = () => {
     // display game end message
     setGameEnd(true);
     setShowBall(false);
+    setShowGo(false);
+    setCountdown(null);
     if (data === socket?.id) {
-      if (forfait)
-        setGameEndMessage('You win by forfait!');
-      else
-        setGameEndMessage('You win!');
-      console.log('LobbyId: ', lobbyId);
-      setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
-    }
-    else {
-      setGameEndMessage('You lose!');
-    }
+        if (forfait) {
+          setGameEndMessage('You win by forfait!');
+        }
+        else {
+          setGameEndMessage('You win!');
+        }
+        console.log('LobbyId: ', lobbyId);
+        setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
+      }
+      else {
+        if (forfait) {
+            setGameStart(false);
+        }
+        setGameEndMessage('You lose!');
+      }
   }
 
     useEffect(() => {

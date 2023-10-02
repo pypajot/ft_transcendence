@@ -9,15 +9,13 @@ import { MoreIcon } from '@twilio-paste/icons/esm/MoreIcon';
 import { useState, useEffect } from 'react';
 import { InviteToChannel } from './InviteToChannel';
 import { useAuth } from '../../context/AuthContext';
-import { ConversationInformation } from '../../../Types/conversationInformation.entity';
 import { UserList } from './UserList';
 import { OptionsUserList } from './OptionsUserList';
 import { User } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
 import { useNavigate } from 'react-router-dom';
 import { useSocketContext } from '../../context/WebSocketContext';
-import { ChatContext, useChatContext } from '../../context/ChatContext';
-import Chat from '../Chat/Chat';
+import { useChatContext } from '../../context/ChatContext';
 
 export const OptionMenu = () => {
     const menu = useMenuState();
@@ -38,7 +36,6 @@ export const OptionMenu = () => {
     const handleCloseOptionUserList = () => {
         setDisplayOptionUserList(false);
     };
-    const navigate = useNavigate();
     const { socket } = useSocketContext();
     const chatContext = useChatContext();
     const info = chatContext.conversationInfo;
@@ -60,19 +57,15 @@ export const OptionMenu = () => {
     }, [chatContext, info]);
 
     const handleInviteGame = () => {
-        console.log(
-            'you invited someone to play: ',
-            target?.username,
-            target?.socketId
-        );
+        const targetId = target?.id;
+        //const targetSocketId = target?.socketId;
+        // get the username of the user who sent the invite
+        const mode = 'Classic';
+        console.log('you invited someone to play: ', target?.username);
         // notify the other user that he has been invited to play
-        socket?.emit('sendInviteToPlay', {
-            socketId: target?.socketId,
-            from: user?.username,
-            mode: 'Classic',
-        });
-        navigate('/game', { state: { mode: true } });
-    };
+        socket?.emit('sendInviteToPlay', {targetId, mode});
+        //navigate('/game', { state: { mode: true } });
+    }
 
     //do we set the invite to play to any member of a channel ?
     return (

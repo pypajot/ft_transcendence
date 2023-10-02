@@ -33,6 +33,7 @@ const ChatComponent = () => {
                 const opp_SocketId = from;
                 console.log(from + ' accepted the game');
                 socket?.emit('launchGameFromChat', { opp_SocketId, mode });
+                localStorage.setItem('gameInProgress', 'false');
                 navigate('/game', { state: { mode: true } });
             } 
             else {
@@ -42,18 +43,18 @@ const ChatComponent = () => {
     
         return () => {
             socket?.off('invitedToPlay');
-            socket?.off('replyGameInvite');
+            socket?.off('repliedGameInvite');
         };
     }, [socket, key, mode]);
 
     return (
         <>
             <TopbarMenu />
-            { gameInvite && (<PopUpInvite mykey={key} from={inviter} from_id={inviter_id} mode={mode}/>)}
+            { gameInvite && (<PopUpInvite key={key} from={inviter} from_id={inviter_id} mode={mode}/>)}
             <Flex>
                 <Flex>
                     <Box
-                        backgroundColor="colorBackgroundDecorativWeakest"
+                        backgroundColor="colorBackgroundDecorative10Weakest"
                         padding="space40"
                         width="100%">
                         <Contact />
@@ -61,7 +62,7 @@ const ChatComponent = () => {
                 </Flex>
                 <Flex grow>
                     <Box
-                        backgroundColor="colorBackgroundDecorativWeakest"
+                        backgroundColor="colorBackgroundDecorative10Weakest"
                         padding="space40"
                         width="100%">
                         <Conversation />
