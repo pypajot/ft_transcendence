@@ -2,21 +2,31 @@ import './Profile.css';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
 import { Button, Checkbox, HelpText } from '@twilio-paste/core';
-import { User } from '../../context/AuthContext';
 import { useContext, useEffect, useRef } from 'react';
 import { useState } from 'react';
-import { isAbsolute } from 'path';
 import { useSocketContext } from '../../context/WebSocketContext';
-import { ProfileContext } from '../../context/ProfileContext';
 
 import {Uploader} from "uploader"
 import { UploadButton } from "react-uploader";
 import HelperText from '../../components/HelperText';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const uploader = Uploader({
 	apiKey: "free"
   });
 
+type GameType = {
+	id: string;
+	winner: {
+	  username: string;
+	};
+	loser: {
+	  username: string;
+	};
+	winnerScore: number;
+	loserScore: number;
+};
+  
 const Profile = () => {
 
 	const { user, setUser, refreshFetch } = useAuth();
@@ -24,15 +34,48 @@ const Profile = () => {
 	const { socket } = useSocketContext();
 	const [usernameError, setUsernameError] = useState<string | null>(null);
 	const [codeError, setCodeError] = useState<string | null>(null);
+	const [searchParams] = useSearchParams();
+	const [currentUser, setCurrentUser] = useState<{id: number, username: string, avatar: string, matchHistory: GameType[]} | null>(null);
+	const [displayMyProfile, setDisplayMyProfile] = useState<boolean>(true);
+	const navigate = useNavigate();
+	const run = useRef(true);
 
-	if (!user)
+	// useEffect(() => {
+	// 	run.current = true;
+	// }, [searchParams.get("id")])
+
+	useEffect(() => {
+		const getCurrentUser = async (id: string | null) => {
+			const response = await refreshFetch('http://localhost:3333/user/' + id, {
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
+				},
+			});
+			if (response.status === 400) {
+				navigate("/error");
+				return ;
+			}
+			setCurrentUser(await response.json());
+			setDisplayMyProfile(id === user?.id.toString());
+		}
+		if (!user || !run.current)
+			return ;
+		if (!searchParams.get("id"))
+			getCurrentUser(user.id.toString());
+		else
+			getCurrentUser(searchParams.get("id"));
+		run.current = false;
+	}, [user, searchParams.get("id")])
+	
+	if (!currentUser || !user)
 		return ;
 
-	function DisplayAvatar() {
+	const DisplayAvatar = (props: {img: string}) => {
 		return (
 			<>
 				<div>
-					<img src={user?.avatar} width={150} height={150} />
+					<img src={props.img} width={150} height={150} />
 				</div>
 			</>
 		)
@@ -56,6 +99,8 @@ const Profile = () => {
 			// if (response.status === 201)
 			// 	user && setUser({...user, avatar: fileUrl});
 		}
+		if (!user || !currentUser || user.id !== currentUser?.id)
+			return ;
 		return (
 			<>
 				<div>
@@ -113,7 +158,8 @@ const Profile = () => {
 			// else if (response.status !== 401)
 			// 	setUsernameError((await response.json()).message);
 		}
-
+		if (!user || !currentUser || user.id !== currentUser?.id)
+			return ;
 		return (
 			<>
 				<form onSubmit={HandleChangeUsername}>
@@ -172,47 +218,35 @@ const Profile = () => {
 		.then((response: any) => setImagePath(response.imagePath.path));
 	}
 
-	type GameType = {
-		id: string;
-		winner: {
-		  username: string;
-		};
-		loser: {
-		  username: string;
-		};
-		winnerScore: number;
-		loserScore: number;
-	  };
-
 	function MatchHistoryDisplay() {
-		const run = useRef(false);
-		const [matchHistory, setMatchHistory] = useState<GameType[]>([]);
+		// const run = useRef(false);
+		// const [matchHistory, setMatchHistory] = useState<GameType[]>([]);
 	  
-		useEffect(() => {
-		  const fetchMatchHistory = async () => {
-			try {
-			  const response = await refreshFetch('http://localhost:3333/profile/match-history', {
-				headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` }
-			  });
-			  const games = await response.json();
-			  setMatchHistory(games);
-			} catch (error) {
-			  console.error('Error fetching match history:', error);
-			}
-		  };
-		  if (!run.current)
-			fetchMatchHistory();
-		  run.current = true;
-		}, []);
+		// useEffect(() => {
+		//   const fetchMatchHistory = async () => {
+		// 	try {
+		// 	  const response = await refreshFetch('http://localhost:3333/profile/match-history/' + `${props.id}`, {
+		// 		headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` }
+		// 	  });
+		// 	  const games = await response.json();
+		// 	  setMatchHistory(games);
+		// 	} catch (error) {
+		// 	  console.error('Error fetching match history:', error);
+		// 	}
+		//   };
+		//   if (!run.current)
+		// 	fetchMatchHistory();
+		//   run.current = true;
+		// }, []);
 	  
 		return (
 		  <div>
 			<h2>Match History</h2>
 			<ul>
-			  {matchHistory.map(game => (
+			  {currentUser?.matchHistory && currentUser.matchHistory.map(game => (
 				<li key={game.id}>
-				  Opponent: {game.winner.username === user?.username ? game.loser.username : game.winner.username} - 
-				  {game.winner.username === user?.username ? 'Win' : 'Loss'} -
+				  Opponent: {game.winner.username === currentUser?.username ? game.loser.username : game.winner.username} - 
+				  {game.winner.username === currentUser?.username ? 'Win' : 'Loss'} -
 				  Score: {game.winnerScore} - {game.loserScore}
 				</li>
 			  ))}
@@ -221,23 +255,19 @@ const Profile = () => {
 		);
 	  }
 	  
-	return (
-		<>
-			<Navbar/>
-			<div>
-				<h1>Profile</h1>
-			</div>
-			<DisplayAvatar />
-			<ChangeAvatar />
-			<div>
-				username:
-				<p>
-					{user?.username}
-				</p>
-				
-					<div>
-						<ChangeUsernameForm />
-					</div>
+	function  DisplayUsername(props: {username: string}) {
+		return (
+			<p>
+				{props.username}
+			</p>
+		)
+	}
+
+	function DisplayActivate2fa() {
+		if (!user || !currentUser || user.id !== currentUser?.id)
+			return ;
+		return (
+			<>
 				<Checkbox
 					id="controlled"
 					value="controlled"
@@ -254,9 +284,26 @@ const Profile = () => {
 				>
 				Activate Two Factor Authentification
 				</Checkbox>
-				
 				<QrDisplay />
+				</>
+		)
+	}
 
+	return (
+		<>
+			<Navbar/>
+			<div>
+				<h1>Profile</h1>
+			</div>
+			<DisplayAvatar img={currentUser?.avatar} />
+			<ChangeAvatar />
+			<div>
+				username:
+				<DisplayUsername username={currentUser.username} />
+					<div>
+						<ChangeUsernameForm />
+					</div>
+				<DisplayActivate2fa />
 				<MatchHistoryDisplay />
 			</div>
 			

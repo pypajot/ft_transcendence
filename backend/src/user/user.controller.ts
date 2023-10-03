@@ -30,6 +30,12 @@ export class UserController {
     return await this.userservice.getMe(payload.sub);
   }
 
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  async getUser(@Param() params: any) {
+	return await this.userservice.getUser(params);
+  }
+
   @Post('username')
 //   @UseGuards(JwtAuthGuard)
 //   async changeUsername(

@@ -25,6 +25,7 @@ export const OptionMenu = () => {
         useState<boolean>(false);
     const channelContext = useChannelContext();
     const { user } = useAuth();
+	const navigate = useNavigate();
     const handleCloseUserList = (user: User | undefined) => {
         if (user) {
             setDisplayOptionUserList(true);
@@ -144,7 +145,7 @@ export const OptionMenu = () => {
                             Invite to Play{' '}
                         </MenuItem>
                         <MenuSeparator {...menu} />
-                        <MenuItem {...menu}>Profile</MenuItem>
+                        <MenuItem {...menu} onClick={() => {navigate(`/profile?id=${info?.user?.id}`)}}>Profile</MenuItem>
                     </Menu>{' '}
                 </div>
             )}
