@@ -16,136 +16,13 @@ import { useChatContext } from '../../context/ChatContext';
 import { OptionMenu } from './OptionMenu';
 import { EnterKeySubmitPlugin, SendButtonPlugin } from './Plugins';
 
-const sortByDate = () => {
-    return function (a: any, b: any) {
-        if (a.createdAt > b.createdAt) {
-            return 1;
-        } else if (a.createdAt < b.createdAt) {
-            return -1;
-        }
-        return 0;
-    };
-};
-
 export const Conversation = () => {
     const [content, setContent] = useState<string>('');
-    const { user, refreshFetch } = useAuth();
-    const [sentMessage, setSentMessage] = useState<Message[]>();
-    const [receivedMessage, setReceivedMessage] = useState<Message[]>();
-    const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
-    const [username, setUsername] = useState<string>('');
-    const [convName, setConvName] = useState<string>('undefined');
 
     const chatContext = useChatContext();
     //Make a component to get the previous messsage
     const { socket } = useSocketContext();
     const info = useChatContext().conversationInfo;
-
-    useEffect(() => {
-        if (!user) {
-            setUsername('');
-        } else {
-            setUsername(user.username);
-        }
-    }, [user]);
-
-    const getMessageReceived = async (obj: {
-        sender: string;
-        receiver: string;
-        isUser: boolean;
-    }) => {
-        const url = 'http://localhost:3333/chat/getMessageReceived';
-
-        try {
-            const response = await refreshFetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${sessionStorage.getItem(
-                        'access_token'
-                    )}`,
-                },
-                body: JSON.stringify({
-                    sender: obj.sender,
-                    receiver: obj.receiver,
-                    isUser: obj.isUser,
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('There was an error fetching the data', error);
-        }
-    };
-
-    useEffect(() => {}, [info, username]);
-
-    useEffect(() => {
-        const info = chatContext.conversationInfo;
-        if (!info) {
-            return;
-        }
-        if (info && info.isChannel && info.channel) {
-            setConvName(info.channel.name);
-        } else if (info && info.isUser && info.user) {
-            setConvName(info.user.username);
-        }
-        if (username != '') {
-            getMessageReceived({
-                sender: convName,
-                receiver: username,
-                isUser: info.isUser,
-            }).then((res: any) => {
-                setReceivedMessage(res);
-            });
-        } else {
-            chatContext.setRenderConversation(false);
-        }
-        if (username != '') {
-            getMessageSent({
-                sender: username,
-                receiver: convName,
-                isUser: info.isUser,
-            }).then((res) => {
-                console.log(res);
-                setSentMessage(res);
-            });
-        }
-    }, [
-        chatContext,
-        chatContext.conversationInfo,
-        chatContext.renderConversation,
-        convName,
-        username,
-    ]);
-
-    useEffect(() => {
-        //if (info && info.ischannel) {
-        // setRenderConversation(false);
-        //return;
-        // }
-        if (receivedMessage && user) {
-            receivedMessage.forEach(function (obj) {
-                obj.sent = false;
-            });
-            setReceivedMessage(receivedMessage);
-        }
-        if (sentMessage != undefined) {
-            sentMessage.forEach(function (obj) {
-                obj.sent = true;
-            });
-            setSentMessage(sentMessage);
-        }
-        if (receivedMessage && sentMessage) {
-            setConversationMsg(
-                sentMessage.concat(receivedMessage).sort(sortByDate())
-            );
-        }
-    }, [sentMessage, receivedMessage]);
 
     const handleComposerChange = (editorState: EditorState): void => {
         editorState.read(() => {
@@ -154,34 +31,6 @@ export const Conversation = () => {
             setContent(text);
         });
     };
-
-    const channelMessage = useCallback(
-        (message: Message) => {
-            if (user && message.senderName != user.username) {
-                message.sent = false;
-            }
-            if (
-                message.channel &&
-                message.channel.name ==
-                    chatContext.conversationInfo?.channel?.name
-            )
-                setConversationMsg([...conversationMsg, message]);
-            console.log(conversationMsg);
-        },
-        [setConversationMsg, conversationMsg, user]
-    );
-
-    const messageListener = useCallback(
-        (message: Message) => {
-            if (
-                info?.isUser &&
-                (message.senderName === info?.user?.username ||
-                    message.senderName === user?.username)
-            )
-                setConversationMsg([...conversationMsg, message]);
-        },
-        [setConversationMsg, conversationMsg]
-    );
 
     const sendMessage = () => {
         if (content && content != '' && info) {
@@ -193,17 +42,6 @@ export const Conversation = () => {
             socket?.emit('message', message_content);
         }
     };
-
-    useEffect(() => {
-        socket?.on('messageSent', messageListener);
-        socket?.on('messageChannel', channelMessage);
-        socket?.on('messageRcv', messageListener);
-        return () => {
-            socket?.off('messageSent', messageListener);
-            socket?.off('messageChannel', channelMessage);
-            socket?.off('messageRcv', messageListener);
-        };
-    }, [messageListener, socket, channelMessage]);
 
     return (
         <>

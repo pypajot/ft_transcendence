@@ -1,5 +1,13 @@
 import { Channel } from './inferfaceList';
 
+export enum t_event {
+    JOIN,
+    LEAVE,
+    MUTED,
+    BANED,
+    KICK,
+}
+
 export interface Message {
     id: number;
     content: string;
@@ -9,4 +17,5 @@ export interface Message {
     senderName: string;
     sent: boolean;
     channel?: Channel;
+    event: t_event | undefined;
 }
