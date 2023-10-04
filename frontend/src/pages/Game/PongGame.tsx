@@ -10,6 +10,7 @@ const PongGame : React.FC = () => {
     const {socket} = useSocketContext(); // Access the WebSocket context
     const [lobbyId, setLobbyId] = useState<string>(''); // The lobby ID to join
     const {gameStart, setGameStart} = useGameContext();
+    const [gameMode, setGameMode] = useState<string>('');
     const [gameState, setGameState] = useState<GameState | null>(null);
     const [countdown, setCountdown] = useState<number | null>(null);
     const [showGo, setShowGo] = useState(false);
@@ -26,8 +27,9 @@ const PongGame : React.FC = () => {
 
   useEffect(() => {
     // Send custom event to request game state from the server
-    socket?.on('createLobby', (lobbyId: string, userName1: string, userName2: string) => {
+    socket?.on('createLobby', (lobbyId: string, mode: string, userName1: string, userName2: string) => {
       setLobbyId(lobbyId);
+      setGameMode(mode);
       setUserName1(userName1);
       setUserName2(userName2);
       localStorage.setItem('gameInProgress', 'true');
@@ -122,7 +124,7 @@ const PongGame : React.FC = () => {
                     </>
                 )}
             </div>
-            <div className="game-board">
+            <div className={`game-board${gameMode === 'Party' ? ' party-border' : ''}`}>
                 {countdown && <div className="countdown">{countdown}</div>}
                 {showGo && <div className="go-message">GO!</div>}
                 {gameEnd && (
@@ -154,7 +156,7 @@ const PongGame : React.FC = () => {
                 {/* Render the ball */}
                 {gameState && showBall && (
                     <div
-                        className="ball"
+                        className={`ball${gameMode === 'Party' ? ' party-ball' : ''}`}
                         style={{
                             top: `${
                                 (gameState.ballY / gameState.gameHeight) * 100
@@ -169,7 +171,7 @@ const PongGame : React.FC = () => {
                 {gameState && (
                     <>
                         <div
-                            className="paddle paddle1"
+                           className={`paddle paddle1${gameMode === 'Party' ? ' party-paddle' : ''}`}
                             style={{
                                 top: `${
                                     (gameState.paddle1Y /
@@ -179,7 +181,7 @@ const PongGame : React.FC = () => {
                             }}
                         />
                         <div
-                            className="paddle paddle2"
+                            className={`paddle paddle2${gameMode === 'Party' ? ' party-paddle' : ''}`}
                             style={{
                                 top: `${
                                     (gameState.paddle2Y /

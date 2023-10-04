@@ -166,8 +166,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       setTimeout(() => {
         const username1 = gameService.player1.username;
         const username2 = gameService.player2.username;
-        client.emit('createLobby', lobbyId, username1, username2);
-        gameService.player1.socket.emit('createLobby', lobbyId, username1, username2);
+        client.emit('createLobby', lobbyId, mode, username1, username2);
+        gameService.player1.socket.emit('createLobby', lobbyId, mode, username1, username2);
         console.log(`Lobby ${lobbyId} created`);
       }, 500);
     }
@@ -222,8 +222,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const username1 = gameService.player1.username;
         const username2 = gameService.player2.username;
         console.log (`${username1} vs ${username2} lets goooo`);
-        player1.socket.emit('createLobby', lobbyId, username1, username2);
-        player2.socket.emit('createLobby', lobbyId, username1, username2);
+        player1.socket.emit('createLobby', lobbyId, mode, username1, username2);
+        player2.socket.emit('createLobby', lobbyId, mode, username1, username2);
         console.log(`Lobby ${lobbyId} created`);
       }, 500);
     }

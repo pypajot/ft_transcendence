@@ -72,3 +72,27 @@
       opacity: 0;
     }
   }
+
+/* Part mode */
+.party-ball {
+  background-color: #ff00ff;
+  animation: glow 1s ease-in-out infinite alternate;
+}
+
+.party-paddle {
+  background-color: #00ff00;
+}
+
+.party-border {
+  border-color: #ff00ff;
+  animation: glow 1s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px #ff00ff;
+  }
+  to {
+    box-shadow: 0 0 30px #ff00ff;
+  }
+}
