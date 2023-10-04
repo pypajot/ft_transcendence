@@ -1,5 +1,15 @@
 import { Channel } from '@prisma/client';
 
+export enum t_event {
+    JOIN,
+    SENT,
+    RCV,
+    LEAVE,
+    MUTED,
+    BANED,
+    KICK,
+}
+
 export interface Message {
     id: number;
     content: string;
@@ -7,6 +17,6 @@ export interface Message {
     authorId: number;
     targetId?: number;
     senderName: string;
-    sent: boolean;
     channel?: Channel;
+    event?: t_event;
 }

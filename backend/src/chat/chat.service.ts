@@ -1,18 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Message } from 'src/types/message.entity';
+import { Message, t_event } from 'src/types/message.entity';
 import { Server } from 'socket.io';
-import { PrismaClient } from '@prisma/client';
-import { Conversation } from 'src/types/conversation.entity';
 import { MessageInfo } from 'src/types/message.info';
 import { UtilsService } from './utills.service';
-import { Channel } from 'src/types/interfacesList';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ChatGatewayService {
-    constructor(private readonly utilsService: UtilsService) {}
+    constructor(
+        private readonly utilsService: UtilsService,
+        private prisma: PrismaService
+    ) {}
     private readonly logger = new Logger(ChatGatewayService.name);
-
-    prisma = new PrismaClient();
 
     async requestFriends(io: Server, socket_id, userToAdd: string) {
         try {
@@ -209,7 +208,6 @@ export class ChatGatewayService {
 
     async sendToUser(io: Server, message: any, socket_id: string) {
         try {
-            console.log(`test : ${message.content}`);
             const sender = await this.prisma.user.findUnique({
                 where: {
                     id: (
@@ -220,13 +218,13 @@ export class ChatGatewayService {
             const msgRes: Message = {
                 ...message,
                 senderName: sender.username,
-                sent: true,
+                event: t_event.SENT,
             };
-            io.to(socket_id).emit('messageSent', msgRes);
-            msgRes.sent = false;
+            io.to(socket_id).emit('messagePrivate', msgRes);
+            msgRes.event = t_event.RCV;
             io.to(
                 await this.utilsService.getSocketIdFromId(message.targetId)
-            ).emit('messageRcv', msgRes);
+            ).emit('messagePrivate', msgRes);
             console.log(
                 await this.utilsService.getSocketIdFromId(message.targetId)
             );

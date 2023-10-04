@@ -6,6 +6,7 @@ import { UtilsService } from './utills.service';
 import { ChannelService } from './channel.service';
 import { ChatControllerService } from './chat.controller.service';
 import { UserService } from 'src/user/user.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
     providers: [
@@ -15,6 +16,7 @@ import { UserService } from 'src/user/user.service';
         UtilsService,
         ChannelService,
         UserService,
+        PrismaService
     ],
     exports: [ChatGatewayService],
     controllers: [ChatController],

@@ -1,3 +1,4 @@
+import { PrismaService } from 'src/prisma/prisma.service';
 import { Player } from './Player';
 import { GameConfiguration, GameMode, GameService } from './game.service';
 import { Injectable } from '@nestjs/common';
@@ -40,7 +41,7 @@ export class MatchmakingService {
     private hardcoreQueue: Player[] = [];
     public gameService: { [key: string]: GameService } = {};
 
-    constructor() {}
+    constructor(private prisma: PrismaService) {}
     // Add a player to the matchmaking queue
     enqueue(player: Player): void {
         const mode = player.gameMode;
@@ -110,7 +111,7 @@ export class MatchmakingService {
       player2.socket.emit('matched');
       // Initialize a new game session with these players
       gameId = player1.socket.id + player2.socket.id;
-      this.gameService[gameId] = new GameService();
+      this.gameService[gameId] = new GameService(this.prisma);
       this.gameService[gameId].initGame(
         gameConfiguration,
         player1,
@@ -135,7 +136,7 @@ export class MatchmakingService {
     }
     // Initialize a new game session with these players
     const gameId = player1.socket.id + player2.socket.id;
-    this.gameService[gameId] = new GameService();
+    this.gameService[gameId] = new GameService(this.prisma);
     this.gameService[gameId].initGame(
       gameConfiguration,
       player1,

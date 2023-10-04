@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthContext';
 import ChatComponent from '../pages/Message/ChatPage';
 import Login2fa from '../pages/Login/Login2fa';
 import Friends from '../pages/Friends/Friends';
+import NotFound from '../pages/NotFound/NotFound';
 
 function AppRoutes() {
  const { accessToken } = useAuth();
@@ -60,6 +61,10 @@ function AppRoutes() {
     path="/chatapp"
     element={accessToken ? <ChatComponent /> : <Navigate to="/landing" />}
    />
+   <Route
+    path="*"
+    element={<NotFound />}
+    />
   </Routes>
  );
 }

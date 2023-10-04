@@ -2,6 +2,8 @@ import { Channel } from './inferfaceList';
 
 export enum t_event {
     JOIN,
+    SENT,
+    RCV,
     LEAVE,
     MUTED,
     BANED,
@@ -17,5 +19,5 @@ export interface Message {
     senderName: string;
     sent: boolean;
     channel?: Channel;
-    event: t_event | undefined;
+    event?: t_event;
 }

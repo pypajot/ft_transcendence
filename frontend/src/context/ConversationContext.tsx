@@ -1,13 +1,15 @@
 import * as React from 'react';
-import { Message } from '../../Types/message.entity';
+import { Message, t_event } from '../../Types/message.entity';
 import { useSocketContext } from './WebSocketContext';
-import { refreshFetch } from '../fetch/refreshFetch';
 import { useAuth } from './AuthContext';
 import { useChatContext } from './ChatContext';
 
-type ConversationContex = {};
+type ConversationContex = {
+    messages: Message[];
+    convName: string;
+};
 
-type ChannelContextProviderPros = {
+type ConversationContextProviderProps = {
     children: React.ReactNode;
 };
 const sortByDate = () => {
@@ -20,14 +22,14 @@ const sortByDate = () => {
         return 0;
     };
 };
-export const ConversatonContext = React.createContext<
+export const ConversationContext = React.createContext<
     ConversationContex | undefined
 >(undefined);
 
 export default function ConversationContextProvider(
-    prop: ChannelContextProviderPros
+    props: ConversationContextProviderProps
 ) {
-    const [message, setMessages] = React.useState<Message[]>([]);
+    const [messages, setMessages] = React.useState<Message[]>([]);
     const [convName, setConvName] = React.useState<string>('undef');
     const [username, setUsername] = React.useState<string>('');
     const { socket } = useSocketContext();
@@ -126,10 +128,17 @@ export default function ConversationContextProvider(
                 receiver: username,
                 isUser: info.isUser,
             }).then((res: any) => {
-                res.array.forEach((msg: Message) => {
-                    msg.sent = false;
-                });
-                rcvMessage = res;
+                if (res.array) {
+                    res.array.forEach((msg: Message) => {
+                        if (
+                            msg.event == t_event.SENT ||
+                            msg.event == t_event.RCV
+                        ) {
+                            msg.event = t_event.RCV;
+                        }
+                    });
+                    rcvMessage = res;
+                }
             });
         } else {
             chatContext.setRenderConversation(false);
@@ -141,16 +150,24 @@ export default function ConversationContextProvider(
                 receiver: convName,
                 isUser: info.isUser,
             }).then((res) => {
-                res.array.forEach((msg: Message) => {
-                    msg.sent = true;
-                });
-                sentMessage = res;
+                console.log(res);
+                if (res.array) {
+                    res.array.forEach((msg: Message) => {
+                        if (
+                            msg.event == t_event.SENT ||
+                            msg.event == t_event.RCV
+                        ) {
+                            msg.event = t_event.SENT;
+                        }
+                    });
+                    sentMessage = res;
+                }
             });
         }
         if (rcvMessage || sentMessage) {
             setMessages(sentMessage.concat(rcvMessage).sort(sortByDate()));
         }
-    });
+    }, []);
     const channelMessage = React.useCallback(
         (message: Message) => {
             if (user && message.senderName != user.username) {
@@ -161,22 +178,23 @@ export default function ConversationContextProvider(
                 message.channel.name ==
                     chatContext.conversationInfo?.channel?.name
             )
-                setConversationMsg([...conversationMsg, message]);
-            console.log(conversationMsg);
+                setMessages([...messages, message]);
+            console.log(messages);
         },
-        [setConversationMsg, conversationMsg, user]
+        [setMessages, messages, user]
     );
 
     const messageListener = React.useCallback(
         (message: Message) => {
             if (
-                info?.isUser &&
-                (message.senderName === info?.user?.username ||
+                chatContext.conversationInfo?.isUser &&
+                (message.senderName ===
+                    chatContext.conversationInfo?.user?.username ||
                     message.senderName === user?.username)
             )
-                setConversationMsg([...conversationMsg, message]);
+                setMessages([...messages, message]);
         },
-        [setConversationMsg, conversationMsg]
+        [setMessages, messages]
     );
 
     React.useEffect(() => {
@@ -187,4 +205,26 @@ export default function ConversationContextProvider(
             socket?.off('messageChannel', channelMessage);
         };
     }, [messageListener, socket, channelMessage]);
+    const value = React.useMemo(
+        () => ({
+            messages,
+            convName,
+        }),
+        [messages, convName]
+    );
+    return (
+        <ConversationContext.Provider value={value}>
+            {props.children}
+        </ConversationContext.Provider>
+    );
+}
+
+export function useConversationContext() {
+    const context = React.useContext(ConversationContext);
+    if (context == undefined) {
+        throw new Error(
+            'You need to use ConversationContext with in a ConversationContextProvider'
+        );
+    }
+    return context;
 }

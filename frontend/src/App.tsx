@@ -6,6 +6,7 @@ import { GameProvider } from './context/GameContext';
 import { ProfileProvider } from './context/ProfileContext';
 import ChatContextProvider from './context/ChatContext';
 import ChannelContextProvider from './context/ChannelContext';
+import ConversationContextProvider from './context/ConversationContext';
 
 // Model for pages, put code in a subfolder of pages, and import it here
 
@@ -19,9 +20,11 @@ function App() {
                     <ProfileProvider>
                         <ChatContextProvider>
                             <ChannelContextProvider>
-                                <BrowserRouter>
-                                    <AppRoutes />
-                                </BrowserRouter>
+                                <ConversationContextProvider>
+                                    <BrowserRouter>
+                                        <AppRoutes />
+                                    </BrowserRouter>
+                                </ConversationContextProvider>
                             </ChannelContextProvider>
                         </ChatContextProvider>
                     </ProfileProvider>

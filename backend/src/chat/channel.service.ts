@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { UtilsService } from './utills.service';
 import { Channel } from 'src/types/interfacesList';
 import { Server, Socket } from 'socket.io';
 import { channelInfo } from 'src/types/channelInfo.entity';
 import { joinChannelInfo } from './chat.gateway';
-import { Message } from 'src/types/message.entity';
+import { Message, t_event } from 'src/types/message.entity';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ChannelService {
-    prisma = new PrismaClient();
-    constructor(private readonly serviceUtils: UtilsService) {}
+    constructor(
+        private readonly serviceUtils: UtilsService,
+        private prisma: PrismaService
+    ) {}
 
     async unMute(userId: number, channel: any, moderationId: number) {
         //Delete moderation elem
@@ -519,7 +521,7 @@ export class ChannelService {
             const msgRes: Message = {
                 ...message,
                 senderName: sender.username,
-                sent: true,
+                event: t_event.SENT,
                 channel: message.Channel,
             };
             io.to(channel_name).emit('messageChannel', msgRes);

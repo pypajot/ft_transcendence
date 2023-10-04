@@ -17,7 +17,7 @@ const Friends = () => {
     }, []);
 
     useEffect(() => {
-        console.log(socketError);
+        // console.log(socketError);
         if (!socketError) return;
         if (socketError.func === 'addFriend') setFriendError(socketError.msg);
         if (socketError.func === 'blockUser') setBlockError(socketError.msg);

@@ -17,9 +17,9 @@ export const HeaderConversation = () => {
   const menu = useMenuState();
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
-      {info?.ischannel && (
+      {info?.isChannel && (
         <h1>
-          {info?.name}
+          {info?.channel?.name}
           <MenuButton {...menu}>
             <MoreIcon decorative={false} title="More options"></MoreIcon>
           </MenuButton>
@@ -47,7 +47,7 @@ export const HeaderConversation = () => {
       )}
       {info?.isUser && (
         <h1>
-          {info?.name}
+          {info?.channel?.name}
           <MenuButton {...menu}>
             <MoreIcon decorative={false} title="More options"></MoreIcon>
           </MenuButton>

@@ -9,9 +9,10 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { GameGateway } from './game/game.gateway';
 import { UserGateway } from './user/user.gateway';
-import { GameService } from './game/game.service';
+import { GameMode, GameService } from './game/game.service';
 import { MatchmakingService } from './game/matchmaking.service';
 import { MatchHistoryModule } from './match_history/match-history.module';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -23,14 +24,12 @@ import { MatchHistoryModule } from './match_history/match-history.module';
     MatchHistoryModule,
     AuthModule,
     PrismaModule,
+    GameModule
   ],
   controllers: [AppController],
   providers: [
     AppService,
     PrismaService,
-    GameService,
-    GameGateway,
-    MatchmakingService,
   ],
 })
 export class AppModule {}

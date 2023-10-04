@@ -13,8 +13,8 @@ import { ChatGatewayService } from './chat.service';
 import { channelInfo } from 'src/types/channelInfo.entity';
 import { MessageInfo } from 'src/types/message.info';
 import { ChannelService } from './channel.service';
-import { PrismaClient } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 export interface joinChannelInfo {
     name: string;
@@ -31,10 +31,10 @@ class ChatGateway
     constructor(
         private readonly chatService: ChatGatewayService,
         private readonly channelService: ChannelService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private prisma: PrismaService
     ) {}
     @WebSocketServer() io: Server<any, ServerToClientEvents>;
-    prisma = new PrismaClient();
     afterInit() {
         this.logger.log('Websocket Initialized\n');
     }

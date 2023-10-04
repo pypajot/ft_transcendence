@@ -1,14 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { Server } from 'socket.io';
 import { Client_elem } from 'src/types/client.entity';
 import { User } from 'src/types/interfacesList';
 import { ChannelService } from './channel.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
-Injectable();
+@Injectable()
 export class UtilsService {
-    constructor(private readonly channelService: ChannelService) {}
-    prisma = new PrismaClient();
+    constructor(private prisma: PrismaService) {}
+
+    async unMute(userId: number, channel: any, moderationId: number) {
+        //Delete moderation elem
+        await this.prisma.channel.update({
+            where: {
+                name: channel.name,
+            },
+            include: {
+                info: true,
+            },
+            data: {
+                info: {
+                    disconnect: { id: moderationId },
+                },
+            },
+        });
+    }
 
     async findUsernameFromId(id: number) {
         try {
@@ -113,7 +128,7 @@ export class UtilsService {
                         ) {
                             res = true;
                         } else {
-                            this.channelService.unMute(
+                            this.unMute(
                                 userId,
                                 channel,
                                 elem.id

@@ -35,10 +35,10 @@ export const UserList = (props: UserListProps) => {
     React.useEffect(() => {
         setTarget(undefined);
         const buff: User[] = [];
-        if (channelContext.channels && chatContext.conversationInfo?.channel) {
+        if (channelContext.channels && chatContext.conversationInfo && chatContext.conversationInfo.channel) {
             const memberList = channelContext.channels.get(
-                chatContext.conversationInfo.channel.name
-            )?.members;
+                chatContext.conversationInfo.channel?.name)
+            ?.members;
             if (memberList) {
                 memberList.map((member) => {
                     if (user?.username != member.username) {
@@ -64,7 +64,7 @@ export const UserList = (props: UserListProps) => {
                     <Dialog onClose={handleClose} open={open}>
                         <DialogTitle>
                             List of the User of{' '}
-                            {chatContext.conversationInfo?.channel.name}
+                            {chatContext.conversationInfo?.channel?.name}
                         </DialogTitle>
                         <List sx={{ pt: 0 }}>
                             {members.map((member) => {

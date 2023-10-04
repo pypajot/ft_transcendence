@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { Conversation } from 'src/types/conversation.entity';
 import { Message } from 'src/types/message.entity';
 import { UtilsService } from './utills.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ChatControllerService {
-    constructor(private readonly serviceUtils: UtilsService) {}
-    prisma = new PrismaClient();
+    constructor(
+        private readonly serviceUtils: UtilsService,
+        private prisma: PrismaService
+    ) {}
 
     async getFriendsList(user_name: string) {
         console.log(user_name);
@@ -99,7 +101,6 @@ export class ChatControllerService {
                         senderName: await this.serviceUtils.findUsernameFromId(
                             channel.messages[i].authorId
                         ),
-                        sent: false,
                     };
                     res.push(msg);
                 }
@@ -137,7 +138,6 @@ export class ChatControllerService {
                                 await this.serviceUtils.findUsernameFromId(
                                     channel.messages[i].authorId
                                 ),
-                            sent: true,
                         };
                         res.push(msg);
                     }
@@ -170,7 +170,6 @@ export class ChatControllerService {
                     senderName: await this.serviceUtils.findUsernameFromId(
                         messages[i].authorId
                     ),
-                    sent: true,
                 };
                 res.push(msg);
             }

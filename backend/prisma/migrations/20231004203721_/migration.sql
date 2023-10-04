@@ -81,6 +81,26 @@ CREATE TABLE "Game" (
 );
 
 -- CreateTable
+CREATE TABLE "Achievement" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "icon" TEXT,
+
+    CONSTRAINT "Achievement_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "UserAchievement" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "achievementId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "UserAchievement_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_Memberships" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
@@ -109,6 +129,12 @@ CREATE UNIQUE INDEX "Channel_id_key" ON "Channel"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "usertokens_family_key" ON "usertokens"("family");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Achievement_name_key" ON "Achievement"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "UserAchievement_userId_achievementId_key" ON "UserAchievement"("userId", "achievementId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_Memberships_AB_unique" ON "_Memberships"("A", "B");
@@ -145,6 +171,12 @@ ALTER TABLE "Game" ADD CONSTRAINT "Game_winnerId_fkey" FOREIGN KEY ("winnerId") 
 
 -- AddForeignKey
 ALTER TABLE "Game" ADD CONSTRAINT "Game_loserId_fkey" FOREIGN KEY ("loserId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserAchievement" ADD CONSTRAINT "UserAchievement_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserAchievement" ADD CONSTRAINT "UserAchievement_achievementId_fkey" FOREIGN KEY ("achievementId") REFERENCES "Achievement"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_Memberships" ADD CONSTRAINT "_Memberships_A_fkey" FOREIGN KEY ("A") REFERENCES "Channel"("id") ON DELETE CASCADE ON UPDATE CASCADE;

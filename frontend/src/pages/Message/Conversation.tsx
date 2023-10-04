@@ -1,20 +1,18 @@
 import { ChatComposer } from '@twilio-paste/chat-composer';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
     $getRoot,
     EditorState,
     ClearEditorPlugin,
 } from '@twilio-paste/lexical-library';
 import { Box, Flex } from '@twilio-paste/core';
-import getMessageSent from './Hooks/GetUserMessageSent';
-import { Message } from '../../../Types/message.entity';
 import { MessageInfo } from '../../../Types/messageInfo.entity';
 import { BasicInMessage, BasicOutMessage } from './BasicMessage';
 import { useSocketContext } from '../../context/WebSocketContext';
-import { useAuth } from '../../context/AuthContext';
 import { useChatContext } from '../../context/ChatContext';
 import { OptionMenu } from './OptionMenu';
 import { EnterKeySubmitPlugin, SendButtonPlugin } from './Plugins';
+import { useConversationContext } from '../../context/ConversationContext';
 
 export const Conversation = () => {
     const [content, setContent] = useState<string>('');
@@ -23,6 +21,7 @@ export const Conversation = () => {
     //Make a component to get the previous messsage
     const { socket } = useSocketContext();
     const info = useChatContext().conversationInfo;
+    const conversationContext = useConversationContext();
 
     const handleComposerChange = (editorState: EditorState): void => {
         editorState.read(() => {
@@ -36,7 +35,7 @@ export const Conversation = () => {
         if (content && content != '' && info) {
             const message_content: MessageInfo = {
                 content: content,
-                target: convName,
+                target: conversationContext.convName,
                 ToUser: info.isUser,
             };
             socket?.emit('message', message_content);
@@ -48,14 +47,14 @@ export const Conversation = () => {
             {chatContext.renderConversation && (
                 <Flex>
                     <Flex grow shrink basis="1px">
-                        <Flex>{convName}</Flex>
+                        <Flex>{conversationContext.convName}</Flex>
                     </Flex>
                     <OptionMenu />
                 </Flex>
             )}
-            {conversationMsg &&
+            {conversationContext.messages &&
                 chatContext.renderConversation &&
-                conversationMsg.map(function (message, i) {
+                conversationContext.messages.map(function (message, i) {
                     if (
                         message.targetId &&
                         chatContext.conversationInfo?.isChannel
