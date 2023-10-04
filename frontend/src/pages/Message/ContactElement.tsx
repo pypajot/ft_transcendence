@@ -28,7 +28,12 @@ export const ContactElement = ({ info }: { info: ConversationInformation }) => {
             );
         return (
             <div className="contact">
-                <img className='contact-image' src={info?.user?.avatar} width={50} height={50} />
+                <img
+                    className="contact-image"
+                    src={info?.user?.avatar}
+                    width={50}
+                    height={50}
+                />
                 <h3
                     className="contact-name"
                     color="white"
@@ -45,7 +50,6 @@ export const ContactElement = ({ info }: { info: ConversationInformation }) => {
     };
     const handleClick = () => {
         chatContext.setConversationInfo(info);
-        // console.log(info);
         chatContext.setRenderConversation(true);
     };
 

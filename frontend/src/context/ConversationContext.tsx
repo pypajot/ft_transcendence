@@ -3,10 +3,11 @@ import { Message, t_event } from '../../Types/message.entity';
 import { useSocketContext } from './WebSocketContext';
 import { useAuth } from './AuthContext';
 import { useChatContext } from './ChatContext';
+import { setRef } from '@mui/material';
 
 type ConversationContex = {
     messages: Message[];
-    convName: string;
+    convName: string | undefined;
 };
 
 type ConversationContextProviderProps = {
@@ -29,8 +30,12 @@ export const ConversationContext = React.createContext<
 export default function ConversationContextProvider(
     props: ConversationContextProviderProps
 ) {
+    const [sentMessage, setSentMessage] = React.useState<Message[]>([]);
+    const [rcvMessage, setRcvMessage] = React.useState<Message[]>([]);
     const [messages, setMessages] = React.useState<Message[]>([]);
-    const [convName, setConvName] = React.useState<string>('undef');
+    const [convName, setConvName] = React.useState<string | undefined>(
+        undefined
+    );
     const [username, setUsername] = React.useState<string>('');
     const { socket } = useSocketContext();
     const { user, refreshFetch } = useAuth();
@@ -112,8 +117,9 @@ export default function ConversationContextProvider(
 
     React.useEffect(() => {
         const info = chatContext.conversationInfo;
-        let rcvMessage: Message[] = [];
-        let sentMessage: Message[] = [];
+        setRcvMessage([]);
+        setSentMessage([]);
+        setMessages([]);
         if (!info) {
             return;
         }
@@ -122,52 +128,40 @@ export default function ConversationContextProvider(
         } else if (info && info.isUser && info.user) {
             setConvName(info.user.username);
         }
-        if (username != '') {
+        if (username != '' && convName) {
             getMessageReceived({
                 sender: convName,
                 receiver: username,
                 isUser: info.isUser,
             }).then((res: any) => {
-                if (res.array) {
-                    res.array.forEach((msg: Message) => {
-                        if (
-                            msg.event == t_event.SENT ||
-                            msg.event == t_event.RCV
-                        ) {
-                            msg.event = t_event.RCV;
-                        }
-                    });
-                    rcvMessage = res;
-                }
+                console.log(res);
+                res.forEach((msg: Message) => {
+                    if (msg.event == t_event.SENT || msg.event == t_event.RCV) {
+                        msg.event = t_event.RCV;
+                    }
+                });
+                setRcvMessage([...rcvMessage, res]);
+                console.log(rcvMessage);
             });
-        } else {
-            chatContext.setRenderConversation(false);
-            return;
         }
-        if (username != '') {
+        if (username != '' && convName) {
             getMessageSent({
                 sender: username,
                 receiver: convName,
                 isUser: info.isUser,
             }).then((res) => {
-                console.log(res);
-                if (res.array) {
-                    res.array.forEach((msg: Message) => {
-                        if (
-                            msg.event == t_event.SENT ||
-                            msg.event == t_event.RCV
-                        ) {
-                            msg.event = t_event.SENT;
-                        }
-                    });
-                    sentMessage = res;
-                }
+                res.forEach((msg: Message) => {
+                    if (msg.event == t_event.SENT || msg.event == t_event.RCV) {
+                        msg.event = t_event.SENT;
+                    }
+                });
+                setSentMessage([...sentMessage, res]);
             });
         }
-        if (rcvMessage || sentMessage) {
+        if (rcvMessage.length > 0 || sentMessage.length > 0) {
             setMessages(sentMessage.concat(rcvMessage).sort(sortByDate()));
         }
-    }, []);
+    }, [chatContext, chatContext.conversationInfo]);
     const channelMessage = React.useCallback(
         (message: Message) => {
             if (user && message.senderName != user.username) {
