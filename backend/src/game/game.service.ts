@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Socket } from 'socket.io';
 import { Player } from './Player';
-import { PrismaClient } from '@prisma/client';
-import { interval } from 'rxjs';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 export enum GameMode {
     Classic = 'Classic',
@@ -46,9 +44,7 @@ export class GameService {
     public goalLimit: number;
     private gameConfiguration: GameConfiguration;
 
-    private prisma = new PrismaClient();
-
-    constructor() {}
+    constructor(private prisma: PrismaService) {}
 
     async initGame(
         gameConfiguration: GameConfiguration,

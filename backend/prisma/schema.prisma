@@ -29,6 +29,7 @@ model User {
   gamesPlayed     Game[]    @relation("Players")
   wins            Int       @default(0)
   losses          Int       @default(0)
+  achievements    UserAchievement[]
 
   tokens UserToken[]
 
@@ -101,4 +102,23 @@ model Game {
   loserId     Int?
   winnerScore Int?
   loserScore  Int?
+}
+
+model Achievement {
+  id       Int              @id @default(autoincrement())
+  name     String           @unique  
+  description String        
+  icon     String?          // URL of an icon for the achievement
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  achievementId Int
+  createdAt     DateTime  @default(now())
+  user          User      @relation(fields: [userId], references: [id])
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])  // ensure a user can only earn each achievement once
 }

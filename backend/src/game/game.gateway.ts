@@ -7,16 +7,17 @@ import { Server, Socket } from 'socket.io';
 import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { MatchmakingService } from './matchmaking.service';
 import { Player } from './Player';
-import { PrismaClient } from '@prisma/client';
-import { subscribe } from 'diagnostics_channel';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { AchievementsService } from './achievements.service';
 
 @WebSocketGateway({
   cors: true,
 })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly matchmakingService: MatchmakingService) {}
+  constructor(private readonly matchmakingService: MatchmakingService,
+    private prisma: PrismaService,
+    private achievements: AchievementsService) {}
 
-  prisma = new PrismaClient();
   private intervals: { [lobbyId: string]: NodeJS.Timeout } = {};
 
   @WebSocketServer()
@@ -147,6 +148,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
           loserScore: loser.score,
         },
       });
+      this.achievements.checkAllAchievements(winner.user_id, loser.user_id);
     } catch (error) {
       console.log(error);
     }

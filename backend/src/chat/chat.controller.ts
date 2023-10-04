@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { PrivMsgLogsDto } from 'src/dto';
 import { ChatControllerService } from './chat.controller.service';
 

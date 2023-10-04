@@ -1,5 +1,4 @@
 import { Socket } from 'socket.io';
-import { PrismaClient } from '@prisma/client';
 //create a player class that will be used to create new players
 
 export class Player {

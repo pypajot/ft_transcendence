@@ -1,18 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Message } from 'src/types/message.entity';
 import { Server } from 'socket.io';
-import { PrismaClient } from '@prisma/client';
-import { Conversation } from 'src/types/conversation.entity';
 import { MessageInfo } from 'src/types/message.info';
 import { UtilsService } from './utills.service';
-import { Channel } from 'src/types/interfacesList';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ChatGatewayService {
-    constructor(private readonly utilsService: UtilsService) {}
+    constructor(private readonly utilsService: UtilsService,
+        private prisma: PrismaService) {}
     private readonly logger = new Logger(ChatGatewayService.name);
-
-    prisma = new PrismaClient();
 
     async requestFriends(io: Server, socket_id, userToAdd: string) {
         try {
