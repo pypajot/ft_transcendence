@@ -15,18 +15,30 @@ export class AchievementsService {
 
 	constructor(private prisma: PrismaService) {}
 
-	async awardAchievement(userId: number, achievementName: string) {
-		console.log(`Awarding ${achievementName} to ${userId}`);
-		const achievement = await this.prisma.achievement.findUnique({ where: { name: achievementName } });
-		if (achievement) {
-			await this.prisma.userAchievement.create({
-			data: {
-				userId,
-				achievementId: achievement.id,
-			},
-			});
-		}
-	}	
+    async awardAchievement(userId: number, achievementName: string) {
+        console.log(`Awarding ${achievementName} to ${userId}`);
+        const achievement = await this.prisma.achievement.findUnique({ where: { name: achievementName } });
+        if (achievement) {
+            const existingUserAchievement = await this.prisma.userAchievement.findFirst({
+                where: {
+                    userId,
+                    achievementId: achievement.id
+                }
+            });
+
+            if (!existingUserAchievement) {
+                await this.prisma.userAchievement.create({
+                    data: {
+                        userId,
+                        achievementId: achievement.id,
+                    },
+                });
+            } 
+			else {
+                console.log(`User ${userId} already has the ${achievementName} achievement.`);
+            }
+        }
+    }
 
 	async checkAllAchievements(userId: number, opponentId: number) {
 		await this.checkFirstBlood(userId);
