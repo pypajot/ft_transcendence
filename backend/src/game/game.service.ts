@@ -18,16 +18,15 @@ export interface GameConfiguration {
     paddleMoveSpeed: number;
 }
 
-@Injectable()
 export class GameService {
     // Properties for the game state
-    public gameId: number; // Unique ID for the game
-    public player1: Player;
-    public player2: Player;
-    private ballX: number; // Position of the ball along the X-axis
-    private ballY: number; // Position of the ball along the Y-axis
-    private ballSpeedX: number; // Ball movement speed along the X-axis
-    private ballSpeedY: number; // Ball movement speed along the Y-axis
+    public gameId: number = 0; // Unique ID for the game
+    public player1: Player = null;
+    public player2: Player = null;
+    private ballX: number = 0; // Position of the ball along the X-axis
+    private ballY: number = 0; // Position of the ball along the Y-axis
+    private ballSpeedX: number = 0; // Ball movement speed along the X-axis
+    private ballSpeedY: number = 0; // Ball movement speed along the Y-axis
 
     // Properties for the game physics
     private readonly gameWidth: number = 600;
@@ -35,14 +34,14 @@ export class GameService {
     private readonly ballSize: number = 12;
     private ballSpeedXDirection = 0; // Ball movement direction along the X-axis (1 or -1)
     private ballSpeedYDirection = 0; // Ball movement direction along the Y-axis (1 or -1)
-    private ballSpeedIncreaseFactor: number;
-    private paddleWidth: number;
-    private paddleHeight: number;
-    private paddleMoveSpeed: number;
+    private ballSpeedIncreaseFactor: number = 0;
+    private paddleWidth: number = 0;
+    private paddleHeight: number = 0;
+    private paddleMoveSpeed: number = 0;
 
     // Properties for the game rules
-    public goalLimit: number;
-    private gameConfiguration: GameConfiguration;
+    public goalLimit: number = 0;
+    private gameConfiguration: GameConfiguration = null;
 
     constructor(private prisma: PrismaService) {}
 

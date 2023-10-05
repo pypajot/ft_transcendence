@@ -14,7 +14,7 @@ const PongGame : React.FC = () => {
     const [gameState, setGameState] = useState<GameState | null>(null);
     const [countdown, setCountdown] = useState<number | null>(null);
     const [showGo, setShowGo] = useState(false);
-    const [showBall, setShowBall] = useState(true);
+    const [showBall, setShowBall] = useState(false);
     const [gameEnd, setGameEnd] = useState(false);
     const [gameEndMessage, setGameEndMessage] = useState('');
     const [userName1, setUserName1] = useState<string>('');
@@ -28,17 +28,22 @@ const PongGame : React.FC = () => {
   useEffect(() => {
     // Send custom event to request game state from the server
     socket?.on('createLobby', (lobbyId: string, mode: string, userName1: string, userName2: string) => {
-      setLobbyId(lobbyId);
-      setGameMode(mode);
-      setUserName1(userName1);
-      setUserName2(userName2);
-      localStorage.setItem('gameInProgress', 'true');
-      socket?.emit('getGameState', { lobbyId });
-      setCountdown(3);
-      setTimeout(() => { if (!gameEndRef.current) setCountdown(2)}, 1000);
-      setTimeout(() => { if (!gameEndRef.current) setCountdown(1)}, 2000);
-      setTimeout(() => { if (!gameEndRef.current) { setShowGo(true), setCountdown(null)}}, 3000);
-      setTimeout(() => { if (!gameEndRef.current) socket?.emit('launchBall', { lobbyId })}, 3000);
+        setLobbyId(lobbyId);
+        setGameMode(mode);
+        setUserName1(userName1);
+        setUserName2(userName2);
+        localStorage.setItem('gameInProgress', 'true');
+        socket?.emit('getGameState', { lobbyId });
+        setCountdown(3);
+        setTimeout(() => { if (!gameEndRef.current) setCountdown(2)}, 1000);
+        setTimeout(() => { if (!gameEndRef.current) setCountdown(1)}, 2000);
+        setTimeout(() => { if (!gameEndRef.current) { setShowGo(true), setCountdown(null)}}, 3000);
+        setTimeout(() => { 
+            if (!gameEndRef.current) {
+                socket?.emit('launchBall', { lobbyId }),
+                setShowBall(true)
+            }
+        }, 3000);
     },);
     // Set up WebSocket event listener to receive the game state from the server
     socket?.on('gameState', (data) => {
@@ -109,6 +114,45 @@ const PongGame : React.FC = () => {
         };
     }, [lobbyId, gameEnd]);
 
+    useEffect(() => {
+        const handleResize = () => {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+          
+            let gameBoardWidth, gameBoardHeight;
+          
+            if (viewportWidth / viewportHeight > 4 / 3) {
+              // If the viewport is wider than the 4:3 ratio, set the height to be the limiting factor
+              gameBoardHeight = viewportHeight * 0.8;
+              gameBoardWidth = (gameBoardHeight * 4) / 3;
+            } 
+            else {
+              // If the viewport is narrower than the 4:3 ratio, set the width to be the limiting factor
+              gameBoardWidth = viewportWidth * 0.8;
+              gameBoardHeight = (gameBoardWidth * 3) / 4;
+            }
+
+            const fontSize = gameBoardWidth / 30; 
+            const game = document.querySelector('.game') as HTMLElement;
+            if (game) {
+                game.style.fontSize = `${fontSize}px`;
+            }
+        
+            const gameBoard = document.querySelector('.game') as HTMLElement;
+            if (gameBoard) {
+                gameBoard.style.width = `${gameBoardWidth}px`;
+                gameBoard.style.height = `${gameBoardHeight}px`;
+            }
+        };
+
+        handleResize();
+
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
     return (
         <div className="game">
             <div className="scores-container">
@@ -129,11 +173,15 @@ const PongGame : React.FC = () => {
                 {showGo && <div className="go-message">GO!</div>}
                 {gameEnd && (
                     <div className="gameEnd">
-                        <Heading as="h6" variant="heading20">
+                        {/* <Heading as="h6" variant='heading20'>
                             {' '}
                             {gameEndMessage}
-                        </Heading>
-                        <ButtonGroup>
+                        </Heading> */}
+                        <h6 className="gameEndMessage">
+                            {' '}
+                            {gameEndMessage}
+                        </h6>
+                        {/* <ButtonGroup>
                             <Button
                                 variant="secondary"
                                 onClick={() => {
@@ -150,7 +198,25 @@ const PongGame : React.FC = () => {
                                     Back to home
                                 </Button>
                             </Link>
-                        </ButtonGroup>
+                        </ButtonGroup> */}
+                            <div className="buttonGroup">
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => {
+                                        setGameStart(false);
+                                    }}>
+                                    Try again
+                                </Button>
+                                <Link to="/">
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => {
+                                            setGameStart(false);
+                                        }}>
+                                        Back to home
+                                    </Button>
+                                </Link>
+                            </div>
                     </div>
                 )}
                 {/* Render the ball */}
