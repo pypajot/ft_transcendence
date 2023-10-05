@@ -115,8 +115,7 @@ export class MatchmakingService {
       this.gameService[gameId].initGame(
         gameConfiguration,
         player1,
-        player2,
-        gameId,
+        player2
       );
       return gameId;
     }
@@ -140,8 +139,7 @@ export class MatchmakingService {
     this.gameService[gameId].initGame(
       gameConfiguration,
       player1,
-      player2,
-      gameId,
+      player2
     );
     return gameId;
   }

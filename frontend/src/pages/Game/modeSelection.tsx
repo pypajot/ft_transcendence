@@ -10,7 +10,7 @@ const ModeSelection = () => {
   const [selectedMode, setSelectedMode] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const {gameStart, setGameStart} = useGameContext();
+  const {setGameStart} = useGameContext();
   // Function to send the selected game mode to the backend
   const handleSelectedMode = (mode: any) => {
     socket?.emit('selectGameMode', mode); // Emit the selected mode to the backend

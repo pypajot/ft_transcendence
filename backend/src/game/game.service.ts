@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
 import { Player } from './Player';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 export enum GameMode {
     Classic = 'Classic',
@@ -21,12 +20,12 @@ export interface GameConfiguration {
 export class GameService {
     // Properties for the game state
     public gameId: number = 0; // Unique ID for the game
-    public player1: Player = null;
-    public player2: Player = null;
+    public player1: Player | undefined = undefined;
+    public player2: Player | undefined = undefined;
     private ballX: number = 0; // Position of the ball along the X-axis
     private ballY: number = 0; // Position of the ball along the Y-axis
-    private ballSpeedX: number = 0; // Ball movement speed along the X-axis
-    private ballSpeedY: number = 0; // Ball movement speed along the Y-axis
+    private ballSpeedX: number | undefined = undefined; // Ball movement speed along the X-axis
+    private ballSpeedY: number | undefined = undefined; // Ball movement speed along the Y-axis
 
     // Properties for the game physics
     private readonly gameWidth: number = 600;
@@ -41,15 +40,14 @@ export class GameService {
 
     // Properties for the game rules
     public goalLimit: number = 0;
-    private gameConfiguration: GameConfiguration = null;
+    private gameConfiguration: GameConfiguration | undefined = undefined;
 
     constructor(private prisma: PrismaService) {}
 
     async initGame(
         gameConfiguration: GameConfiguration,
         Player1: Player,
-        Player2: Player,
-        lobbyId: string
+        Player2: Player
     ): Promise<void> {
         // Initialize the game state depending on the game mode
         const game = await this.prisma.game.create({
@@ -98,12 +96,12 @@ export class GameService {
     // Add a method to get the current game state, which will be sent to the clients via WebSocket.
     getGameState(): GameState {
         return {
-            paddle1Y: this.player1.paddlePos,
-            paddle2Y: this.player2.paddlePos,
+            paddle1Y: this.player1?.paddlePos,
+            paddle2Y: this.player2?.paddlePos,
             ballX: this.ballX,
             ballY: this.ballY,
-            player1Score: this.player1.score,
-            player2Score: this.player2.score,
+            player1Score: this.player1?.score,
+            player2Score: this.player2?.score,
             gameWidth: this.gameWidth,
             gameHeight: this.gameHeight,
         };
@@ -112,28 +110,33 @@ export class GameService {
     // Methods to move the paddles up and down
     movePaddleUp(clientId: string): void {
         const player =
-            clientId === this.player1.socket.id ? this.player1 : this.player2;
-        if (player.paddlePos >= this.paddleMoveSpeed)
+            clientId === this.player1?.socket.id ? this.player1 : this.player2;
+        if (player && player.paddlePos >= this.paddleMoveSpeed)
             player.paddleVelocity = -this.paddleMoveSpeed;
     }
 
     movePaddleDown(clientId: string): void {
         const player =
-            clientId === this.player1.socket.id ? this.player1 : this.player2;
-        if (
-            player.paddlePos <=
+            clientId === this.player1?.socket.id ? this.player1 : this.player2;
+        if (player && player?.paddlePos <=
             this.gameHeight - this.paddleHeight - this.paddleMoveSpeed
-        )
+        ) {
             player.paddleVelocity = this.paddleMoveSpeed;
+        }
     }
 
-    stopPaddle(clientId: string): void {
+    stopPaddle(clientId: string | undefined): void {
         const player =
-            clientId === this.player1.socket.id ? this.player1 : this.player2;
-        player.paddleVelocity = 0;
+            clientId === this.player1?.socket.id ? this.player1 : this.player2;
+        if (player) {
+            player.paddleVelocity = 0;
+        }
     }
     // Method to update the game state based on physics and user input
     updateGameState(): void {
+        if (!this.player1 || !this.player2 || !this.gameConfiguration || !this.ballSpeedX || !this.ballSpeedY) {
+            return;
+        }
         const ballXVelocity = this.ballSpeedX * this.ballSpeedXDirection;
         const ballYVelocity = this.ballSpeedY * this.ballSpeedYDirection;
         const buffer = this.gameWidth / 100;
@@ -198,8 +201,8 @@ export class GameService {
     resetBall(): void {
         this.ballX = this.gameWidth / 2;
         this.ballY = this.gameHeight / 2;
-        this.ballSpeedX = this.gameConfiguration.ballSpeed;
-        this.ballSpeedY = this.gameConfiguration.ballSpeed;
+        this.ballSpeedX = this.gameConfiguration?.ballSpeed;
+        this.ballSpeedY = this.gameConfiguration?.ballSpeed;
         this.ballSpeedXDirection = Math.random() > 0.5 ? 1 : -1;
         this.ballSpeedYDirection = Math.random() > 0.5 ? 1 : -1;
     }
@@ -207,12 +210,12 @@ export class GameService {
 
 // Interface definition for the game state data that will be sent to clients.
 export interface GameState {
-    paddle1Y: number;
-    paddle2Y: number;
+    paddle1Y: number | undefined;
+    paddle2Y: number | undefined;
     ballX: number;
     ballY: number;
-    player1Score: number;
-    player2Score: number;
+    player1Score: number | undefined;
+    player2Score: number | undefined;
     gameWidth: number;
     gameHeight: number;
 }

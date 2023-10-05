@@ -2,14 +2,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext.tsx';
 import { GameState } from '../../../../backend/src/game/game.service.ts';
 import './PongGame.css';
-import { Button, ButtonGroup, Heading } from '@twilio-paste/core';
+import { Button } from '@twilio-paste/core';
 import { Link } from 'react-router-dom';
 import { useGameContext } from '../../context/GameContext.tsx';
 
 const PongGame : React.FC = () => {
     const {socket} = useSocketContext(); // Access the WebSocket context
     const [lobbyId, setLobbyId] = useState<string>(''); // The lobby ID to join
-    const {gameStart, setGameStart} = useGameContext();
+    const {setGameStart} = useGameContext();
     const [gameMode, setGameMode] = useState<string>('');
     const [gameState, setGameState] = useState<GameState | null>(null);
     const [countdown, setCountdown] = useState<number | null>(null);
