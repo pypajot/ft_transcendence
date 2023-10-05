@@ -4,11 +4,13 @@ import { Channel } from '../../Types/inferfaceList';
 import { useChatContext } from './ChatContext';
 import { useSocketContext } from './WebSocketContext';
 import { useAuth } from './AuthContext';
+import { array } from 'prop-types';
 
 type ChannelContext = {
     isAdmin: () => boolean;
     isChannelOwner: (targetId: number) => boolean;
     leaveChannel: (channelName: string, username: string) => void;
+	emitDeleteChannel: (channelName: string) => void;
     channels: Map<string, Channel> | undefined;
     arrayChannels: Channel[];
     isBan: (userId: number) => boolean;
@@ -127,18 +129,44 @@ export default function ChannelContextProvider(
         [user, leaveChannel]
     );
 
+	const deleteChannel = React.useCallback(
+		(channelName: string) => {
+			const test = channels && channels.get(channelName);
+			const newMap = channels;
+			newMap?.delete(channelName);
+			const newArray = arrayChannels;
+			test && newArray.splice(newArray.indexOf(test), 1);
+			setArrayChannels(newArray);
+			setChannels(newMap);
+			chatContext.setConversationInfo(undefined);
+			chatContext.setRenderConversation(false)
+		},
+		[channels, arrayChannels]
+	);
+
+	const emitDeleteChannel = React.useCallback(
+		(channelName: string) => {
+			socket?.emit("deleteChannel", {
+				channelName: channelName
+			});
+		},
+		[socket]
+	);
+
     React.useEffect(() => {
         socket?.on('successfullyJoinedChannel', addChannel);
         socket?.on('InitChannels', initChannels);
         socket?.on('Kicked', handleGettingKicked);
         socket?.on('updateChannel', updateChannel);
+		socket?.on('deleteChannel', deleteChannel);
         return () => {
             socket?.off('InitChannels', initChannels);
             socket?.off('successfullyJoinedChannel', addChannel);
             socket?.off('Kicked', handleGettingKicked);
             socket?.off('updateChannel', updateChannel);
+			socket?.off('deleteChannel', deleteChannel);
         };
-    }, [socket, updateChannel, addChannel, initChannels, handleGettingKicked]);
+    }, [socket, updateChannel, addChannel, initChannels, handleGettingKicked, deleteChannel]);
 
     const isBan = React.useCallback(
         (userId: number) => {
@@ -218,6 +246,7 @@ export default function ChannelContextProvider(
             isAdmin,
             isBan,
             isMute,
+			emitDeleteChannel,
         }),
         [
             channels,
@@ -227,6 +256,7 @@ export default function ChannelContextProvider(
             isAdmin,
             isBan,
             isMute,
+			emitDeleteChannel,
         ]
     );
     return (

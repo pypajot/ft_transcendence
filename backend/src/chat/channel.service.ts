@@ -296,6 +296,40 @@ export class ChannelService {
         client.emit('InitChannelsRequest', channelReqList);
     }
 
+	async deleteFromChannel(channelName: string, id: number) {
+		let channel = await this.prisma.channel.update({
+			where: {
+				name: channelName,
+			},
+			include: { members: true },
+			data: {
+				members: {
+					disconnect: { id: id },
+				},
+			},
+		});
+		if (channel.admins.includes(id))
+			channel.admins.splice(channel.admins.indexOf(id), 1);
+		if (channel.owner !== id)
+			return ;
+		if (channel.admins.length > 0) {
+			channel.owner = channel.admins[0];
+		}
+		else if (channel.members.length > 0) {
+			channel.admins.push(channel.members[0].id);
+			channel.owner = channel.members[0].id;
+		}
+		return await this.prisma.channel.update({
+			where: {
+				name: channelName,
+			},
+			data: {
+				owner: channel.owner,
+				admins: channel.admins,
+			}
+		})
+	}
+
     async leaveChannel(io, client: any, info: any) {
         try {
             const user = await this.prisma.user.findUnique({
@@ -311,18 +345,7 @@ export class ChannelService {
                     members: true,
                 },
             });
-            const print = await this.prisma.channel.update({
-                where: {
-                    name: info.channelName,
-                },
-                include: { members: true },
-                data: {
-                    members: {
-                        disconnect: { id: user.id },
-                    },
-                },
-            });
-
+            const channelLeft = await this.deleteFromChannel(info.channelName, user.id);
             const leavingUser = await this.prisma.user.update({
                 where: {
                     username: info.user,
@@ -337,7 +360,11 @@ export class ChannelService {
                 },
             });
             client.leave(info.channelName);
-            this.updateChannel(io, info.channelName);
+			console.log('channel left: ', channelLeft);
+			if (channelLeft.admins.length === 0)
+				this.deleteChannel(io, client, info.channelName)
+			else
+				this.updateChannel(io, info.channelName);
         } catch (error) {
             console.log(error);
         }
@@ -527,4 +554,13 @@ export class ChannelService {
             console.log(error);
         }
     }
+
+	async deleteChannel(server: any, client: any, channelName: string) {
+		const channel = await this.prisma.channel.delete({
+			where: {
+				name: channelName,
+			},
+		});
+		server.to(channelName).emit("deleteChannel", channelName);
+	}
 }

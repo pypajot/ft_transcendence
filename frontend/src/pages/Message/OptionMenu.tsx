@@ -126,7 +126,9 @@ export const OptionMenu = () => {
                         {user && channelContext.isChannelOwner(user.id) && (
                             <div>
                                 <MenuSeparator {...menu} />
-                                <MenuItem {...menu}>Delete Channel</MenuItem>
+                                <MenuItem {...menu} onClick={() => {
+									info.channel?.name && channelContext.emitDeleteChannel(info.channel?.name)
+								}}>Delete Channel</MenuItem>
                             </div>
                         )}
                     </Menu>{' '}

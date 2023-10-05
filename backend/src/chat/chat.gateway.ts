@@ -174,6 +174,12 @@ class ChatGateway
     handleUnBanRequest(client: any, data: any) {
         this.channelService.unBan(data.targetId, data.channelName);
     }
+	
+	@SubscribeMessage("deleteChannel")
+	handleDeleteChannel(client: any, data: any) {
+		this.channelService.deleteChannel(this.io, client, data.channelName);
+		this.io.in('channelName').socketsLeave('channelName');
+	}
 }
 
 export default ChatGateway;
