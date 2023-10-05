@@ -58,9 +58,11 @@ export class MatchmakingService {
         // Add the player to the appropriate queue based on selected mode.
         if (mode === GameMode.Classic) {
             this.classicQueue.push(player);
-        } else if (mode === GameMode.Party) {
+        } 
+        else if (mode === GameMode.Party) {
             this.partyQueue.push(player);
-        } else if (mode === GameMode.Hardcore) {
+        } 
+        else if (mode === GameMode.Hardcore) {
             this.hardcoreQueue.push(player);
         }
     }
@@ -85,7 +87,7 @@ export class MatchmakingService {
     }
 
   // Attempt to match players in the queue
-  tryMatchPlayers(mode: string): string {
+  async tryMatchPlayers(mode: string): Promise<string> {
     // Select the appropriate queue based on the game mode
     let queue: Player[];
     let gameConfiguration: GameConfiguration;
@@ -111,18 +113,43 @@ export class MatchmakingService {
       player2.socket.emit('matched');
       // Initialize a new game session with these players
       gameId = player1.socket.id + player2.socket.id;
-      this.gameService[gameId] = new GameService(this.prisma);
+      this.gameService[gameId] = new GameService();
       this.gameService[gameId].initGame(
         gameConfiguration,
         player1,
         player2
       );
+      const game = await this.prisma.game.create({
+        data: {
+            players: {
+                connect: [{ id: player1.user_id }, { id: player2.user_id }],
+            },
+            mode: gameConfiguration.mode,
+        },
+      });
+      await this.prisma.user.update({
+          where: {
+              id: player1.user_id,
+          },
+          data: {
+              status: 'ingame',
+          },
+      });
+      await this.prisma.user.update({
+          where: {
+              id: player2.user_id,
+          },
+          data: {
+              status: 'ingame',
+          },
+      });
+      this.gameService[gameId].gameId = game.id;
       return gameId;
     }
     return undefined;
   }
 
-  launchFromChat(player1: Player, player2: Player, mode: string): string {
+  async launchFromChat(player1: Player, player2: Player, mode: string): Promise<string> {
     let gameConfiguration: GameConfiguration;
     if (mode === GameMode.Classic) {
       gameConfiguration = classicGameConfig;
@@ -135,12 +162,37 @@ export class MatchmakingService {
     }
     // Initialize a new game session with these players
     const gameId = player1.socket.id + player2.socket.id;
-    this.gameService[gameId] = new GameService(this.prisma);
+    this.gameService[gameId] = new GameService();
     this.gameService[gameId].initGame(
       gameConfiguration,
       player1,
       player2
     );
+    const game = await this.prisma.game.create({
+      data: {
+          players: {
+              connect: [{ id: player1.user_id }, { id: player2.user_id }],
+          },
+          mode: gameConfiguration.mode,
+      },
+    });
+    await this.prisma.user.update({
+        where: {
+            id: player1.user_id,
+        },
+        data: {
+            status: 'ingame',
+        },
+    });
+    await this.prisma.user.update({
+        where: {
+            id: player2.user_id,
+        },
+        data: {
+            status: 'ingame',
+        },
+    });
+    this.gameService[gameId].gameId = game.id;
     return gameId;
   }
 }

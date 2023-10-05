@@ -1,5 +1,4 @@
 import { Player } from './Player';
-import { PrismaService } from '../prisma/prisma.service';
 
 export enum GameMode {
     Classic = 'Classic',
@@ -42,7 +41,7 @@ export class GameService {
     public goalLimit: number = 0;
     private gameConfiguration: GameConfiguration | undefined = undefined;
 
-    constructor(private prisma: PrismaService) {}
+    constructor() {}
 
     async initGame(
         gameConfiguration: GameConfiguration,
@@ -50,31 +49,30 @@ export class GameService {
         Player2: Player
     ): Promise<void> {
         // Initialize the game state depending on the game mode
-        const game = await this.prisma.game.create({
-            data: {
-                players: {
-                    connect: [{ id: Player1.user_id }, { id: Player2.user_id }],
-                },
-                mode: gameConfiguration.mode,
-            },
-        });
-        await this.prisma.user.update({
-            where: {
-                id: Player1.user_id,
-            },
-            data: {
-                status: 'ingame',
-            },
-        });
-        await this.prisma.user.update({
-            where: {
-                id: Player2.user_id,
-            },
-            data: {
-                status: 'ingame',
-            },
-        });
-        this.gameId = game.id;
+        // const game = await this.prisma.game.create({
+        //     data: {
+        //         players: {
+        //             connect: [{ id: Player1.user_id }, { id: Player2.user_id }],
+        //         },
+        //         mode: gameConfiguration.mode,
+        //     },
+        // });
+        // await this.prisma.user.update({
+        //     where: {
+        //         id: Player1.user_id,
+        //     },
+        //     data: {
+        //         status: 'ingame',
+        //     },
+        // });
+        // await this.prisma.user.update({
+        //     where: {
+        //         id: Player2.user_id,
+        //     },
+        //     data: {
+        //         status: 'ingame',
+        //     },
+        // });
         console.log('Init game');
         this.gameConfiguration = gameConfiguration;
         this.player1 = Player1;

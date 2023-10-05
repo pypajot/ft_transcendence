@@ -159,7 +159,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const player = await this.createPlayer(client, mode);
     // place the player in the appropriate queue based on selected mode.
     this.matchmakingService.enqueue(player);
-    const lobbyId = this.matchmakingService.tryMatchPlayers(mode);
+    const lobbyId = await this.matchmakingService.tryMatchPlayers(mode);
     if (lobbyId !== undefined) {
       const gameService = this.matchmakingService.gameService[lobbyId];
       // wait for 1/2 second before emitting the createLobby event
@@ -214,7 +214,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const opponent = this.server.sockets.sockets.get(opp_SocketId);
     const player1 = await this.createPlayer(client, mode);
     const player2 = await this.createPlayer(opponent, mode);
-    const lobbyId = this.matchmakingService.launchFromChat(player1, player2, mode);
+    const lobbyId = await this.matchmakingService.launchFromChat(player1, player2, mode);
     if (lobbyId !== undefined) {
       const gameService = this.matchmakingService.gameService[lobbyId];
       // wait for 1/2 second before emitting the createLobby event
