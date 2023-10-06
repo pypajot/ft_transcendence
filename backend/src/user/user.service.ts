@@ -29,6 +29,7 @@ export class UserService {
 		if (!user)
 			throw new BadRequestException('Invalid user id');
 		const matchHistory = await this.getMatchHistory(Number(params.id));
+		const elo = await this.getElo(Number(params.id), user.wins, user.losses);
         return {
             ...user,
             hash: undefined,
@@ -37,8 +38,26 @@ export class UserService {
             friendsRequest: undefined,
 			blocked: undefined,
 			matchHistory: matchHistory,
+			elo: elo,
         };
     }
+
+	async getElo(id: number, wins: number, losses: number) {
+		const hardcoreWins = await this.prisma.game.count({
+			where: {
+				mode: 'hardcore',
+				winnerId: id
+			}
+		});
+		const hardcoreLosses = await this.prisma.game.count({
+			where: {
+				mode: 'hardcore',
+				loserId: id
+			}
+		});
+		const elo = wins * 3 - losses * 1 + hardcoreWins * 15 - hardcoreLosses * 7;
+		return (elo >= 0 ? elo : 0);
+	}
 
     async getUsersbyId(ids: number[]) {
         const users = await this.prisma.user.findMany({

@@ -34,8 +34,8 @@ export const AddFriends = () => {
   return (
     <Box display="flex">
       <PopoverContainer baseId="NewFriends">
-        <PopoverButton variant="primary">Add newFriends</PopoverButton>
-        <Popover aria-label="FriendRequest" width="size30">
+        <PopoverButton data-paste-element="BUTTON" variant="primary">Add newFriends</PopoverButton>
+        <Popover data-paste-element="BUTTON" aria-label="FriendRequest" width="size30">
           <Input
             type="text"
             id={"friendsRequestId"}
@@ -52,7 +52,7 @@ export const AddFriends = () => {
               </StatusBadge>
             </Box>
           )}
-          <Button variant="primary" onClick={sendFriendsRequest}>
+          <Button data-paste-element="BUTTON" variant="primary" onClick={sendFriendsRequest}>
             Request to be friend
           </Button>
         </Popover>

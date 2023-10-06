@@ -25,6 +25,7 @@ type GameType = {
 	};
 	winnerScore: number;
 	loserScore: number;
+	mode: string;
 };
   
 const Profile = () => {
@@ -35,7 +36,7 @@ const Profile = () => {
 	const [usernameError, setUsernameError] = useState<string | null>(null);
 	const [codeError, setCodeError] = useState<string | null>(null);
 	const [searchParams] = useSearchParams();
-	const [currentUser, setCurrentUser] = useState<{id: number, username: string, avatar: string, matchHistory: GameType[]} | null>(null);
+	const [currentUser, setCurrentUser] = useState<{id: number, username: string, avatar: string, matchHistory: GameType[], elo: number} | null>(null);
 	const [displayMyProfile, setDisplayMyProfile] = useState<boolean>(true);
 	const navigate = useNavigate();
 	const run = useRef(true);
@@ -241,13 +242,17 @@ const Profile = () => {
 	  
 		return (
 		  <div>
+			<div>
+				<h2>Elo: {currentUser?.elo}</h2>
+			</div>
 			<h2>Match History</h2>
 			<ul>
 			  {currentUser?.matchHistory && currentUser.matchHistory.map(game => (
 				<li key={game.id}>
 				  Opponent: {game.winner.username === currentUser?.username ? game.loser.username : game.winner.username} - 
 				  {game.winner.username === currentUser?.username ? 'Win' : 'Loss'} -
-				  Score: {game.winnerScore} - {game.loserScore}
+				  Score: {game.winnerScore} - {game.loserScore} - 
+				  Game Mode: {game.mode}
 				</li>
 			  ))}
 			</ul>
