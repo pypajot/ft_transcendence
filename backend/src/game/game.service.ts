@@ -113,6 +113,7 @@ export class GameService {
         const ballXVelocity = this.ballSpeedX * this.ballSpeedXDirection;
         const ballYVelocity = this.ballSpeedY * this.ballSpeedYDirection;
         const buffer = this.gameWidth / 100;
+        const paddleRoom = this.gameHeight / 30;
         // Move the ball based on its current speed and direction
         this.ballX += ballXVelocity;
         this.ballY += ballYVelocity;
@@ -122,21 +123,21 @@ export class GameService {
 
         // Ensure the paddles don’t move out of the game boundaries.
         this.player1.paddlePos = Math.max(
-            0,
+            paddleRoom,
             Math.min(
-                this.gameHeight - this.paddleHeight,
+                this.gameHeight - this.paddleHeight - paddleRoom,
                 this.player1.paddlePos
             )
         );
         this.player2.paddlePos = Math.max(
-            0,
+            paddleRoom,
             Math.min(
-                this.gameHeight - this.paddleHeight,
+                this.gameHeight - this.paddleHeight - paddleRoom,
                 this.player2.paddlePos
             )
         );
 
-        // Check for collisions with top and bottom walls
+        // Check for ball collisions with top and bottom walls
         if (
             this.ballY - this.ballSize / 2 <= 0 ||
             this.ballY + this.ballSize / 2 >= this.gameHeight

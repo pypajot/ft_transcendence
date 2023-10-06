@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext.tsx';
 import { GameState } from '../../../../backend/src/game/game.service.ts';
 import './PongGame.css';
-import { Button } from '@twilio-paste/core';
 import { Link } from 'react-router-dom';
 import { useGameContext } from '../../context/GameContext.tsx';
 
@@ -131,17 +130,19 @@ const PongGame : React.FC = () => {
               gameBoardWidth = viewportWidth * 0.8;
               gameBoardHeight = (gameBoardWidth * 3) / 4;
             }
+            const glowSize = gameBoardWidth / 9;
+            const glowMedium = `0px 0px ${glowSize}px ${glowSize / 7}px rgba(154,46,255,0.79)`;
+            const fontSize = gameBoardWidth / 30;
 
-            const fontSize = gameBoardWidth / 30; 
+            document.documentElement.style.fontSize = `${fontSize}px`;
             const game = document.querySelector('.game') as HTMLElement;
-            if (game) {
-                game.style.fontSize = `${fontSize}px`;
+            if (game) {               
+                game.style.width = `${gameBoardWidth}px`;
+                game.style.height = `${gameBoardHeight}px`;
             }
-        
-            const gameBoard = document.querySelector('.game') as HTMLElement;
+            const gameBoard = document.querySelector('.game-board') as HTMLElement;
             if (gameBoard) {
-                gameBoard.style.width = `${gameBoardWidth}px`;
-                gameBoard.style.height = `${gameBoardHeight}px`;
+                gameBoard.style.boxShadow = glowMedium;
             }
         };
 
@@ -173,50 +174,26 @@ const PongGame : React.FC = () => {
                 {showGo && <div className="go-message">GO!</div>}
                 {gameEnd && (
                     <div className="gameEnd">
-                        {/* <Heading as="h6" variant='heading20'>
-                            {' '}
-                            {gameEndMessage}
-                        </Heading> */}
                         <h6 className="gameEndMessage">
                             {' '}
                             {gameEndMessage}
                         </h6>
-                        {/* <ButtonGroup>
-                            <Button
-                                variant="secondary"
+                        <div className="buttonGroup">
+                            <button className = "game-button"
                                 onClick={() => {
                                     setGameStart(false);
                                 }}>
                                 Try again
-                            </Button>
+                            </button>
                             <Link to="/">
-                                <Button
-                                    variant="secondary"
+                                <button className = "game-button"
                                     onClick={() => {
                                         setGameStart(false);
                                     }}>
-                                    Back to home
-                                </Button>
+                                    Home
+                                </button>
                             </Link>
-                        </ButtonGroup> */}
-                            <div className="buttonGroup">
-                                <Button
-                                    variant="secondary"
-                                    onClick={() => {
-                                        setGameStart(false);
-                                    }}>
-                                    Try again
-                                </Button>
-                                <Link to="/">
-                                    <Button
-                                        variant="secondary"
-                                        onClick={() => {
-                                            setGameStart(false);
-                                        }}>
-                                        Back to home
-                                    </Button>
-                                </Link>
-                            </div>
+                        </div>
                     </div>
                 )}
                 {/* Render the ball */}

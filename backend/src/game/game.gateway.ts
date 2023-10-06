@@ -9,6 +9,7 @@ import { MatchmakingService } from './matchmaking.service';
 import { Player } from './Player';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AchievementsService } from './achievements.service';
+import { UserService } from 'src/user/user.service';
 
 @WebSocketGateway({
   cors: true,
@@ -16,7 +17,8 @@ import { AchievementsService } from './achievements.service';
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly matchmakingService: MatchmakingService,
     private prisma: PrismaService,
-    private achievements: AchievementsService) {}
+    private achievements: AchievementsService,
+    private userservice: UserService) {}
 
   private intervals: { [lobbyId: string]: NodeJS.Timeout } = {};
 
@@ -113,7 +115,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
           gamesPlayed: {
             connect: [{ id: gameId }],
           },
-          status: 'online',
         },
       });
       await this.prisma.user.update({
@@ -130,7 +131,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
           gamesPlayed: {
             connect: [{ id: gameId }],
           },
-          status: 'online',
         },
       });
       await this.prisma.game.update({
@@ -148,6 +148,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
           loserScore: loser.score,
         },
       });
+      this.userservice.changeStatus(winner.socket.id, 'online', this.server);
+      this.userservice.changeStatus(loser.socket.id, 'online', this.server);
       this.achievements.checkAllAchievements(winner.user_id, loser.user_id);
     } catch (error) {
       console.log(error);
