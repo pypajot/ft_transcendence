@@ -158,7 +158,7 @@
   border: 0.12rem solid #775d85;
   border-radius:1rem;
   cursor: pointer;
-  filter: drop-shadow(0 0 15px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
+  filter: drop-shadow(0 0 0.6rem #775d85) drop-shadow(0 0 2rem #775d85) contrast(2) brightness(2);
   transition: .5s;
   background: transparent;
 }
@@ -166,7 +166,7 @@
 .game-button:hover {
   color: white;
   background-color: #775d85;
-  filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
+  filter: drop-shadow(0 0 0.8rem #775d85) contrast(2) brightness(2);
 }
 
 @keyframes glow {
