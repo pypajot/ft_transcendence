@@ -2,35 +2,37 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Player } from './Player';
 import { GameConfiguration, GameMode, GameService } from './game.service';
 import { Injectable } from '@nestjs/common';
+import { UserService } from '../user/user.service';
+import { Server } from 'socket.io';
 
 const classicGameConfig: GameConfiguration = {
   mode: GameMode.Classic,
   ballSpeed: 3,
   ballSpeedIncreaseFactor: 1.1,
   paddleWidth: 10,
-  paddleHeight: 50,
+  paddleHeight: 60,
   paddleMoveSpeed: 7,
   goalLimit: 5,
 };
 
 const partyGameConfig: GameConfiguration = {
   mode: GameMode.Party,
-  ballSpeed: 3,
+  ballSpeed: 3.5,
   ballSpeedIncreaseFactor: 1.1,
   paddleWidth: 10,
-  paddleHeight: 50,
+  paddleHeight: 60,
   paddleMoveSpeed: 7,
   goalLimit: 5,
 };
 
 const hardcoreGameConfig: GameConfiguration = {
   mode: GameMode.Hardcore,
-  ballSpeed: 5,
-  ballSpeedIncreaseFactor: 1.2,
+  ballSpeed: 4,
+  ballSpeedIncreaseFactor: 1.3,
   paddleWidth: 10,
-  paddleHeight: 50,
-  paddleMoveSpeed: 10,
-  goalLimit: 1,
+  paddleHeight: 45,
+  paddleMoveSpeed: 12,
+  goalLimit: 5,
 };
 
 @Injectable()
@@ -41,7 +43,8 @@ export class MatchmakingService {
     private hardcoreQueue: Player[] = [];
     public gameService: { [key: string]: GameService } = {};
 
-    constructor(private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService, 
+      private userservice: UserService) {}
     // Add a player to the matchmaking queue
     enqueue(player: Player): void {
         const mode = player.gameMode;
@@ -87,7 +90,7 @@ export class MatchmakingService {
     }
 
   // Attempt to match players in the queue
-  async tryMatchPlayers(mode: string): Promise<string> {
+  async tryMatchPlayers(mode: string, server: Server): Promise<string> {
     // Select the appropriate queue based on the game mode
     let queue: Player[];
     let gameConfiguration: GameConfiguration;
@@ -127,29 +130,15 @@ export class MatchmakingService {
             mode: gameConfiguration.mode,
         },
       });
-      await this.prisma.user.update({
-          where: {
-              id: player1.user_id,
-          },
-          data: {
-              status: 'ingame',
-          },
-      });
-      await this.prisma.user.update({
-          where: {
-              id: player2.user_id,
-          },
-          data: {
-              status: 'ingame',
-          },
-      });
+      this.userservice.changeStatus(player1.socket.id, 'ingame', server);
+      this.userservice.changeStatus(player2.socket.id, 'ingame', server);
       this.gameService[gameId].gameId = game.id;
       return gameId;
     }
     return undefined;
   }
 
-  async launchFromChat(player1: Player, player2: Player, mode: string): Promise<string> {
+  async launchFromChat(player1: Player, player2: Player, mode: string, server: Server): Promise<string> {
     let gameConfiguration: GameConfiguration;
     if (mode === GameMode.Classic) {
       gameConfiguration = classicGameConfig;
@@ -176,22 +165,8 @@ export class MatchmakingService {
           mode: gameConfiguration.mode,
       },
     });
-    await this.prisma.user.update({
-        where: {
-            id: player1.user_id,
-        },
-        data: {
-            status: 'ingame',
-        },
-    });
-    await this.prisma.user.update({
-        where: {
-            id: player2.user_id,
-        },
-        data: {
-            status: 'ingame',
-        },
-    });
+    this.userservice.changeStatus(player1.socket.id, 'ingame', server);
+    this.userservice.changeStatus(player2.socket.id, 'ingame', server);
     this.gameService[gameId].gameId = game.id;
     return gameId;
   }

@@ -48,31 +48,6 @@ export class GameService {
         Player1: Player,
         Player2: Player
     ): Promise<void> {
-        // Initialize the game state depending on the game mode
-        // const game = await this.prisma.game.create({
-        //     data: {
-        //         players: {
-        //             connect: [{ id: Player1.user_id }, { id: Player2.user_id }],
-        //         },
-        //         mode: gameConfiguration.mode,
-        //     },
-        // });
-        // await this.prisma.user.update({
-        //     where: {
-        //         id: Player1.user_id,
-        //     },
-        //     data: {
-        //         status: 'ingame',
-        //     },
-        // });
-        // await this.prisma.user.update({
-        //     where: {
-        //         id: Player2.user_id,
-        //     },
-        //     data: {
-        //         status: 'ingame',
-        //     },
-        // });
         console.log('Init game');
         this.gameConfiguration = gameConfiguration;
         this.player1 = Player1;

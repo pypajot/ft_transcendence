@@ -168,7 +168,7 @@ const PongGame : React.FC = () => {
                     </>
                 )}
             </div>
-            <div className={`game-board${gameMode === 'Party' ? ' party-border' : ''}`}>
+            <div className={`game-board${gameMode === 'Party' ? ' party-border' : ' glow-medium'}`}>
                 {countdown && <div className="countdown">{countdown}</div>}
                 {showGo && <div className="go-message">GO!</div>}
                 {gameEnd && (
@@ -234,10 +234,15 @@ const PongGame : React.FC = () => {
                     />
                 )}
                 {/* Render paddles */}
-                {gameState && (
+                {gameState && gameState.paddle1Y !== undefined && 
+                    gameState.paddle2Y !== undefined &&
+                    (
                     <>
                         <div
-                           className={`paddle paddle1${gameMode === 'Party' ? ' party-paddle' : ''}`}
+                            className={`paddle paddle1${
+                                gameMode === 'Party' ? ' party-paddle' : 
+                                gameMode === 'Hardcore' ? ' hardcore-paddle' : ''
+                            } glow-small`}
                             style={{
                                 top: `${
                                     (gameState.paddle1Y /
@@ -247,7 +252,10 @@ const PongGame : React.FC = () => {
                             }}
                         />
                         <div
-                            className={`paddle paddle2${gameMode === 'Party' ? ' party-paddle' : ''}`}
+                            className={`paddle paddle2${
+                                gameMode === 'Party' ? ' party-paddle' : 
+                                gameMode === 'Hardcore' ? ' hardcore-paddle' : ''
+                            } glow-small`}                            
                             style={{
                                 top: `${
                                     (gameState.paddle2Y /
