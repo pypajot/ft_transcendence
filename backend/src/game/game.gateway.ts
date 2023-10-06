@@ -34,14 +34,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // Check if the client was part of an active game
     const lobbyId = this.findLobbyByClientId(client.id);
     if (lobbyId) { this.handleForfait(client, {lobbyId}); }
-    await this.prisma.user.update({
-      where: {
-        socketId: client.id,
-      },
-      data: {
-        status: 'offline',
-      },
-    });
+    this.userservice.changeStatus(client.id, 'offline', this.server);
   }
 
   private findLobbyByClientId(clientId: string): string | null {
@@ -322,5 +315,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     console.log(`Lobby ${lobbyId} destroyed`);
     delete this.matchmakingService.gameService[lobbyId];
+  }
+
+  @SubscribeMessage('locationChange')
+  handleLocationChange(client: Socket): void {
+    const lobbyId = this.findLobbyByClientId(client.id);
+    if (lobbyId) { this.handleForfait(client, {lobbyId}); }
   }
 }
