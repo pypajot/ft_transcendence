@@ -1,0 +1,54 @@
+.dropdown {
+	position: relative;
+}
+
+.friend-request-list {
+	position: absolute;
+
+	list-style-type: none;
+	margin: 5px 0;
+	padding: 0;
+
+	border: 2px solid grey;
+	width: 250px;
+	z-index: 999;
+
+}
+
+.friend-request-list > div {
+	margin: 0;
+	height: 45px;
+	background-color: rgb(17, 17, 17);
+	display: flex;
+	justify-content: space-between;
+}
+
+.friend-request-list > div > h4 {
+	width: 70%;
+	margin: 10px 10px 0 0;
+}
+
+.friend-request-list > div > div {
+	width: 15%;
+	justify-content: center;
+	position: relative;
+}
+
+.friend-request-list > div > div > img {
+	/* background-color: black; */
+	/* border: 5px; */
+	width: 35px;
+	height: 35px;
+	/* border-color: aliceblue; */
+	border-radius: 50%;
+	padding: 5px;
+	margin: 0;
+	font: inherit;
+	cursor: pointer; 
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+	text-align: center;
+}

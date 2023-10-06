@@ -33,20 +33,6 @@ export const TopbarMenu = () => {
                 <AddFriends />
                 <JoinChanel />
             </TopbarActions>
-            <TopbarActions justify="end">
-                <UserDialogContainer name={name} baseId="i-am-user-dialog">
-                    <UserDialog
-                        aria-label="user menu"
-                        data-testid="basic-user-dialog">
-                        <UserDialogUserInfo>
-                            <UserDialogUserName>{name}</UserDialogUserName>
-                        </UserDialogUserInfo>
-                        <UserDialogListItem {...userDialogList}>
-                            Log out
-                        </UserDialogListItem>
-                    </UserDialog>
-                </UserDialogContainer>
-            </TopbarActions>
         </Topbar>
     );
 };
