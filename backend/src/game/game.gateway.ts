@@ -9,6 +9,7 @@ import { MatchmakingService } from './matchmaking.service';
 import { Player } from './Player';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AchievementsService } from './achievements.service';
+import { UserService } from 'src/user/user.service';
 
 @WebSocketGateway({
   cors: true,
@@ -16,7 +17,8 @@ import { AchievementsService } from './achievements.service';
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly matchmakingService: MatchmakingService,
     private prisma: PrismaService,
-    private achievements: AchievementsService) {}
+    private achievements: AchievementsService,
+    private userservice: UserService) {}
 
   private intervals: { [lobbyId: string]: NodeJS.Timeout } = {};
 
@@ -113,7 +115,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
           gamesPlayed: {
             connect: [{ id: gameId }],
           },
-          status: 'online',
         },
       });
       await this.prisma.user.update({
@@ -130,7 +131,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
           gamesPlayed: {
             connect: [{ id: gameId }],
           },
-          status: 'online',
         },
       });
       await this.prisma.game.update({
@@ -148,6 +148,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
           loserScore: loser.score,
         },
       });
+      this.userservice.changeStatus(winner.socket.id, 'online', this.server);
+      this.userservice.changeStatus(loser.socket.id, 'online', this.server);
       this.achievements.checkAllAchievements(winner.user_id, loser.user_id);
     } catch (error) {
       console.log(error);
@@ -159,15 +161,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const player = await this.createPlayer(client, mode);
     // place the player in the appropriate queue based on selected mode.
     this.matchmakingService.enqueue(player);
-    const lobbyId = this.matchmakingService.tryMatchPlayers(mode);
+    const lobbyId = await this.matchmakingService.tryMatchPlayers(mode, this.server);
     if (lobbyId !== undefined) {
       const gameService = this.matchmakingService.gameService[lobbyId];
       // wait for 1/2 second before emitting the createLobby event
       setTimeout(() => {
         const username1 = gameService.player1.username;
         const username2 = gameService.player2.username;
-        client.emit('createLobby', lobbyId, username1, username2);
-        gameService.player1.socket.emit('createLobby', lobbyId, username1, username2);
+        client.emit('createLobby', lobbyId, mode, username1, username2);
+        gameService.player1.socket.emit('createLobby', lobbyId, mode, username1, username2);
         console.log(`Lobby ${lobbyId} created`);
       }, 500);
     }
@@ -214,7 +216,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const opponent = this.server.sockets.sockets.get(opp_SocketId);
     const player1 = await this.createPlayer(client, mode);
     const player2 = await this.createPlayer(opponent, mode);
-    const lobbyId = this.matchmakingService.launchFromChat(player1, player2, mode);
+    const lobbyId = await this.matchmakingService.launchFromChat(player1, player2, mode, this.server);
     if (lobbyId !== undefined) {
       const gameService = this.matchmakingService.gameService[lobbyId];
       // wait for 1/2 second before emitting the createLobby event
@@ -222,8 +224,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const username1 = gameService.player1.username;
         const username2 = gameService.player2.username;
         console.log (`${username1} vs ${username2} lets goooo`);
-        player1.socket.emit('createLobby', lobbyId, username1, username2);
-        player2.socket.emit('createLobby', lobbyId, username1, username2);
+        player1.socket.emit('createLobby', lobbyId, mode, username1, username2);
+        player2.socket.emit('createLobby', lobbyId, mode, username1, username2);
         console.log(`Lobby ${lobbyId} created`);
       }, 500);
     }

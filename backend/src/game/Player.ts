@@ -24,7 +24,8 @@ export class Player {
     this.score = 0;
     this.gameMode = gameMode;
     this.lobby = '';
-    this.paddleDirection = null;
+    this.paddleDirection = '';
     this.paddleVelocity = 0;
+    this.paddlePos = 0;
   }
 }

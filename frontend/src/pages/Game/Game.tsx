@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import PongGame from './PongGame';
 import ModeSelection from './modeSelection';
 import { useGameContext } from '../../context/GameContext';
@@ -36,7 +36,7 @@ const Game : React.FC = () => {
 		};
 	}, []);
 	
-	const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+	const handleBeforeUnload = () => {
 		setGameStart(false);
 		localStorage.setItem('gameInProgress', 'true');
 	};

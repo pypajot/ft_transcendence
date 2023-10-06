@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 
-
 // The achievements are : 
 
 // First Blood: Win your first game
