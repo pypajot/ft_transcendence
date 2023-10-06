@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import './Navbar.css';
+import First from "./Notifications";
 
 const Navbar = () => {
 	const { logout } = useAuth();
@@ -41,6 +42,9 @@ const Navbar = () => {
 						CHAT
 					</Link>
 				</li>
+			</div>
+			<div>
+				<First></First>
 			</div>
 			<div className="logout-button">
 				<button className="button" onClick={logout}>

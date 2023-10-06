@@ -39,15 +39,11 @@ const Friends = () => {
         return (
             <>
                 <form onSubmit={SendFriendRequest}>
-                    <div>
                         <label>
                             Username: <input type="text" name="username" />
                             <HelperText errorText={friendError} />
                         </label>
-                    </div>
-                    <div>
                         <button type="submit">Send friend request</button>
-                    </div>
                 </form>
             </>
         );
@@ -67,15 +63,11 @@ const Friends = () => {
         return (
             <>
                 <form onSubmit={BlockUser}>
-                    <div>
                         <label>
                             Username: <input type="text" name="username" />
                             <HelperText errorText={blockError} />
                         </label>
-                    </div>
-                    <div>
                         <button type="submit">Block user</button>
-                    </div>
                 </form>
             </>
         );
@@ -95,15 +87,11 @@ const Friends = () => {
         return (
             <>
                 <form onSubmit={UnblockUser}>
-                    <div>
                         <label>
                             Username: <input type="text" name="username" />
                             <HelperText errorText={unblockError} />
                         </label>
-                    </div>
-                    <div>
                         <button type="submit">Unblock user</button>
-                    </div>
                 </form>
             </>
         );

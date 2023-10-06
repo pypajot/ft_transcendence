@@ -124,10 +124,13 @@ export const Conversation = () => {
         } else if (info && info.isUser && info.user) {
             setConvName(info.user.username);
         }
-		if (username === '' || convName === '') {
-			chatContext.setRenderConversation(false);
+		console.log('username conversaation: ', username, convName)
+		// if (username === '' || convName === '') {
+		// 	chatContext.setRenderConversation(false);
+		// 	return ;
+		// }
+		if (!convName || !username)
 			return ;
-		}
 		getMessageReceived({
 			sender: convName,
 			receiver: username,
@@ -235,7 +238,7 @@ export const Conversation = () => {
 
     return (
         <>
-            {chatContext.renderConversation && (
+            {chatContext.conversationInfo && (
                 <Flex>
                     <Flex grow shrink basis="1px">
                         <Flex>{convName}</Flex>
@@ -244,7 +247,7 @@ export const Conversation = () => {
                 </Flex>
             )}
             {conversationMsg &&
-                chatContext.renderConversation &&
+                chatContext.conversationInfo &&
                 conversationMsg.map(function (message, i) {
                     if (
                         message.targetId &&
@@ -271,7 +274,7 @@ export const Conversation = () => {
                         );
                     }
                 })}
-            {chatContext.renderConversation && (
+            {chatContext.conversationInfo && (
                 <Box
                     borderStyle="solid"
                     borderWidth="borderWidth0"
