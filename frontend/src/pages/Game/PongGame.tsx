@@ -38,7 +38,7 @@ const PongGame : React.FC = () => {
         setTimeout(() => { if (!gameEndRef.current) setCountdown(1)}, 2000);
         setTimeout(() => { if (!gameEndRef.current) { setShowGo(true), setCountdown(null)}}, 3000);
         setTimeout(() => { 
-            if (!gameEndRef.current) {
+            if (!gameEndRef.current && localStorage.getItem('gameInProgress') === 'true') {
                 socket?.emit('launchBall', { lobbyId }),
                 setShowBall(true)
             }
