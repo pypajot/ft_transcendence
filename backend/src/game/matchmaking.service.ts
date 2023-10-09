@@ -170,4 +170,22 @@ export class MatchmakingService {
     this.gameService[gameId].gameId = game.id;
     return gameId;
   }
+
+  // find a player in the queue by socket id
+  findPlayerBySocketId(socketId: string): Player {
+    let player: Player;
+    player = this.classicQueue.find((p) => p.socket.id === socketId);
+    if (player) {
+      return player;
+    }
+    player = this.partyQueue.find((p) => p.socket.id === socketId);
+    if (player) {
+      return player;
+    }
+    player = this.hardcoreQueue.find((p) => p.socket.id === socketId);
+    if (player) {
+      return player;
+    }
+    return undefined;
+  }
 }
