@@ -1,0 +1,21 @@
+.add-friends-dropdown {
+	position: relative;
+}
+
+.add-friends {
+	position: absolute;
+	background-color: black;
+	margin: 5px 0;
+	padding: 0;
+
+	border: 2px solid grey;
+	width: 350px;
+	height: 350px;
+	z-index: 999;
+
+}
+
+.add-friends > div {
+	height: 20%;
+	border-bottom: 1px solid grey;
+}

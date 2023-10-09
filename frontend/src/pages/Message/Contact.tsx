@@ -7,6 +7,11 @@ import { Channel } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
 import { ContactType } from '../../../Types/contact.entity';
 import { ConversationInformation } from '../../../Types/conversationInformation.entity';
+import './Contact.css'
+import { CreateNewConversation } from './CreateNewConversation';
+import { JoinChanel } from './JoinChannel';
+import { InviteToChannel } from './InviteToChannel';
+import { AddFriends } from './AddFriends';
 
 export const Contact = () => {
     const [username, setUsername] = useState<string>('');
@@ -71,42 +76,99 @@ export const Contact = () => {
         setConversationList(channelContext.arrayChannels);
     }, [channelContext.arrayChannels]);
 
-    return (
-        <>
-            <div>
-                <h1> Channel </h1>
-                {username &&
-                    conversationList.map((channel) => {
-                        return (
-                            <div key={channel.id}>
-                                <ContactElement
-                                    info={{
-                                        isChannel: true,
-                                        isUser: false,
-                                        channel: channel,
-                                    }}></ContactElement>
-                            </div>
-                        );
-                    })}
-            </div>
-            <h1> Friend </h1>
-            {username &&
-                user?.friends &&
-                user.friends.map((user) => {
-                    if (chatContext.isBlocked(user.id)) {
-                        return;
-                    }
-                    return (
-                        <div key={user.id}>
-                            <ContactElement
-                                info={{
-                                    isChannel: false,
-                                    isUser: true,
-                                    user: user,
-                                }}></ContactElement>
-                        </div>
-                    );
-                })}
-        </>
-    );
+    // return (
+    //     <>
+    //         <div>
+    //             <h1> Channel </h1>
+    //             {username &&
+    //                 conversationList.map((channel) => {
+    //                     return (
+    //                         <div key={channel.id}>
+    //                             <ContactElement
+    //                                 info={{
+    //                                     isChannel: true,
+    //                                     isUser: false,
+    //                                     channel: channel,
+    //                                 }}></ContactElement>
+    //                         </div>
+    //                     );
+    //                 })}
+    //         </div>
+    //         <h1> Friend </h1>
+    //         {username &&
+    //             user?.friends &&
+    //             user.friends.map((user) => {
+    //                 if (chatContext.isBlocked(user.id)) {
+    //                     return;
+    //                 }
+    //                 return (
+    //                     <div key={user.id}>
+    //                         <ContactElement
+    //                             info={{
+    //                                 isChannel: false,
+    //                                 isUser: true,
+    //                                 user: user,
+    //                             }}></ContactElement>
+    //                     </div>
+    //                 );
+    //             })}
+    //     </>
+    // );
+	return (
+		<>
+			<div className="wrapper">
+				<div className="tabs">
+					<div className="tab">
+						<input type="radio" name="css-tabs" id="tab-1" checked className="tab-switch" />
+						<label htmlFor="tab-1" className="tab-label">Channel</label>
+						<div className="tab-content">
+							<div>
+								<CreateNewConversation />
+								<JoinChanel />
+							</div>
+							{username &&
+								conversationList.map((channel) => {
+									return (
+										<div key={channel.id}>
+											<ContactElement
+												info={{
+													isChannel: true,
+													isUser: false,
+													channel: channel,
+												}}></ContactElement>
+										</div>
+									);
+								})}
+						</div>
+					</div>
+					<div className="tab">
+						<input type="radio" name="css-tabs" id="tab-2" className="tab-switch" />
+						<label htmlFor="tab-2" className="tab-label">Friends</label>
+						<div className="tab-content">
+							<div>
+								{/* <AddFriends /> */}
+							</div>
+							{username &&
+								user?.friends &&
+								user.friends.map((user) => {
+									if (chatContext.isBlocked(user.id)) {
+										return;
+									}
+									return (
+										<div key={user.id}>
+											<ContactElement
+												info={{
+													isChannel: false,
+													isUser: true,
+													user: user,
+												}}></ContactElement>
+										</div>
+									);
+								})}
+						</div>
+					</div>
+				</div>
+			</div>
+		</>
+	)
 };

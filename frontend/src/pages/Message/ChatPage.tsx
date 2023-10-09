@@ -54,14 +54,7 @@ const ChatComponent = () => {
             <TopbarMenu />
             { gameInvite && (<PopUpInvite key={key} from={inviter} from_id={inviter_id} mode={mode}/>)}
             <Flex>
-                <Flex>
-                    <Box
-                        backgroundColor="colorBackgroundDecorative10Weakest"
-                        padding="space40"
-                        width="100%">
-                        <Contact />
-                    </Box>
-                </Flex>
+                <Contact />
                 <Flex grow>
                     <Box
                         backgroundColor="colorBackgroundDecorative10Weakest"
