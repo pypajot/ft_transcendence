@@ -7,10 +7,6 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { GameGateway } from './game/game.gateway';
-import { UserGateway } from './user/user.gateway';
-import { GameMode, GameService } from './game/game.service';
-import { MatchmakingService } from './game/matchmaking.service';
 import { MatchHistoryModule } from './match_history/match-history.module';
 import { GameModule } from './game/game.module';
 

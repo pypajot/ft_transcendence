@@ -1,6 +1,6 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Player } from './Player';
-import { GameConfiguration, GameMode, GameService } from './game.service';
+import { GameConfiguration, GameMode, GameLobby } from './game.lobby';
 import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { Server } from 'socket.io';
@@ -41,7 +41,7 @@ export class MatchmakingService {
     private classicQueue: Player[] = [];
     private partyQueue: Player[] = [];
     private hardcoreQueue: Player[] = [];
-    public gameService: { [key: string]: GameService } = {};
+    public gameLobby: { [key: string]: GameLobby } = {};
 
     constructor(private prisma: PrismaService, 
       private userservice: UserService) {}
@@ -116,8 +116,8 @@ export class MatchmakingService {
       player2.socket.emit('matched');
       // Initialize a new game session with these players
       gameId = player1.socket.id + player2.socket.id;
-      this.gameService[gameId] = new GameService();
-      this.gameService[gameId].initGame(
+      this.gameLobby[gameId] = new GameLobby();
+      this.gameLobby[gameId].initGame(
         gameConfiguration,
         player1,
         player2
@@ -132,7 +132,7 @@ export class MatchmakingService {
       });
       this.userservice.changeStatus(player1.socket.id, 'ingame', server);
       this.userservice.changeStatus(player2.socket.id, 'ingame', server);
-      this.gameService[gameId].gameId = game.id;
+      this.gameLobby[gameId].gameId = game.id;
       return gameId;
     }
     return undefined;
@@ -151,8 +151,8 @@ export class MatchmakingService {
     }
     // Initialize a new game session with these players
     const gameId = player1.socket.id + player2.socket.id;
-    this.gameService[gameId] = new GameService();
-    this.gameService[gameId].initGame(
+    this.gameLobby[gameId] = new GameLobby();
+    this.gameLobby[gameId].initGame(
       gameConfiguration,
       player1,
       player2
@@ -167,7 +167,7 @@ export class MatchmakingService {
     });
     this.userservice.changeStatus(player1.socket.id, 'ingame', server);
     this.userservice.changeStatus(player2.socket.id, 'ingame', server);
-    this.gameService[gameId].gameId = game.id;
+    this.gameLobby[gameId].gameId = game.id;
     return gameId;
   }
 

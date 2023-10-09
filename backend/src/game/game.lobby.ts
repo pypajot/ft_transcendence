@@ -16,7 +16,7 @@ export interface GameConfiguration {
     paddleMoveSpeed: number;
 }
 
-export class GameService {
+export class GameLobby {
     // Properties for the game state
     public gameId: number = 0; // Unique ID for the game
     public player1: Player | undefined = undefined;

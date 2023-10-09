@@ -41,11 +41,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private findLobbyByClientId(clientId: string): string | null {
-    for (const [lobbyId, gameService] of Object.entries(this.matchmakingService.gameService)) {
-      if (gameService.player1?.socket?.id === clientId) {
+    for (const [lobbyId, gameLobby] of Object.entries(this.matchmakingService.gameLobby)) {
+      if (gameLobby.player1?.socket?.id === clientId) {
         return lobbyId;
       }
-      if (gameService.player2?.socket?.id === clientId) {
+      if (gameLobby.player2?.socket?.id === clientId) {
         return lobbyId;
       }
     }
@@ -59,9 +59,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (lobbyId === undefined) {
       return;
     }
-    const player1 = this.matchmakingService.gameService[lobbyId].player1;
-    const player2 = this.matchmakingService.gameService[lobbyId].player2;
-    const gameId = this.matchmakingService.gameService[lobbyId].gameId;
+    const player1 = this.matchmakingService.gameLobby[lobbyId].player1;
+    const player2 = this.matchmakingService.gameLobby[lobbyId].player2;
+    const gameId = this.matchmakingService.gameLobby[lobbyId].gameId;
     if (client.id === player1.socket.id) {
       this.handleUpdateDB(player2, player1, gameId);
       client.emit('gameEnd', player2.socket.id, forfait);
@@ -159,13 +159,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.matchmakingService.enqueue(player);
     const lobbyId = await this.matchmakingService.tryMatchPlayers(mode, this.server);
     if (lobbyId !== undefined) {
-      const gameService = this.matchmakingService.gameService[lobbyId];
+      const gameLobby = this.matchmakingService.gameLobby[lobbyId];
       // wait for 1/2 second before emitting the createLobby event
       setTimeout(() => {
-        const username1 = gameService.player1.username;
-        const username2 = gameService.player2.username;
+        const username1 = gameLobby.player1.username;
+        const username2 = gameLobby.player2.username;
         client.emit('createLobby', lobbyId, mode, username1, username2);
-        gameService.player1.socket.emit('createLobby', lobbyId, mode, username1, username2);
+        gameLobby.player1.socket.emit('createLobby', lobbyId, mode, username1, username2);
         console.log(`Lobby ${lobbyId} created`);
       }, 500);
     }
@@ -214,11 +214,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const player2 = await this.createPlayer(opponent, mode);
     const lobbyId = await this.matchmakingService.launchFromChat(player1, player2, mode, this.server);
     if (lobbyId !== undefined) {
-      const gameService = this.matchmakingService.gameService[lobbyId];
+      const gameLobby = this.matchmakingService.gameLobby[lobbyId];
       // wait for 1/2 second before emitting the createLobby event
       setTimeout(() => {
-        const username1 = gameService.player1.username;
-        const username2 = gameService.player2.username;
+        const username1 = gameLobby.player1.username;
+        const username2 = gameLobby.player2.username;
         console.log (`${username1} vs ${username2} lets goooo`);
         player1.socket.emit('createLobby', lobbyId, mode, username1, username2);
         player2.socket.emit('createLobby', lobbyId, mode, username1, username2);
@@ -233,7 +233,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (lobbyId === undefined || lobbyId === null) {
       return;
     }
-    this.matchmakingService.gameService[lobbyId].resetBall();
+    this.matchmakingService.gameLobby[lobbyId].resetBall();
   }
 
   @SubscribeMessage('movePaddle')
@@ -241,17 +241,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { lobbyId, direction } = data;
     if (!lobbyId)
       return; 
-    const gameService = this.matchmakingService.gameService[lobbyId];
+    const gameLobby = this.matchmakingService.gameLobby[lobbyId];
     const clientId = client.id;
 
     if (direction === 'up') {
-      gameService.movePaddleUp(clientId);
+      gameLobby.movePaddleUp(clientId);
     } 
     else if (direction === 'down') {
-      gameService.movePaddleDown(clientId);
+      gameLobby.movePaddleDown(clientId);
     } 
     else if (direction === 'stop') {
-      gameService.stopPaddle(clientId);
+      gameLobby.stopPaddle(clientId);
     }
   }
   
@@ -270,11 +270,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       clearInterval(this.intervals[lobbyId]);
       delete this.intervals[lobbyId];
     }
-    const gameService = this.matchmakingService.gameService[lobbyId];
-    let   gameState = gameService.getGameState();
-    const player1 = gameService.player1;
-    const player2 = gameService.player2;
-    const gameId = gameService.gameId;
+    const gameLobby = this.matchmakingService.gameLobby[lobbyId];
+    let   gameState = gameLobby.getGameState();
+    const player1 = gameLobby.player1;
+    const player2 = gameLobby.player2;
+    const gameId = gameLobby.gameId;
     // create a loop with a delay of 50ms
     this.intervals[lobbyId] = setInterval(async () => {
       if (lobbyId === undefined || lobbyId === null) {
@@ -282,22 +282,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         delete this.intervals[lobbyId];
         return;
       }
-      if (gameService === undefined || gameService === null) {
+      if (gameLobby === undefined || gameLobby === null) {
         clearInterval(this.intervals[lobbyId]);
         delete this.intervals[lobbyId];
         return;
       }
-      gameService.updateGameState(); // Update the game state
-      gameState = gameService.getGameState(); // Get the updated game state
+      gameLobby.updateGameState(); // Update the game state
+      gameState = gameLobby.getGameState(); // Get the updated game state
       // check for game end
-      if (gameService.player1.score === gameService.goalLimit) {
+      if (gameLobby.player1.score === gameLobby.goalLimit) {
         this.handleUpdateDB(player1, player2, gameId);
         player1.socket.emit('gameEnd', player1.socket.id, false);
         player2.socket.emit('gameEnd', player1.socket.id, false);
         clearInterval(this.intervals[lobbyId]);
         delete this.intervals[lobbyId];
       } 
-      else if ( gameService.player2.score === gameService.goalLimit) {
+      else if ( gameLobby.player2.score === gameLobby.goalLimit) {
         this.handleUpdateDB(player2, player1, gameId);
         player1.socket.emit('gameEnd', player2.socket.id, false);
         player2.socket.emit('gameEnd', player2.socket.id, false);
@@ -317,7 +317,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
     console.log(`Lobby ${lobbyId} destroyed`);
-    delete this.matchmakingService.gameService[lobbyId];
+    delete this.matchmakingService.gameLobby[lobbyId];
   }
 
   @SubscribeMessage('locationChange')
