@@ -75,8 +75,8 @@ const Profile = () => {
 	const DisplayAvatar = (props: {img: string}) => {
 		return (
 			<>
-				<div>
-					<img src={props.img} width={150} height={150} />
+				<div className='avatar-div'>
+					<img src={props.img} width={150} height={150} className='avatar-dimensions'/>
 				</div>
 			</>
 		)
@@ -104,17 +104,16 @@ const Profile = () => {
 			return ;
 		return (
 			<>
-				<div>
-					Change avatar
+				<div className='avatar-button-div'>
+					<UploadButton uploader={uploader}
+						onComplete={HandleChangeAvatar}>
+						{({onClick}) =>
+							<button onClick={onClick} className='avatar-button'>
+								<img src='https://i.imgur.com/GU9MG2a.png' className='change-avatar-img'></img>
+							</button>
+						}
+					</UploadButton>
 				</div>
-				<UploadButton uploader={uploader}
-					onComplete={HandleChangeAvatar}>
-					{({onClick}) =>
-						<button onClick={onClick}>
-							Upload file
-						</button>
-					}
-				</UploadButton>
 			</>
 		)
 	}
@@ -164,14 +163,14 @@ const Profile = () => {
 		return (
 			<>
 				<form onSubmit={HandleChangeUsername}>
-					<div>
+					<div className='div-submit-button-new'>
 						<label>
-							New username: <input type="text" name="username"  />
+							<input type="text" name="username"  placeholder="  new username" className='user-input-new' />
 							<HelperText errorText={usernameError} />
 						</label>
 					</div>
-					<div>
-						<button type="submit">
+					<div className='submit-button-new-div'>
+						<button type="submit" className='submit-button-new'>
 							Submit
 						</button>
 					</div>
@@ -197,7 +196,7 @@ const Profile = () => {
 							</label>
 						</div>
 						<div>
-							<button type="submit">
+							<button type="submit" className='submit-button-new'>
 								Submit
 							</button>
 						</div>
@@ -241,9 +240,9 @@ const Profile = () => {
 		// }, []);
 	  
 		return (
-		  <div>
-			<div>
-				<h2>Elo: {currentUser?.elo}</h2>
+		  <div className='stats'>
+			<div className='elo'>
+				<h2>Elo : {currentUser?.elo}</h2>
 			</div>
 			<h2>Match History</h2>
 			<ul>
@@ -273,6 +272,7 @@ const Profile = () => {
 			return ;
 		return (
 			<>
+			<div className='fa-div'>
 				<Checkbox
 					id="controlled"
 					value="controlled"
@@ -290,26 +290,28 @@ const Profile = () => {
 				Activate Two Factor Authentification
 				</Checkbox>
 				<QrDisplay />
-				</>
+			</div>
+			</>
 		)
 	}
 
 	return (
 		<>
 			<Navbar/>
-			<div>
-				<h1>Profile</h1>
+			<div className='logo-profile'>
+				<img src='https://i.imgur.com/2xFFdd3.png' className='logo-profile-size'></img>
 			</div>
 			<DisplayAvatar img={currentUser?.avatar} />
 			<ChangeAvatar />
 			<div>
-				username:
-				<DisplayUsername username={currentUser.username} />
-					<div>
-						<ChangeUsernameForm />
-					</div>
-				<DisplayActivate2fa />
-				<MatchHistoryDisplay />
+				<div className='display-username'>
+					<DisplayUsername username={currentUser.username} />
+				</div>
+						<div>
+							<ChangeUsernameForm />
+						</div>
+					<DisplayActivate2fa />
+					<MatchHistoryDisplay />
 			</div>
 			
 		</>
