@@ -212,7 +212,6 @@ const PongGame : React.FC = () => {
                     <>
                         <div
                             className={`paddle paddle1${
-                                gameMode === 'Party' ? ' party-paddle' : 
                                 gameMode === 'Hardcore' ? ' hardcore-paddle' : ''
                             } glow-small`}
                             style={{
@@ -225,7 +224,6 @@ const PongGame : React.FC = () => {
                         />
                         <div
                             className={`paddle paddle2${
-                                gameMode === 'Party' ? ' party-paddle' : 
                                 gameMode === 'Hardcore' ? ' hardcore-paddle' : ''
                             } glow-small`}                            
                             style={{
