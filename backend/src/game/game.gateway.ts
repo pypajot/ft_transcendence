@@ -233,6 +233,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (lobbyId === undefined || lobbyId === null) {
       return;
     }
+    if (this.matchmakingService.gameLobby[lobbyId] === undefined) {
+      return;
+    }
     this.matchmakingService.gameLobby[lobbyId].resetBall();
   }
 
@@ -324,7 +327,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleLocationChange(client: Socket): void {
     // Check if a player was in a queue
     const player = this.matchmakingService.findPlayerBySocketId(client.id);
-    if (player) { this.matchmakingService.dequeue(player); }
+    if (player) {
+      this.matchmakingService.dequeue(player);
+      client.emit('leftQueue');
+    }
     // Check if the client was part of an active game
     const lobbyId = this.findLobbyByClientId(client.id);
     if (lobbyId) { this.handleForfait(client, {lobbyId}); }

@@ -17,6 +17,7 @@ const Game : React.FC = () => {
 	// if so, render the game
 	// if reload from game page, render the mode selection no matter what
 	useEffect(() => {
+		console.log ('location changed');
 		const gameInProgress = localStorage.getItem('gameInProgress');
 		if (gameInProgress !== 'true' && location?.state) {
 			setGameStart(true);

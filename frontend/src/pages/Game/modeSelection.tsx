@@ -27,6 +27,14 @@ const ModeSelection = () => {
       setIsLoading(false);
       socket?.off('matched');
     });
+
+    socket?.on('leftQueue', () => {
+      // reset the selected mode and loading state
+      setSelectedMode(null);
+      setIsLoading(false);
+      setMessage('');
+      socket?.off('leftQueue');
+    });
   };
 
   return (

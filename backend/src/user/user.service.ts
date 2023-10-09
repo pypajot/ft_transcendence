@@ -363,6 +363,8 @@ export class UserService {
                 status: status,
             },
         });
-        await this.updateUserAndFriends(user, server);
+        if (user) {
+            await this.updateUserAndFriends(user, server);
+        }
     }
 }

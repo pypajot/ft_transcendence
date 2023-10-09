@@ -164,7 +164,7 @@ const PongGame : React.FC = () => {
                     </>
                 )}
             </div>
-            <div className={`game-board${gameMode === 'Party' ? ' party-border' : ' glow-medium'}`}>
+            <div className={`game-board${gameMode === 'Party' ? ' party-game-board' : ''} glow-medium`}>
                 {countdown && <div className="countdown">{countdown}</div>}
                 {showGo && <div className="go-message">GO!</div>}
                 {gameEnd && (
