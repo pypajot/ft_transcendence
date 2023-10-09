@@ -31,6 +31,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
   async handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
+    // Check if a player was in a queue 
+    const player = this.matchmakingService.findPlayerBySocketId(client.id);
+    if (player) { this.matchmakingService.dequeue(player); }
     // Check if the client was part of an active game
     const lobbyId = this.findLobbyByClientId(client.id);
     if (lobbyId) { this.handleForfait(client, {lobbyId}); }
@@ -319,6 +322,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('locationChange')
   handleLocationChange(client: Socket): void {
+    // Check if a player was in a queue
+    const player = this.matchmakingService.findPlayerBySocketId(client.id);
+    if (player) { this.matchmakingService.dequeue(player); }
+    // Check if the client was part of an active game
     const lobbyId = this.findLobbyByClientId(client.id);
     if (lobbyId) { this.handleForfait(client, {lobbyId}); }
   }
