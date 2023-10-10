@@ -240,21 +240,25 @@ const Profile = () => {
 		// }, []);
 	  
 		return (
-		  <div className='stats'>
-			<div className='elo'>
-				<h2>Elo : {currentUser?.elo}</h2>
+		  <div>
+			<img src='https://i.imgur.com/bZsILPR.png' className='match-img'></img>
+			<div className='stats'>
+				<div className='game-stats'>
+					<div className='elo'>
+						<h2>ELO : {currentUser?.elo}</h2>
+					</div>
+					<ul>
+					{currentUser?.matchHistory && currentUser.matchHistory.map(game => (
+						<li key={game.id} className='match-history'>
+						Opponent : {game.winner.username === currentUser?.username ? game.loser.username : game.winner.username} - 
+						{game.winner.username === currentUser?.username ? 'Win' : 'Loss'} -
+						Score : {game.winnerScore} - {game.loserScore} - 
+						Game Mode : {game.mode}
+						</li>
+					))}
+					</ul>
+				</div>
 			</div>
-			<h2>Match History</h2>
-			<ul>
-			  {currentUser?.matchHistory && currentUser.matchHistory.map(game => (
-				<li key={game.id}>
-				  Opponent: {game.winner.username === currentUser?.username ? game.loser.username : game.winner.username} - 
-				  {game.winner.username === currentUser?.username ? 'Win' : 'Loss'} -
-				  Score: {game.winnerScore} - {game.loserScore} - 
-				  Game Mode: {game.mode}
-				</li>
-			  ))}
-			</ul>
 		  </div>
 		);
 	  }

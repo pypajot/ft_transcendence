@@ -105,10 +105,32 @@
 .fa-div{
 	display: flex;
 	justify-content: center;
-	padding-top: 4%;
+	padding-top: 3%;
 	padding-bottom: 3%;
 }
 
-.stats{
+.elo{
+	display: flex;
+	justify-content: center;
+}
 
+.match-img{
+	width: 300px;
+}
+
+.elo-img{
+	width: 125px;
+}
+
+.stats{
+	display: flex;
+	justify-content: center;
+}
+
+.game-stats{
+	width: 650px;
+	color: white;
+	border: 1px solid hsl(0, 0%, 100%);
+	border-radius:30px;
+	filter: drop-shadow(0 0 15px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
 }
