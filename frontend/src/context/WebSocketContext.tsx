@@ -120,8 +120,8 @@ export default function SocketContextProvider(
         });
         newSocket.on('connect_error', refresh);
         setSocket(newSocket);
-        newSocket.on('exception', (msg) => {
-            setSocketError(msg);
+        newSocket.on('exception', (err) => {
+            setSocketError(err);
         });
         newSocket.on('updateUser', (newUser) => {
             setUser((currentUser: any) => ({

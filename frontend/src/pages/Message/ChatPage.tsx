@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Conversation } from './Conversation';
 import { Box, Flex } from '@twilio-paste/core';
 import { Contact } from './Contact';
-import { TopbarMenu } from './TopMenu';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useNavigate } from 'react-router-dom';
 import { PopUpInvite } from './PopUpInvite';
@@ -51,17 +50,9 @@ const ChatComponent = () => {
     return (
         <>
 			<Navbar />
-            <TopbarMenu />
             { gameInvite && (<PopUpInvite key={key} from={inviter} from_id={inviter_id} mode={mode}/>)}
             <Flex>
-                <Flex>
-                    <Box
-                        backgroundColor="colorBackgroundDecorative10Weakest"
-                        padding="space40"
-                        width="100%">
-                        <Contact />
-                    </Box>
-                </Flex>
+                <Contact />
                 <Flex grow>
                     <Box
                         backgroundColor="colorBackgroundDecorative10Weakest"

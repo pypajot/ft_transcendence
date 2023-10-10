@@ -1,0 +1,50 @@
+*
+  .wrapper {
+	/* max-width: 50rem; */
+	background: #2c3e50;
+	width: 30%;
+	margin: 0 auto;
+  }
+  .tabs {
+	height: 3.5rem;
+	
+  }
+
+  .active-tab {
+	background-color: blueviolet;
+	border-color:chartreuse;
+	border-width: 0.2rem;
+	border-style: solid;
+	border-bottom-style: hidden;
+  }
+
+  .inactive-tab {
+	background-color: brown;
+	border-color:chartreuse;
+	border-width: 0.2rem;
+	border-style: hidden;
+	border-bottom-style: solid;
+  }
+
+  .tabs > div {
+	float: left;
+	position: relative;
+	width: 50%;
+	height: 100%;
+	
+  }
+  
+  .tab-content {
+	/* height: 12rem; */
+	width: 100%;
+	position: relative;
+	z-index: 1;
+	padding: 1.618rem;
+	background: blueviolet;
+	transition: all 0.35s;
+	border-color:chartreuse;
+	border-width: 0.2rem;
+	border-style: solid;
+	border-top-style: hidden;
+  }
+  

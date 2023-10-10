@@ -41,10 +41,16 @@ export const First = () => {
 		</div>
 	));
 
+	const no_request = (
+		<div>
+			<h4>No Friend Request</h4>
+		</div>
+	);
+
 	return (
 		<>
 			<div className="friend-request-list">
-				{list}
+				{user?.friendsRequest.length ? list : no_request}
 			</div>
 		</>
 	)

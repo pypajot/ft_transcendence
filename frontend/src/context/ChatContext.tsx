@@ -17,6 +17,8 @@ type ChatContext = {
     setRenderConversation: (value: boolean) => void;
     renderConversation: boolean;
     isBlocked: (id: number) => boolean;
+	tabDisplay: string;
+	setTabDisplay: React.Dispatch<React.SetStateAction<string>>; 
 };
 
 type ChatContextProviderProps = {
@@ -30,6 +32,7 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
     >(undefined);
     const [renderConversation, setRenderConversation] =
         useState<boolean>(false);
+	const [tabDisplay, setTabDisplay] = useState<string>("friends");
     const { socket } = useSocketContext();
     const { user } = useAuth();
     // const [channelRequestList, setChannelRequestList] = useState<
@@ -71,8 +74,9 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
         [setChannelRequestList]
     );*/
 
-    const setErrorFromBackend = (error: Error) => {
-        setError(error);
+    const setErrorFromBackend = (err: ErrorType) => {
+        setError(err);
+		console.log("error: ", error);
     };
 
     const resetError = React.useCallback(() => {
@@ -104,6 +108,8 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
             setRenderConversation,
             renderConversation,
             isBlocked,
+			tabDisplay,
+			setTabDisplay,
         }),
         [
             conversationInfo,
@@ -115,6 +121,8 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
             setRenderConversation,
             renderConversation,
             isBlocked,
+			tabDisplay,
+			setTabDisplay,
         ]
     );
     return (

@@ -3,7 +3,7 @@ export function HelperText(props: {className?: string, errorText: string | null}
 		return null
 	return (
 		<>
-			<div className={props?.className} style={{color: "red"}}>{props.errorText}</div>
+			<span className={props?.className} style={{color: "red"}}>{props.errorText}</span>
 		</>
 	);
 }

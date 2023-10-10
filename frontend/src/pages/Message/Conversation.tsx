@@ -1,5 +1,5 @@
 import { ChatComposer } from '@twilio-paste/chat-composer';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import {
     $getRoot,
     EditorState,
@@ -14,6 +14,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useChatContext } from '../../context/ChatContext';
 import { OptionMenu } from './OptionMenu';
 import { EnterKeySubmitPlugin, SendButtonPlugin } from './Plugins';
+import sendIcon from '../../assets/send.png';
+import './Conversation.css';
 
 const sortByDate = () => {
     return function (a: any, b: any) {
@@ -34,6 +36,7 @@ export const Conversation = () => {
     const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
     const [username, setUsername] = useState<string>('');
     const [convName, setConvName] = useState<string>('');
+    const convContainerRef = useRef<HTMLDivElement>(null); 
 
     const chatContext = useChatContext();
     //Make a component to get the previous messsage
@@ -222,6 +225,7 @@ export const Conversation = () => {
                 ToUser: info.isUser,
             };
             socket?.emit('message', message_content);
+            setContent('');
         }
     };
 
@@ -236,6 +240,21 @@ export const Conversation = () => {
         };
     }, [messageListener, socket, channelMessage]);
 
+    const handleFormSubmit = (e : any) => {
+        e.preventDefault();  // Prevents default form submission behavior
+        sendMessage();
+    };
+
+    const handleInputChange = (e : any) => {
+        setContent(e.target.value);
+    };
+
+    useEffect(() => {
+        const container = convContainerRef.current;
+        if (container)
+            container.scrollTop = container.scrollHeight - container.clientHeight;
+    }, [conversationMsg]);
+
     return (
         <>
             {chatContext.conversationInfo && (
@@ -246,61 +265,65 @@ export const Conversation = () => {
                     <OptionMenu />
                 </Flex>
             )}
-            {conversationMsg &&
-                chatContext.conversationInfo &&
-                conversationMsg.map(function (message, i) {
-                    if (
-                        message.targetId &&
-                        chatContext.conversationInfo?.isChannel
-                    ) {
-                        return;
-                    }
-                    if (message.sent) {
-                        return (
-                            <div key={i}>
-                                <BasicOutMessage
-                                    message={message}></BasicOutMessage>
-                            </div>
-                        );
-                    } else {
-                        if (chatContext.isBlocked(message.authorId)) {
+            {chatContext.conversationInfo && (
+            <div className="conversation-container" ref={convContainerRef}>
+                {conversationMsg &&
+                    conversationMsg.map(function (message, i) {
+                        if (
+                            message.targetId &&
+                            chatContext.conversationInfo?.isChannel
+                        ) {
                             return;
                         }
-                        return (
-                            <div key={i}>
-                                <BasicInMessage
-                                    message={message}></BasicInMessage>
-                            </div>
-                        );
-                    }
-                })}
+                        if (message.sent) {
+                            return (
+                                <div key={i}>
+                                    <BasicOutMessage
+                                        message={message}></BasicOutMessage>
+                                </div>
+                            );
+                        } else {
+                            if (chatContext.isBlocked(message.authorId)) {
+                                return;
+                            }
+                            return (
+                                <div key={i}>
+                                    <BasicInMessage
+                                        message={message}></BasicInMessage>
+                                </div>
+                            );
+                        }
+                    })}
+            </div>
+            )}
             {chatContext.conversationInfo && (
-                <Box
-                    borderStyle="solid"
-                    borderWidth="borderWidth0"
-                    borderTopWidth="borderWidth10"
-                    borderColor="colorBorderWeak"
-                    display="flex"
-                    flexDirection="row"
-                    columnGap="space30"
-                    paddingX="space70"
-                    paddingTop="space50">
-                    <ChatComposer
-                        maxHeight="size10"
-                        config={{
-                            namespace: 'chatBox',
-                            onError: (error) => {
-                                throw error;
-                            },
-                        }}
-                        ariaLabel="Message"
+                <div
+                style={{
+                    border: '1px solid #ccc',
+                    padding: '10px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: '10px'
+                }}
+            >
+                <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
+                    <input
+                        type="text"
                         placeholder="Type here..."
-                        onChange={handleComposerChange}>
-                        <ClearEditorPlugin />
-                        <SendButtonPlugin onClick={sendMessage} />
-                        <EnterKeySubmitPlugin onKeyDown={sendMessage} />
-                    </ChatComposer>
-                </Box>
+                        value={content}
+                        onChange={handleInputChange}
+                        style={{ flex: 1 }}
+                    />
+                    <button
+                        className='conversation-button'
+                        type="submit"
+                        name="send"
+                        disabled={!content}
+                    >
+                        <img src={sendIcon} alt="Send" className="conversation-button-icon" />
+                    </button>
+                </form>
+            </div>
             )}
         </>
     );

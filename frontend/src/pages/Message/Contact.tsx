@@ -5,8 +5,11 @@ import { useChatContext } from '../../context/ChatContext';
 import { ProfileContext } from '../../context/ProfileContext';
 import { Channel } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
-import { ContactType } from '../../../Types/contact.entity';
-import { ConversationInformation } from '../../../Types/conversationInformation.entity';
+import './Contact.css'
+import { CreateNewConversation } from './CreateNewConversation';
+import { JoinChannel } from './JoinChannel';
+import { AddFriends } from './AddFriends';
+import { useSocketContext } from '../../context/WebSocketContext';
 
 export const Contact = () => {
     const [username, setUsername] = useState<string>('');
@@ -15,14 +18,9 @@ export const Contact = () => {
     const chatContext = useChatContext();
     const channelContext = useChannelContext();
     const friends = useContext(ProfileContext).friendList;
-    //  const [dataLoaded, setDataLoaded] = useState(false);
-    /*
-    useEffect(() => {
-        // Simulate data loading
-        setTimeout(() => {
-            setDataLoaded(true);
-        }, 200);
-    }, []);*/
+	const [open, setOpen] = useState<string | null>(null);
+	const [friendError, setFriendError] = useState<string>("");
+	const {socketError} = useSocketContext();
 
     const getName = () => {
         if (!user) {
@@ -31,14 +29,6 @@ export const Contact = () => {
             return user.username;
         }
     };
-    /*
-  useEffect(() => {
-    socket?.on("goodFriendsRequest", refreshContacts);
-    return () => {
-      socket?.off("goodFriendsRequest", refreshContacts);
-    };
-  }, [socket]);
-  */
 
     useEffect(() => {
         const res = getName();
@@ -49,64 +39,98 @@ export const Contact = () => {
             setUsername(res);
         }
     }, [user]);
-    //Request the back (Should Get all Message from a certain User)
-    //Then check on all message to list all conversation / Channel Or nOt
-    //If not channel then link to the user
-    //Return a list of string Channel And User
-
-    //Ask the back for the userList
-    //   const contactList = friendList?.map(function (user, i) {
-    // 	return (
-    // 	  <div key={i}>
-    // 		<ContactElement
-    // 		  content={user.username}
-    // 		  setConversation={setConversation}
-    // 		></ContactElement>
-    // 	  </div>
-    // 	);
-    //   })
+	
+	useEffect(() => {
+		if (!socketError) return;
+		if (socketError.func === 'addFriend' || socketError.func === "joinChannel") {
+			setFriendError(socketError.msg);
+		}
+	}, [socketError]);
+    
     const [conversationList, setConversationList] = useState<Channel[]>([]);
 
     useEffect(() => {
         setConversationList(channelContext.arrayChannels);
     }, [channelContext.arrayChannels]);
 
-    return (
-        <>
-            <div>
-                <h1> Channel </h1>
-                {username &&
-                    conversationList.map((channel) => {
-                        return (
-                            <div key={channel.id}>
-                                <ContactElement
-                                    info={{
-                                        isChannel: true,
-                                        isUser: false,
-                                        channel: channel,
-                                    }}></ContactElement>
-                            </div>
-                        );
-                    })}
-            </div>
-            <h1> Friend </h1>
-            {username &&
-                user?.friends &&
-                user.friends.map((user) => {
-                    if (chatContext.isBlocked(user.id)) {
-                        return;
-                    }
-                    return (
-                        <div key={user.id}>
-                            <ContactElement
-                                info={{
-                                    isChannel: false,
-                                    isUser: true,
-                                    user: user,
-                                }}></ContactElement>
-                        </div>
-                    );
-                })}
-        </>
-    );
+	const ChangeTabToFriends = () => {
+		chatContext.setTabDisplay("friends");
+		setOpen(null);
+	}
+
+	const ChangeTabToChannel = () => {
+		chatContext.setTabDisplay("channel");
+		setOpen(null);
+	}
+
+	const FriendsTab = () => {
+		return (
+			<div className="tab-content">
+				<div>
+					<AddFriends open={open} setOpen={setOpen} friendError={friendError} setFriendError={setFriendError}/>
+				</div>
+				{username &&
+					user?.friends &&
+					user.friends.map((user) => {
+						if (chatContext.isBlocked(user.id)) {
+							return;
+						}
+						return (
+							<div key={user.id}>
+								<ContactElement
+									info={{
+										isChannel: false,
+										isUser: true,
+										user: user,
+									}}></ContactElement>
+							</div>
+						);
+					})}
+			</div>
+		)
+	}
+
+	const ChannelTab = () => {
+		return (
+			<div className="tab-content">
+				<div>
+					<div>
+						<CreateNewConversation  open={open} setOpen={setOpen}/>
+					</div>
+					<div>
+						<JoinChannel open={open} setOpen={setOpen} friendError={friendError} setFriendError={setFriendError}/>
+					</div>
+				</div>
+				{username &&
+					conversationList.map((channel) => {
+						return (
+							<div key={channel.id}>
+								<ContactElement
+									info={{
+										isChannel: true,
+										isUser: false,
+										channel: channel,
+									}}></ContactElement>
+							</div>
+						);
+					})}
+			</div>
+		)
+	}
+
+	return (
+		<>
+			<div className="wrapper">
+				<div className="tabs">
+					<div className={chatContext.tabDisplay === "friends" ? "active-tab" : "inactive-tab"} onClick={ChangeTabToFriends}>
+						<h4>Friends</h4>
+					</div>
+					<div className={chatContext.tabDisplay === "channel" ? "active-tab" : "inactive-tab"} onClick={ChangeTabToChannel}>
+						<h4>Channel</h4>
+					</div>
+				</div>
+				{chatContext.tabDisplay === "friends" ? <FriendsTab /> : <ChannelTab />}
+			</div>
+		</>
+	)
 };

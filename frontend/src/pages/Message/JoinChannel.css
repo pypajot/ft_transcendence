@@ -1,0 +1,21 @@
+.join-channel-dropdown {
+    position: relative;
+}
+
+.join-channel {
+    position: absolute;
+    background-color: black;
+    margin: 5px 0;
+    padding: 0;
+
+    border: 2px solid grey;
+    width: 350px;
+    height: 350px;
+    z-index: 999;
+
+}
+
+.join-channel > div {
+    height: 20%;
+    border-bottom: 1px solid grey;
+}
