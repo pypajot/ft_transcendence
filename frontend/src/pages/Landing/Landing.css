@@ -1,3 +1,7 @@
+#root{
+  text-align: center;
+}
+
 .logo-landing{
   display: flex;
   justify-content: center;
