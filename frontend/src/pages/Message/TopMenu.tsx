@@ -11,7 +11,7 @@ import {
 import { CreateNewConversation } from './CreateNewConversation';
 import { useAuth } from '../../context/AuthContext';
 import { AddFriends } from './AddFriends';
-import { JoinChanel } from './JoinChannel';
+import { JoinChannel } from './JoinChannel';
 
 export const TopbarMenu = () => {
     const userDialogList = useUserDialogListState();
@@ -29,9 +29,6 @@ export const TopbarMenu = () => {
     return (
         <Topbar id="topbar">
             <TopbarActions justify="start">
-                <CreateNewConversation />
-                <AddFriends />
-                <JoinChanel />
             </TopbarActions>
         </Topbar>
     );

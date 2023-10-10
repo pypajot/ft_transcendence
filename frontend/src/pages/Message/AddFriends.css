@@ -15,7 +15,7 @@
 
 }
 
-.add-friends > div {
+.add-friends > form > div {
 	height: 20%;
 	border-bottom: 1px solid grey;
 }

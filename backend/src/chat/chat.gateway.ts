@@ -84,9 +84,8 @@ class ChatGateway
     }
 
     @SubscribeMessage('JoinChannel')
-    handleChannelJoining(client: any, data: joinChannelInfo): void {
-        console.log(data);
-        this.channelService.newChannelMember(this.io, client, data);
+    async handleChannelJoining(client: any, data: joinChannelInfo): Promise<void> {
+        await this.channelService.newChannelMember(this.io, client, data);
     }
 
     @SubscribeMessage('ChannelMessage')

@@ -1,4 +1,3 @@
-import { Box, SidebarBody, useMenuState } from '@twilio-paste/core';
 import { ConversationInformation } from '../../../Types/conversationInformation.entity';
 import { useChatContext } from '../../context/ChatContext';
 import './ContactElement.css';
@@ -11,8 +10,6 @@ const statusIcon = {
 
 export const ContactElement = ({ info }: { info: ConversationInformation }) => {
     const chatContext = useChatContext();
-
-    const menu = useMenuState();
 
     const User = () => {
         if (info.isChannel && info.channel)

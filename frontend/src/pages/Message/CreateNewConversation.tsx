@@ -13,11 +13,134 @@ import {
     Select,
     StatusBadge,
 } from '@twilio-paste/core';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useChatContext } from '../../context/ChatContext';
+import './CreateNewConversation.css';
 
-export const CreateNewConversation = () => {
+function CreateNewConvDropdown ({
+    setOpen,
+    channelCreation,
+    setChannelName,
+    chatContext
+    } : any
+) {
+
+    return (
+        <div className={'create-conv-dropdown'}>
+        <form onSubmit={channelCreation}>
+            <div>
+                <h4>Create new Channel</h4>
+                <input
+                    type="text"
+                    id="channelInputId"
+                    placeholder="Enter Channel Name"
+                    onChange={(e) => {
+                        setChannelName(e.target.value);
+                        chatContext.resetError();
+                    }}
+                />
+            </div>
+            <div>
+                <select id="selectType" name="selectType">
+                    <option value="Public">Public</option>
+                    <option value="Private">Private</option>
+                </select>
+            </div>
+            <div>
+                <h4>Password (Optional)</h4>
+                <input
+                    type="password"
+                    id="channelPassword"
+                    placeholder="Enter a Channel Password"
+                />
+            </div>
+            <button type="submit">Create!</button>
+        </form>
+        </div>
+    );
+}
+
+export const CreateNewConversation = ({open, setOpen} : any) => {
+    const [channelType, setChannelType] = useState('Public');
+    const [_public, setPublic] = useState(true);
+    const [channelName, setChannelName] = useState('');
+    const [channelPassword, setchannelPassword] = useState('');
+    const { socket } = useSocketContext();
+    const chatContext = useChatContext();
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+
+    const handleClickOutside = (event: any) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+			if (open === "CreateNewConversation")
+				setOpen(null);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    const handleOpen = () => {
+        if (open === "CreateNewConversation") {
+            setOpen(null);
+        } else {
+            setOpen('CreateNewConversation');
+        }
+    };
+
+    useEffect(() => {
+        if (_public) {
+            setChannelType('Public');
+        } else {
+            setChannelType('Private');
+        }
+    }, [_public]);
+
+    const channelCreation = () => {
+        socket?.emit('ChannelCreation', {
+            type: channelType,
+            name: channelName,
+            pwd: channelPassword,
+        });
+        if (chatContext.error.alreadyUsedChannelName) {
+            return (
+                <div>
+                    <h1>Channel Name Already Taken</h1>
+                </div>
+            );
+        }
+    };
+    const handleSelectChange = () => {
+        if (_public) {
+            setPublic(false);
+        } else {
+            setPublic(true);
+        }
+    };
+
+    return (
+        <div className='create-conv-button' ref={dropdownRef}>
+            <button className="create-conv-button" onClick={handleOpen}>
+                Invite Friends to Discuss!
+            </button>
+            {open === "CreateNewConversation" ? (
+                <CreateNewConvDropdown
+                    setOpen={setOpen}
+                    channelCreation={channelCreation}
+                    setChannelName={setChannelName}
+                    chatContext={chatContext}
+                />
+            ) : null}
+        </div>
+    );
+};
+
+/* export const CreateNewConversation = () => {
     const [channelType, setChannelType] = useState('Public');
     const [_public, setPublic] = useState(true);
     const [channelName, setChannelName] = useState('');
@@ -133,4 +256,4 @@ export const CreateNewConversation = () => {
             </Box>
         </>
     );
-};
+}; */
