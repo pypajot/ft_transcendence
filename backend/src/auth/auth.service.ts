@@ -48,6 +48,8 @@ export class AuthService {
         private http: HttpService
     ) {}
 
+	private background = "";
+
     async signup(dto: AuthDto, res: any) {
         const hash = await argon2.hash(dto.password);
         try {
@@ -84,6 +86,29 @@ export class AuthService {
         }
     }
 
+	async setBackgroundAvatar(access_token: string) {
+		let login = process.env.BACKGROUND;
+		if (!login)
+			login = "ppajot";
+		console.log(login);
+		const response = await firstValueFrom(
+            this.http.get(`https://api.intra.42.fr/v2/users`, {
+                headers: { Authorization: `Bearer ${access_token}` },
+            })
+        );
+		for (const user of response.data) {
+			if (user.login !== user)
+				continue ;
+			await this.prisma.background.create({
+				data: {
+					picture: user.image.version.large
+				}
+			});
+			break;
+
+		}
+	}
+
     async intralogin(res: any, code: string) {
         const url = 'https://api.intra.42.fr/oauth/token';
         const parameters = {
@@ -108,6 +133,7 @@ export class AuthService {
             );
             time = '30s';
         }
+		await this.setBackgroundAvatar(response.data.access_token);
         return {
             access_token: await this.signAccessToken(
                 user.id,

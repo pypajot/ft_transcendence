@@ -122,3 +122,8 @@ model UserAchievement {
 
   @@unique([userId, achievementId])  // ensure a user can only earn each achievement once
 }
+
+model Background {
+	id		Int		@id @default(autoincrement())
+	picture	String
+}

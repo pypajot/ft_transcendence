@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { useSocketContext } from './WebSocketContext';
 
 type GameContextType = {
   gameStart: boolean;
+  partyBackground: string;
   setGameStart: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -13,9 +15,24 @@ type GameProviderProps = {
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [gameStart, setGameStart] = useState(false);
+  const [partyBackground, setPartyBackground] = useState<string>("")
+  const {socket} = useSocketContext();
+
+  useEffect(() => {
+	if (!socket)
+		return ;
+	socket?.emit("getPartyBackground");
+	socket?.on("getPartyBackground", (url: string) => {
+		setPartyBackground(url);
+	});
+	return (() => {
+		socket?.off("getPartyBackground");
+	})
+  }, [socket])
 
   return (
-    <GameContext.Provider value={{ gameStart, setGameStart }}>
+    <GameContext.Provider value={{ gameStart, setGameStart, partyBackground
+	}}>
       {children}
     </GameContext.Provider>
   );

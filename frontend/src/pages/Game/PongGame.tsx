@@ -8,7 +8,7 @@ import { useGameContext } from '../../context/GameContext.tsx';
 const PongGame : React.FC = () => {
     const {socket} = useSocketContext(); // Access the WebSocket context
     const [lobbyId, setLobbyId] = useState<string>(''); // The lobby ID to join
-    const {setGameStart} = useGameContext();
+    const {setGameStart, partyBackground} = useGameContext();
     const [gameMode, setGameMode] = useState<string>('');
     const [gameState, setGameState] = useState<GameState | null>(null);
     const [countdown, setCountdown] = useState<number | null>(null);
@@ -164,7 +164,8 @@ const PongGame : React.FC = () => {
                     </>
                 )}
             </div>
-            <div className={`game-board${gameMode === 'Party' ? ' party-game-board' : ''} glow-medium`}>
+            <div className={`game-board${gameMode === 'Party' ? ' party-game-board' : ''} glow-medium`}
+				style={gameMode === 'Party' ? {backgroundImage: `url(${partyBackground})`} : {}}>
                 {countdown && <div className="countdown">{countdown}</div>}
                 {showGo && <div className="go-message">GO!</div>}
                 {gameEnd && (

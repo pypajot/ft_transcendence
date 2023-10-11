@@ -56,4 +56,9 @@ export class UserGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleUnblockUser(client: Socket, content: any) {
 		await this.userService.unblockUser(content, this.server);
 	}
+
+	@SubscribeMessage('getPartyBackground')
+	async  handleGetPartyBackgound(client: Socket) {
+		await this.userService.getPartyBackground(client);
+	}
 }
