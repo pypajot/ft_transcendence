@@ -17,3 +17,10 @@
 .create-conv-show {
     display: flex;
 }
+
+.chat-error {
+	color: red;
+	font-size: 1rem;
+	text-align: center;
+    margin: 0.5rem 0;
+}

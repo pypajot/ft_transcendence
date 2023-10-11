@@ -297,15 +297,7 @@ export const Conversation = () => {
             </div>
             )}
             {chatContext.conversationInfo && (
-                <div
-                style={{
-                    border: '1px solid #ccc',
-                    padding: '10px',
-                    display: 'flex',
-                    flexDirection: 'row',
-                    gap: '10px'
-                }}
-            >
+            <div className='conversation-input-area'>
                 <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
                     <input
                         type="text"

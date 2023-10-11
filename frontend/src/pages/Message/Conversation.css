@@ -4,6 +4,17 @@
     overflow-y: auto;
     border: 1px solid #ccc;
     padding: 10px;
+    border-radius: 1rem;
+}
+
+.conversation-input-area {
+    border: 1px solid #ccc;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    border-radius: 1rem;
+    margin-top : 0.2rem;
 }
 
 .conversation-button {

@@ -76,7 +76,7 @@ export default function ChatContextProvider(props: ChatContextProviderProps) {
 
     const setErrorFromBackend = (err: ErrorType) => {
         setError(err);
-		console.log("error: ", error);
+		console.log("error: ", err);
     };
 
     const resetError = React.useCallback(() => {
