@@ -16,6 +16,7 @@ import { useChannelContext } from '../../context/ChannelContext';
 import { useNavigate } from 'react-router-dom';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useChatContext } from '../../context/ChatContext';
+import { InvitePending } from './InvitePending';
 
 export const OptionMenu = () => {
     const menu = useMenuState();
@@ -41,6 +42,8 @@ export const OptionMenu = () => {
     const chatContext = useChatContext();
     const info = chatContext.conversationInfo;
     const [target, setTarget] = useState<User | undefined>(info?.user);
+    const [key, setKey] = useState<number>(0);
+    const [Invite, setInvite] = useState<boolean>(false);
 
     useEffect(() => {
         if (info && info.isUser) {
@@ -64,13 +67,16 @@ export const OptionMenu = () => {
         const mode = 'Classic';
         // console.log('you invited someone to play: ', target?.username);
         // notify the other user that he has been invited to play
+        setInvite(true);
         socket?.emit('sendInviteToPlay', {targetId, mode});
+        setKey(prevkey => prevkey + 1);
         //navigate('/game', { state: { mode: true } });
     }
 
     //do we set the invite to play to any member of a channel ?
     return (
         <div>
+            {Invite && (<InvitePending key={key} target={target?.username || ''} target_id={target?.id || 0} />)}
             <MenuButton {...menu} variant="reset" size="reset">
                 <MoreIcon decorative={false} title="More options" />
             </MenuButton>

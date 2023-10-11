@@ -27,19 +27,6 @@ const ChatComponent = () => {
             setMode(mode);
             setKey(prevkey => prevkey + 1);
         });
-
-        socket?.on('repliedGameInvite', (reply: boolean, from: string, mode: string) => {
-            if (reply) {
-                const opp_SocketId = from;
-                console.log(from + ' accepted the game');
-                socket?.emit('launchGameFromChat', { opp_SocketId, mode });
-                localStorage.setItem('gameInProgress', 'false');
-                navigate('/game', { state: { mode: true } });
-            } 
-            else {
-                console.log(from + ' declined the game');
-            }
-        });
     
         return () => {
             socket?.off('invitedToPlay');

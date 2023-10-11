@@ -21,7 +21,15 @@ function AppRoutes() {
   const {socket} = useSocketContext();
 
   useEffect(() => {
-    socket?.emit('locationChange');
+    //if the user comes from the chat invite, we send a boolean to the server
+    console.log('location: ', location );
+    if (location?.state) {
+      socket?.emit('gameInvite', {
+        invite: true,
+      });
+    }
+
+    socket?.emit('locationChange', location);
   }, [location]);
 
   return (

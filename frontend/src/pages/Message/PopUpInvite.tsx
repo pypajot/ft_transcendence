@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, ModalFooterActions, ModalHeading } from '@twilio-paste/modal';
 import { Button } from '@twilio-paste/button';
 import { useUID } from '@twilio-paste/core/uid-library';
@@ -13,19 +13,20 @@ interface PopUpProps {
 	mode: string;
 }
 
-export const PopUpInvite: React.FC<PopUpProps> = ({key, from, from_id, mode}) => {
+export const PopUpInvite: React.FC<PopUpProps> = ({from, from_id, mode}) => {
 	// Modal properties
 	const [isOpen, setIsOpen] = useState(true);
 	const handleClose = () => setIsOpen(false);
 	const modalHeadingID = useUID();
 	const {socket} = useSocketContext();
 	const navigate = useNavigate();
+	const [canceled, setCanceled] = useState<boolean>(false);
 
 	const handleAccept = () => {
 		// console.log('you accepted the game');
 		const reply = true;
 		socket?.emit('replyGameInvite', {reply, from_id, mode});
-		localStorage.setItem('gameInProgress', 'false');
+		sessionStorage.setItem('gameInProgress', 'false');
 		navigate('/game', { state: { mode: true } });
 		handleClose();
 	}
@@ -37,6 +38,16 @@ export const PopUpInvite: React.FC<PopUpProps> = ({key, from, from_id, mode}) =>
 		handleClose();
 	}
 
+	useEffect (() => {
+		socket?.on('canceledGameInvite', (from: string) => {
+			setCanceled(true);
+			console.log(from + ' canceled the game');
+		});
+		return () => {	
+			socket?.off('canceledGameInvite');
+		};
+	}, [socket]);
+
 	return (
 	  <div>
 		<Modal ariaLabelledby={modalHeadingID} isOpen={isOpen} onDismiss={handleDecline} size="default">
@@ -46,11 +57,18 @@ export const PopUpInvite: React.FC<PopUpProps> = ({key, from, from_id, mode}) =>
 			</ModalHeading>
 		  </ModalHeader>
 		  <ModalBody>
-			<Paragraph>
-				{from} invited you to a game of pong !
-			</Paragraph>
+			{canceled ? (
+				<Paragraph>
+					{from} canceled this invite... probably scared.
+				</Paragraph>
+			) : (
+				<Paragraph>
+					{from} invited you to a game of pong !
+				</Paragraph>
+			)}
 		  </ModalBody>
 		  <ModalFooter>
+			{!canceled && (
 			<ModalFooterActions>
 			  <Button variant="secondary" onClick={handleDecline}>
 				Decline
@@ -58,6 +76,7 @@ export const PopUpInvite: React.FC<PopUpProps> = ({key, from, from_id, mode}) =>
 			  <Button variant="primary" onClick={handleAccept}>
 				Accept</Button>
 			</ModalFooterActions>
+			)}
 		  </ModalFooter>
 		</Modal>
 	  </div>

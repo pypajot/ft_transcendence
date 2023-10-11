@@ -11,6 +11,7 @@ const Game : React.FC = () => {
 	const location = useLocation();
 	
 	useEffect(() => {
+		console.log ('comp mount : game start set to false');
 		setGameStart(false);
 	}, []);
 	// we use location to check if the user is coming from the chat invite
@@ -18,29 +19,15 @@ const Game : React.FC = () => {
 	// if reload from game page, render the mode selection no matter what
 	useEffect(() => {
 		console.log ('location changed');
-		const gameInProgress = localStorage.getItem('gameInProgress');
-		if (gameInProgress !== 'true' && location?.state) {
+		if (sessionStorage.getItem('gameInProgress') !== 'true' && location?.state) {
+			console.log ('set game start to true');
 			setGameStart(true);
 		} 
 		else { 
+			console.log ('set game start to false');
 			setGameStart(false);
 		}
 	}, [location]);
-
-	// we use beforeunload for the case where the user reloads the page
-	// during game : it must not be able to reload the game
-	useEffect(() => {
-		window.addEventListener('beforeunload', handleBeforeUnload);
-	
-		return () => {
-			window.removeEventListener('beforeunload', handleBeforeUnload);
-		};
-	}, []);
-	
-	const handleBeforeUnload = () => {
-		setGameStart(false);
-		localStorage.setItem('gameInProgress', 'true');
-	};
 	
 	return (
 		<div>

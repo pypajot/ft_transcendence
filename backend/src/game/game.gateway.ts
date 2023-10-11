@@ -175,13 +175,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleInviteToPlay(client: Socket, data: { targetId: number, mode: string }): Promise<void> {
     const { targetId, mode } = data;
     // get the inviter client username in db
-    const inviter = await this.prisma.user.findFirst({
+    const inviter = await this.prisma.user.findUnique({
       where: {
         socketId: client.id,
       },
     });
     // get the target client socket id in db
-    const target = await this.prisma.user.findFirst({
+    const target = await this.prisma.user.findUnique({
       where: {
         id: targetId,
       },
@@ -196,13 +196,27 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { reply, from_id, mode } = data;
     // send the reply to the client who sent the invite
     // get the 'from' client socket id in db
-    const inviter = await this.prisma.user.findFirst({
+    const inviter = await this.prisma.user.findUnique({
       where: {
         id: from_id,
       },
     });
     console.log('replyGameInvite received from ' + client.id + ' to ' + inviter.username + ' in mode ' + mode);
     this.server.to(inviter.socketId).emit('repliedGameInvite', reply, client.id, mode);
+  }
+
+  @SubscribeMessage('cancelGameInvite')
+  async handleCancelGameInvite(client: Socket, data: { target_id: number }): Promise<void> {
+    const { target_id } = data;
+    // get the target client socket id in db
+    const target = await this.prisma.user.findUnique({
+      where: {
+        id: target_id,
+      },
+    });
+    // print the data received from the client
+    console.log('cancelGameInvite received from ' + client.id + ' to ' + target.username);
+    this.server.to(target.socketId).emit('canceledGameInvite', client.id);
   }
 
   @SubscribeMessage('launchGameFromChat')
@@ -324,7 +338,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('locationChange')
-  handleLocationChange(client: Socket): void {
+  handleLocationChange(client: Socket, location: any ): void {
+    console.log('user goes to : ', location.pathname);
     // Check if a player was in a queue
     const player = this.matchmakingService.findPlayerBySocketId(client.id);
     if (player) {
@@ -333,6 +348,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     // Check if the client was part of an active game
     const lobbyId = this.findLobbyByClientId(client.id);
-    if (lobbyId) { this.handleForfait(client, {lobbyId}); }
+    if (lobbyId && location.pathname !== '/game') { 
+      this.handleForfait(client, {lobbyId});
+    }
   }
 }

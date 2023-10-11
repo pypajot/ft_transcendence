@@ -31,14 +31,14 @@ const PongGame : React.FC = () => {
         setGameMode(mode);
         setUserName1(userName1);
         setUserName2(userName2);
-        localStorage.setItem('gameInProgress', 'true');
+        sessionStorage.setItem('gameInProgress', 'true');
         socket?.emit('getGameState', { lobbyId });
         setCountdown(3);
         setTimeout(() => { if (!gameEndRef.current) setCountdown(2)}, 1000);
         setTimeout(() => { if (!gameEndRef.current) setCountdown(1)}, 2000);
         setTimeout(() => { if (!gameEndRef.current) { setShowGo(true), setCountdown(null)}}, 3000);
         setTimeout(() => { 
-            if (!gameEndRef.current && localStorage.getItem('gameInProgress') === 'true') {
+            if (!gameEndRef.current && sessionStorage.getItem('gameInProgress') === 'true') {
                 socket?.emit('launchBall', { lobbyId }),
                 setShowBall(true)
             }
