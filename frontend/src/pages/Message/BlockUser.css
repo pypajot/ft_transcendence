@@ -1,0 +1,21 @@
+.block-user-dropdown {
+	position: relative;
+}
+
+.block-user {
+	position: absolute;
+	background-color: black;
+	margin: 5px 0;
+	padding: 0;
+
+	border: 2px solid grey;
+	width: 350px;
+	height: 350px;
+	z-index: 999;
+
+}
+
+.block-user > form > div {
+	height: 20%;
+	border-bottom: 1px solid grey;
+}

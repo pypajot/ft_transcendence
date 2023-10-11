@@ -104,8 +104,8 @@ export class ChatControllerService {
                     res.push(msg);
                 }
             }
-            console.log(`msgRCV from : ${channel_name} to ${user_name}:`);
-            console.log(res);
+            // console.log(`msgRCV from : ${channel_name} to ${user_name}:`);
+            // console.log(res);
             return JSON.stringify(res);
         } catch (error) {
             console.log(error);
@@ -142,8 +142,8 @@ export class ChatControllerService {
                         res.push(msg);
                     }
                 }
-                console.log(`msgSent from : ${user_name} :`);
-                console.log(res);
+                // console.log(`msgSent from : ${user_name} :`);
+                // console.log(res);
                 return JSON.stringify(res);
             }
         } catch (error) {

@@ -85,6 +85,7 @@ class ChatGateway
 
     @SubscribeMessage('JoinChannel')
     async handleChannelJoining(client: any, data: joinChannelInfo): Promise<void> {
+		console.log(data);
         await this.channelService.newChannelMember(this.io, client, data);
     }
 
@@ -123,7 +124,7 @@ class ChatGateway
 
     @SubscribeMessage('MuteUser')
     handleMuteRequest(client: any, data: any) {
-        this.channelService.muteUser(client, data.targetId, data.channelName);
+        this.channelService.muteUser(client, data.targetId, data.channelName, this.io);
     }
 
     @SubscribeMessage('UnmuteUser')
@@ -144,7 +145,8 @@ class ChatGateway
                         this.channelService.unMute(
                             data.targetId,
                             channel,
-                            elem.id
+                            elem.id,
+							this.io
                         );
                     }
                 });
@@ -171,7 +173,7 @@ class ChatGateway
 
     @SubscribeMessage('UnbanUser')
     handleUnBanRequest(client: any, data: any) {
-        this.channelService.unBan(data.targetId, data.channelName);
+        this.channelService.unBan(data.targetId, data.channelName, this.io);
     }
 	
 	@SubscribeMessage("deleteChannel")

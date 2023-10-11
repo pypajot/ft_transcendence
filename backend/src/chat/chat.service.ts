@@ -11,6 +11,21 @@ export class ChatGatewayService {
         private prisma: PrismaService) {}
     private readonly logger = new Logger(ChatGatewayService.name);
 
+	async getChannelsWithMod(channel_name: string) {
+		const channel = await this.prisma.channel.findUnique({
+			where: {name: channel_name},
+			include: {members: true}
+		})
+		const info = await this.prisma.managementChannel.findMany({
+			where: {channelName: channel.name},
+			include: {target: true}
+		})
+		return {
+			...channel,
+			info: info
+		}
+	}
+
     async requestFriends(io: Server, socket_id, userToAdd: string) {
         try {
             let friendsList;
@@ -187,15 +202,7 @@ export class ChatGatewayService {
             for (let i = 0; i < chatUser.channels.length; i++) {
                 client.join(chatUser.channels[i].name);
                 channelArr.push(
-                    await this.prisma.channel.findUnique({
-                        where: {
-                            name: chatUser.channels[i].name,
-                        },
-                        include: {
-                            members: true,
-                            info: true,
-                        },
-                    })
+					await this.getChannelsWithMod(chatUser.channels[i].name)
                 );
             }
             client.emit('InitChannels', channelArr);

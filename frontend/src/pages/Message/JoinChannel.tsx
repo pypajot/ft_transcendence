@@ -11,6 +11,7 @@ function JoinChannelDropdown (
 		friendError,
       } : any
 ) {
+	const {socketError} = useSocketContext();
     return (
             <div className='join-channel'>
 				<form onSubmit={joinChannel}>
@@ -34,7 +35,7 @@ function JoinChannelDropdown (
                 </div>
                 )}
                 <div>
-                {friendError === "Invalid password" && <span>{friendError}</span>}
+					{friendError === "Invalid password" && <span>{friendError}</span>}
                     <button type="submit">Join !</button>
 					</div>
 				</form>
@@ -76,10 +77,11 @@ export const JoinChannel = ({open, setOpen, friendError, setFriendError} : any) 
 		setSocketError(null);
 		setFriendError("");
 		// chatContext.resetError();
-		if (e.target.password === undefined)
-			socket?.emit('JoinChannel', { name: e.target.id.value, pass: "" });
-		else
-			socket?.emit('JoinChannel', { name: e.target.id.value, pass: e.target.password.value });
+		// if (e.target.password === undefined)
+		// 	socket?.emit('JoinChannel', { name: e.target.id.value, pass: "" });
+		// else
+		console.log("password: ", e.target?.password?.value)
+			socket?.emit('JoinChannel', { name: e.target.id.value, pass: e.target?.password?.value });
         //Checker que on a bien join puis
         // setConversation(channelName);
     };
