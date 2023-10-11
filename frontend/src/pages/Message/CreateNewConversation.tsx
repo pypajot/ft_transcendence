@@ -1,30 +1,29 @@
-import {
-    Box,
-    Button,
-    Form,
-    FormControl,
-    Heading,
-    Input,
-    Label,
-    Option,
-    Popover,
-    PopoverButton,
-    PopoverContainer,
-    Select,
-    StatusBadge,
-} from '@twilio-paste/core';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useChatContext } from '../../context/ChatContext';
 import './CreateNewConversation.css';
 
-function CreateNewConvDropdown ({
-    setOpen,
-    channelCreation,
-    setChannelName,
-    chatContext
-    } : any
-) {
+function CreateNewConvDropdown () {
+    const { socket } = useSocketContext();
+    const chatContext = useChatContext();
+
+    const channelCreation = useCallback(async (e: any) => {
+        e.preventDefault();
+        console.log ('Channel to be created: ' + e.target.channelInputId.value, e.target.channelPassword.value, e.target.selectType.value);
+        socket?.emit('ChannelCreation', {
+            type: e.target.selectType.value,
+            name: e.target.channelInputId.value,
+            pwd: e.target.channelPassword.value,
+        });
+        if (chatContext.error.alreadyUsedChannelName) {
+            console.log ('Channel name already taken');
+            return (
+                <div>
+                    <h1>Channel Name Already Taken</h1>
+                </div>
+            );
+        }
+    }, [chatContext.error.alreadyUsedChannelName, socket]);
 
     return (
         <div className={'create-conv-dropdown'}>
@@ -35,10 +34,6 @@ function CreateNewConvDropdown ({
                     type="text"
                     id="channelInputId"
                     placeholder="Enter Channel Name"
-                    onChange={(e) => {
-                        setChannelName(e.target.value);
-                        chatContext.resetError();
-                    }}
                 />
             </div>
             <div>
@@ -62,12 +57,6 @@ function CreateNewConvDropdown ({
 }
 
 export const CreateNewConversation = ({open, setOpen} : any) => {
-    const [channelType, setChannelType] = useState('Public');
-    const [_public, setPublic] = useState(true);
-    const [channelName, setChannelName] = useState('');
-    const [channelPassword, setchannelPassword] = useState('');
-    const { socket } = useSocketContext();
-    const chatContext = useChatContext();
     const dropdownRef = useRef<HTMLDivElement>(null);
 
 
@@ -93,48 +82,13 @@ export const CreateNewConversation = ({open, setOpen} : any) => {
         }
     };
 
-    useEffect(() => {
-        if (_public) {
-            setChannelType('Public');
-        } else {
-            setChannelType('Private');
-        }
-    }, [_public]);
-
-    const channelCreation = () => {
-        socket?.emit('ChannelCreation', {
-            type: channelType,
-            name: channelName,
-            pwd: channelPassword,
-        });
-        if (chatContext.error.alreadyUsedChannelName) {
-            return (
-                <div>
-                    <h1>Channel Name Already Taken</h1>
-                </div>
-            );
-        }
-    };
-    const handleSelectChange = () => {
-        if (_public) {
-            setPublic(false);
-        } else {
-            setPublic(true);
-        }
-    };
-
     return (
         <div className='create-conv-button' ref={dropdownRef}>
             <button className="create-conv-button" onClick={handleOpen}>
                 Invite Friends to Discuss!
             </button>
             {open === "CreateNewConversation" ? (
-                <CreateNewConvDropdown
-                    setOpen={setOpen}
-                    channelCreation={channelCreation}
-                    setChannelName={setChannelName}
-                    chatContext={chatContext}
-                />
+                <CreateNewConvDropdown/>
             ) : null}
         </div>
     );

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { ConversationInformation } from '../../../Types/conversationInformation.entity';
 import { useChatContext } from '../../context/ChatContext';
@@ -20,13 +20,6 @@ function JoinChannelDropdown (
                         name="id"
                         type="text"
                         placeholder="Enter a Channel"
-                        // value={channelName}
-                        // onChange={(e) => {
-                        //     setChannelName(e.target.value);
-                        //     chatContext.resetError();
-                        //     setReqPassword(false);
-                        //     setPassword('');
-                        // }}
                     />
                 </div>
                 {(friendError !== "Invalid password") && <span>{friendError}</span>}

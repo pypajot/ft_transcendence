@@ -94,8 +94,8 @@ class ChatGateway
         this.channelService.sendToChannel(this.io, data[0], data[1], client.id);
     }
     @SubscribeMessage('ChannelCreation')
-    handleChannelCreation(client: any, data: channelInfo): void {
-        this.channelService.channelCreation(this.io, data, client.id, client);
+    async handleChannelCreation(client: any, data: channelInfo): Promise<void> {
+        await this.channelService.channelCreation(this.io, data, client.id, client);
     }
 
     @SubscribeMessage('ChannelInvitResponse')
