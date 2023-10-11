@@ -16,29 +16,29 @@ export class ChatController {
 
     @Post('getMessageSent')
     async getLogsSender(@Body() dto: PrivMsgLogsDto): Promise<string> {
-        console.log(dto);
+        // console.log(dto);
         if (dto.isUser) {
-            return this.chatService.getLogsUserToUser(dto.sender, dto.receiver);
+            return await this.chatService.getLogsUserToUser(dto.sender, dto.receiver);
         } else {
-            console.log(
-                await this.chatService.getLogsUserToChannel(
-                    dto.sender,
-                    dto.receiver
-                )
-            );
-            return this.chatService.getLogsUserToChannel(
+            // console.log(
+            //     await this.chatService.getLogsUserToChannel(
+            //         dto.sender,
+            //         dto.receiver
+            //     )
+            // );
+            return await this.chatService.getLogsUserToChannel(
                 dto.sender,
                 dto.receiver
             );
         }
     }
     @Post('getMessageReceived')
-    getLogsReceiver(@Body() dto: PrivMsgLogsDto): Promise<string> {
+    async getLogsReceiver(@Body() dto: PrivMsgLogsDto): Promise<string> {
         console.log(dto);
         if (dto.isUser) {
-            return this.chatService.getLogsUserToUser(dto.sender, dto.receiver);
+            return await this.chatService.getLogsUserToUser(dto.sender, dto.receiver);
         } else {
-            return this.chatService.getChannelLogsToUser(
+            return await this.chatService.getChannelLogsToUser(
                 dto.sender,
                 dto.receiver
             );

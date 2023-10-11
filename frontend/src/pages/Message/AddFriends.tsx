@@ -12,8 +12,8 @@ export const AddFriends = ({open, setOpen, friendError, setFriendError } : any) 
 
     const handleClickOutside = (event: MouseEvent) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-			console.log("close when outside component")
-            setOpen(null);
+			if (open === "addfriends")
+				setOpen(null);
         }
     };
 
@@ -37,6 +37,7 @@ export const AddFriends = ({open, setOpen, friendError, setFriendError } : any) 
 		e.preventDefault();
 		setFriendError(null);
 		setSocketError(null);
+		console.log(e.target.username.value);
 		socket?.emit('addFriend', {
 			friendName: e.target.username.value,
 			userId: user?.id,

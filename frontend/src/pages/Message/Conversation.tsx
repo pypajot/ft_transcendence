@@ -38,10 +38,9 @@ export const Conversation = () => {
     const [convName, setConvName] = useState<string>('');
     const convContainerRef = useRef<HTMLDivElement>(null); 
 
-    const chatContext = useChatContext();
+    const {conversationInfo, isBlocked, renderConversation} = useChatContext();
     //Make a component to get the previous messsage
     const { socket } = useSocketContext();
-    const info = useChatContext().conversationInfo;
 
     useEffect(() => {
         if (!user) {
@@ -78,6 +77,7 @@ export const Conversation = () => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
+			
 
             return await response.json();
         } catch (error) {
@@ -92,7 +92,7 @@ export const Conversation = () => {
     }) => {
         const url = 'http://localhost:3333/chat/getMessageSent';
 		console.log("sent: ", obj);
-        try {
+        // try {
 			const response = await refreshFetch(url, {
 			  method: "POST",
 			  headers: {
@@ -108,51 +108,51 @@ export const Conversation = () => {
 			if (!response.ok) {
 			  throw new Error(`HTTP error! Status: ${response.status}`);
 			}
-		
-			return await response.json();
-		  } catch (error) {
-			console.error("There was an error fetching the data", error);
-		  }
+			// console.log(response)
+			response.json().then((res: any) => setSentMessage(res))
+			// return ();
+		//   } catch (error) {
+		// 	console.error("There was an error fetching the data", error);
+		//   }
     };
 
-    useEffect(() => {}, [info, username]);
+    useEffect(() => {}, [conversationInfo, username]);
 
     useEffect(() => {
-        const info = chatContext.conversationInfo;
+		const updateMessages = async (info: any) => {
+			await getMessageReceived({
+				sender: convName,
+				receiver: username,
+				isUser: info.isUser,
+			}).then((res: any) => {
+				setReceivedMessage(res);
+			});
+		}
+        const info = conversationInfo;
         if (!info) {
-            return;
+			return;
         }
         if (info && info.isChannel && info.channel) {
-            setConvName(info.channel.name);
+			setConvName(info.channel.name);
         } else if (info && info.isUser && info.user) {
-            setConvName(info.user.username);
+			setConvName(info.user.username);
         }
 		console.log('username conversaation: ', username, convName)
 		// if (username === '' || convName === '') {
-		// 	chatContext.setRenderConversation(false);
-		// 	return ;
-		// }
-		if (!convName || !username)
+			// 	setRenderConversation(false);
+			// 	return ;
+			// }
+			if (!convName || !username)
 			return ;
-		getMessageReceived({
-			sender: convName,
-			receiver: username,
-			isUser: info.isUser,
-		}).then((res: any) => {
-			setReceivedMessage(res);
-		});
+		updateMessages(info);
 		getMessageSent({
 			sender: username,
 			receiver: convName,
 			isUser: info.isUser,
-		}).then((res) => {
-			// console.log(res);
-			setSentMessage(res);
 		});
     }, [
-        chatContext,
-        chatContext.conversationInfo,
-        chatContext.renderConversation,
+        conversationInfo,
+        renderConversation,
         convName,
         username,
     ]);
@@ -197,7 +197,7 @@ export const Conversation = () => {
             if (
                 message.channel &&
                 message.channel.name ==
-                    chatContext.conversationInfo?.channel?.name
+                    conversationInfo?.channel?.name
             )
                 setConversationMsg([...conversationMsg, message]);
             // console.log(conversationMsg);
@@ -208,8 +208,8 @@ export const Conversation = () => {
     const messageListener = useCallback(
         (message: Message) => {
             if (
-                info?.isUser &&
-                (message.senderName === info?.user?.username ||
+                conversationInfo?.isUser &&
+                (message.senderName === conversationInfo?.user?.username ||
                     message.senderName === user?.username)
             )
                 setConversationMsg([...conversationMsg, message]);
@@ -218,11 +218,11 @@ export const Conversation = () => {
     );
 
     const sendMessage = () => {
-        if (content && content != '' && info) {
+        if (content && content != '' && conversationInfo) {
             const message_content: MessageInfo = {
                 content: content,
                 target: convName,
-                ToUser: info.isUser,
+                ToUser: conversationInfo.isUser,
             };
             socket?.emit('message', message_content);
             setContent('');
@@ -257,7 +257,7 @@ export const Conversation = () => {
 
     return (
         <>
-            {chatContext.conversationInfo && (
+            {conversationInfo && (
                 <Flex>
                     <Flex grow shrink basis="1px">
                         <Flex>{convName}</Flex>
@@ -265,13 +265,13 @@ export const Conversation = () => {
                     <OptionMenu />
                 </Flex>
             )}
-            {chatContext.conversationInfo && (
+            {conversationInfo && (
             <div className="conversation-container" ref={convContainerRef}>
                 {conversationMsg &&
                     conversationMsg.map(function (message, i) {
                         if (
                             message.targetId &&
-                            chatContext.conversationInfo?.isChannel
+                            conversationInfo?.isChannel
                         ) {
                             return;
                         }
@@ -283,7 +283,7 @@ export const Conversation = () => {
                                 </div>
                             );
                         } else {
-                            if (chatContext.isBlocked(message.authorId)) {
+                            if (isBlocked(message.authorId)) {
                                 return;
                             }
                             return (
@@ -296,8 +296,8 @@ export const Conversation = () => {
                     })}
             </div>
             )}
-            {chatContext.conversationInfo && (
-            <div className='conversation-input-area'>
+            {conversationInfo && (
+                <div className='conversation-input-area'>
                 <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
                     <input
                         type="text"

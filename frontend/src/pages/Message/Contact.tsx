@@ -10,6 +10,7 @@ import { CreateNewConversation } from './CreateNewConversation';
 import { JoinChannel } from './JoinChannel';
 import { AddFriends } from './AddFriends';
 import { useSocketContext } from '../../context/WebSocketContext';
+import BlockUser from './BlockUser';
 
 export const Contact = () => {
     const [username, setUsername] = useState<string>('');
@@ -44,6 +45,7 @@ export const Contact = () => {
 		if (!socketError) return;
 		if (socketError.func === 'addFriend' || socketError.func === "joinChannel") {
 			setFriendError(socketError.msg);
+			
 		}
 	}, [socketError]);
     
@@ -69,6 +71,9 @@ export const Contact = () => {
 				<div>
 					<AddFriends open={open} setOpen={setOpen} friendError={friendError} setFriendError={setFriendError}/>
 				</div>
+				<div>
+					<BlockUser open={open} setOpen={setOpen} friendError={friendError} setFriendError={setFriendError}/>
+				</div>
 				{username &&
 					user?.friends &&
 					user.friends.map((user) => {
@@ -76,7 +81,7 @@ export const Contact = () => {
 							return;
 						}
 						return (
-							<div key={user.id}>
+							<div key={"user_" + user.username}>
 								<ContactElement
 									info={{
 										isChannel: false,
@@ -104,7 +109,7 @@ export const Contact = () => {
 				{username &&
 					conversationList.map((channel) => {
 						return (
-							<div key={channel.id}>
+							<div key={"channel_" + channel.name}>
 								<ContactElement
 									info={{
 										isChannel: true,

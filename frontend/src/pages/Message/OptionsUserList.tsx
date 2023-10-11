@@ -103,13 +103,13 @@ export const OptionsUserList = (props: OptionUserListProps) => {
             case 'Play with':
                 handleInviteGame(target);
                 break;
-            case 'Profile':
+            case 'View Profile':
                 handleProfile();
                 break;
             case 'Block':
                 handleBlock();
                 break;
-            case 'Sudo':
+            case 'Promote to admin':
                 handleSudo();
                 break;
             case 'Unban':
@@ -139,28 +139,32 @@ export const OptionsUserList = (props: OptionUserListProps) => {
             'Mute',
             'Ban',
             'Kick',
-            'Add',
+            // 'Add',
             'Play with',
-            'Profile',
-            'Block',
+            'View Profile',
+            // 'Block',
         ];
-        const choices2: string[] = ['Add', 'Play with', 'Profile', 'Block'];
-        if (user && channelContext.isChannelOwner(user.id)) {
-            setOptions([...choices, 'Sudo']);
+        const choices2: string[] = ['Play with', 'View profile'];
+		const choices3: string[] = ['Ban', 'View Profile'];
+
+        if (user && channelContext.isChannelOwner(user.id) && !channelContext.isAdmin()) {
+            setOptions(['Promote to admin', ...choices]);
+        } else if (target && channelContext.isBan(target.id)) {
+			setOptions(choices3);
         } else if (
             target &&
             channelContext.isAdmin() &&
             !channelContext.isChannelOwner(target.id)
         ) {
             setOptions(choices);
-        } else {
+		} else {
             setOptions(choices2);
         }
     }, [chatContext, channelContext]);
 
     return (
         <Dialog onClose={handleClose} open={open}>
-            <DialogTitle>Choose an option below</DialogTitle>
+            <DialogTitle>{target?.username}<br />Choose an option below</DialogTitle>
             <List sx={{ pt: 0 }}>
                 {' '}
                 {options.map((choice, i) => {
@@ -187,7 +191,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                                     handleOptionClick(choice);
                                 }}>
                                 <ListItemText
-                                    primary={choice + ' ' + target?.username}
+                                    primary={choice}
                                 />
                             </ListItemButton>
                         </ListItem>

@@ -9,7 +9,7 @@ const statusIcon = {
 };
 
 export const ContactElement = ({ info }: { info: ConversationInformation }) => {
-    const chatContext = useChatContext();
+    const {conversationInfo, setConversationInfo, renderConversation, setRenderConversation} = useChatContext();
 
     const User = () => {
         if (info.isChannel && info.channel)
@@ -41,9 +41,12 @@ export const ContactElement = ({ info }: { info: ConversationInformation }) => {
         );
     };
     const handleClick = () => {
-        chatContext.setConversationInfo(info);
-        // console.log(info);
-        chatContext.setRenderConversation(true);
+		if (info?.channel?.name !== conversationInfo?.channel?.name ||
+			info?.user?.username !== conversationInfo?.user?.username) {
+			setConversationInfo(info);
+		}
+		if (!renderConversation)
+			setRenderConversation(true);
     };
 
     return (
