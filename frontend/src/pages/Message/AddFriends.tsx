@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import './AddFriends.css';
+import './ChatPage.css';
 import { useAuth } from "../../context/AuthContext";
 import { useSocketContext } from "../../context/WebSocketContext";
 
 
 export const AddFriends = ({open, setOpen, friendError, setFriendError } : any) => {
 	const {user} = useAuth();
-	const { socket, socketError, setSocketError } = useSocketContext();
+	const { socket, setSocketError } = useSocketContext();
 
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -47,11 +48,12 @@ export const AddFriends = ({open, setOpen, friendError, setFriendError } : any) 
 	function AddFriendsDropdown() {
 		return (
 			<>
-				<div className="add-friends">
+				<div className="chat-dropdown-menu">
 					<h4>Add friend</h4>
 					<form onSubmit={SendFriendRequest}>
 						<div>
 							<input
+							className='chat-input-field'
 							name="username"
 							type="text"
 							placeholder="Enter a username" />
@@ -60,7 +62,8 @@ export const AddFriends = ({open, setOpen, friendError, setFriendError } : any) 
 							<h4 className="error">{friendError}</h4>
 						</div>
 						<div>
-							<button type="submit">Send friend request</button>
+							<button className='chat-submit-button'
+							type="submit">Send friend request</button>
 						</div>
 					</form>
 
@@ -71,7 +74,7 @@ export const AddFriends = ({open, setOpen, friendError, setFriendError } : any) 
 
   return (
     <div className="add-friends-dropdown"  ref={dropdownRef}>
-      <button onClick={handleOpen}>Friend Requests</button>
+      <button className="add-friends-button" onClick={handleOpen}>Friend Requests</button>
       {open === "addfriends" ? (
         <AddFriendsDropdown />
       ) : null}

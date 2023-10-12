@@ -3,6 +3,7 @@ import { useSocketContext } from '../../context/WebSocketContext';
 import { ConversationInformation } from '../../../Types/conversationInformation.entity';
 import { useChatContext } from '../../context/ChatContext';
 import './JoinChannel.css';
+import './ChatPage.css';
 
 function JoinChannelDropdown (
     {
@@ -13,11 +14,12 @@ function JoinChannelDropdown (
 ) {
 	const {socketError} = useSocketContext();
     return (
-            <div className='join-channel'>
+            <div className='chat-dropdown-menu'>
 				<form onSubmit={joinChannel}>
-                <div>
+                <div >
                     <h4> Channel Name </h4>
                     <input
+                        className='chat-input-field'
                         name="id"
                         type="text"
                         placeholder="Enter a Channel"
@@ -28,6 +30,7 @@ function JoinChannelDropdown (
                 <div>
                     <h4> Password is required </h4>
                     <input
+                        className='chat-input-field'
                         type="password"
 						name="password"
                         placeholder="Enter a Password"
@@ -36,7 +39,9 @@ function JoinChannelDropdown (
                 )}
                 <div>
 					{friendError === "Invalid password" && <span>{friendError}</span>}
-                    <button type="submit">Join !</button>
+                    <button className='chat-submit-button'
+                        type="submit">Join !
+                    </button>
 					</div>
 				</form>
             </div>
@@ -123,7 +128,9 @@ export const JoinChannel = ({open, setOpen, friendError, setFriendError} : any) 
 
     return (
         <div className='join-channel-dropdown' ref={dropdownRef}>
-            <button onClick={handleOpen}>Join a Channel</button>
+            <button className='join-channel-button'
+                onClick={handleOpen}>Join a Channel
+            </button>
             {open === "joinChannel" ? (
                     <JoinChannelDropdown
                     requestPassword={requestPassword}

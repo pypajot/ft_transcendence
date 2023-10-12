@@ -1,7 +1,7 @@
 *
   .wrapper {
 	/* max-width: 50rem; */
-	background: #2c3e50;
+	background: #000000;
 	width: 30%;
 	margin: 0 auto;
   }
@@ -11,19 +11,21 @@
   }
 
   .active-tab {
-	background-color: blueviolet;
-	border-color:chartreuse;
+	background-color : #510779;
+	border-color:#663880;
 	border-width: 0.2rem;
 	border-style: solid;
 	border-bottom-style: hidden;
+	border-radius: 1rem;
   }
 
   .inactive-tab {
-	background-color: brown;
-	border-color:chartreuse;
+	background-color : #510779;
+	border-color:#663880;
 	border-width: 0.2rem;
 	border-style: hidden;
 	border-bottom-style: solid;
+	border-radius: 1rem;
   }
 
   .tabs > div {
@@ -40,11 +42,11 @@
 	position: relative;
 	z-index: 1;
 	padding: 1.618rem;
-	background: blueviolet;
+	background-color: #510779;
 	transition: all 0.35s;
-	border-color:chartreuse;
+	border-color:#663880;
 	border-width: 0.2rem;
 	border-style: solid;
 	border-top-style: hidden;
+	border-radius: 1rem;
   }
-  

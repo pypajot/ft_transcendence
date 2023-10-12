@@ -137,7 +137,7 @@ export const Conversation = () => {
         } else if (info && info.isUser && info.user) {
 			setConvName(info.user.username);
         }
-		console.log('username conversaation: ', username, convName)
+		console.log('username conversation: ', username, convName)
 		// if (username === '' || convName === '') {
 			// 	setRenderConversation(false);
 			// 	return ;
@@ -258,12 +258,14 @@ export const Conversation = () => {
     return (
         <>
             {conversationInfo && (
+                <div className='conversation-name'>
                 <Flex>
                     <Flex grow shrink basis="1px">
                         <Flex>{convName}</Flex>
                     </Flex>
                     <OptionMenu />
                 </Flex>
+                </div>
             )}
             {conversationInfo && (
             <div className="conversation-container" ref={convContainerRef}>
@@ -300,6 +302,7 @@ export const Conversation = () => {
                 <div className='conversation-input-area'>
                 <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
                     <input
+                        className='conversation-input-field'
                         type="text"
                         placeholder="Type here..."
                         value={content}
