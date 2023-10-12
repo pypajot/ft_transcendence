@@ -111,6 +111,8 @@ const PongGame : React.FC = () => {
     }, [lobbyId, gameEnd]);
 
     useEffect(() => {
+        const originalFontSize = document.documentElement.style.fontSize;
+
         const handleResize = () => {
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
@@ -121,7 +123,7 @@ const PongGame : React.FC = () => {
               // If the viewport is wider than the 4:3 ratio, set the height to be the limiting factor
               gameBoardHeight = viewportHeight * 0.8;
               gameBoardWidth = (gameBoardHeight * 4) / 3;
-            } 
+            }
             else {
               // If the viewport is narrower than the 4:3 ratio, set the width to be the limiting factor
               gameBoardWidth = viewportWidth * 0.8;
@@ -149,6 +151,7 @@ const PongGame : React.FC = () => {
         return () => {
             window.removeEventListener('resize', handleResize);
             socket?.emit('gameInviteOff');
+            document.documentElement.style.fontSize = originalFontSize;
         };
     }, []);
 
