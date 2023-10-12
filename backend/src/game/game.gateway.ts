@@ -188,7 +188,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
     // print the data received from the client
     console.log('invite to play received from ' + inviter.username + ' to ' + target.socketId + ' in mode ' + mode);
-    this.server.to(target.socketId).emit('invitedToPlay', inviter.username, inviter.id, mode);
+
+    if (target.status === 'offline' || target.status === 'ingame') {
+      client.emit('targetUnavailable', target.status);
+    } else if (target.gameInvite === true)  {
+      client.emit('targetUnavailable', 'busy');
+    } else {
+      this.server.to(target.socketId).emit('invitedToPlay', inviter.username, inviter.id, mode);
+    }
   }
 
   @SubscribeMessage('replyGameInvite')
@@ -217,6 +224,30 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // print the data received from the client
     console.log('cancelGameInvite received from ' + client.id + ' to ' + target.username);
     this.server.to(target.socketId).emit('canceledGameInvite', client.id);
+  }
+
+  @SubscribeMessage('gameInviteOn')
+  async handleGameInviteOn(client: Socket): Promise<void> {
+    await this.prisma.user.update({
+      where: {
+        socketId: client.id,
+      },
+      data: {
+        gameInvite: true,
+      },
+    });
+  }
+
+  @SubscribeMessage('gameInviteOff')
+  async handleGameInviteOff(client: Socket): Promise<void> {
+    await this.prisma.user.update({
+      where: {
+        socketId: client.id,
+      },
+      data: {
+        gameInvite: false,
+      },
+    });
   }
 
   @SubscribeMessage('launchGameFromChat')

@@ -5,6 +5,7 @@ import { useUID } from '@twilio-paste/core/uid-library';
 import { Paragraph } from '@twilio-paste/paragraph';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useNavigate } from 'react-router-dom';
+import { useGameContext } from '../../context/GameContext';
 
 interface PopUpProps {
 	key: number;
@@ -21,6 +22,15 @@ export const PopUpInvite: React.FC<PopUpProps> = ({from, from_id, mode}) => {
 	const {socket} = useSocketContext();
 	const navigate = useNavigate();
 	const [canceled, setCanceled] = useState<boolean>(false);
+	const { clearGameInvite } = useGameContext();
+
+	useEffect (() => {
+		socket?.emit('gameInviteOn');
+
+		return () => {
+			socket?.emit('gameInviteOff');
+		}
+	}, []);
 
 	const handleAccept = () => {
 		// console.log('you accepted the game');
@@ -29,6 +39,7 @@ export const PopUpInvite: React.FC<PopUpProps> = ({from, from_id, mode}) => {
 		sessionStorage.setItem('gameInProgress', 'false');
 		navigate('/game', { state: { mode: true } });
 		handleClose();
+		clearGameInvite();
 	}
 
 	const handleDecline = () => {
@@ -36,6 +47,7 @@ export const PopUpInvite: React.FC<PopUpProps> = ({from, from_id, mode}) => {
 		const reply = false;
 		socket?.emit('replyGameInvite', {reply, from_id, mode});
 		handleClose();
+		clearGameInvite();
 	}
 
 	useEffect (() => {

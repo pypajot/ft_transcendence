@@ -14,6 +14,7 @@ CREATE TABLE "users" (
     "socketId" TEXT,
     "wins" INTEGER NOT NULL DEFAULT 0,
     "losses" INTEGER NOT NULL DEFAULT 0,
+    "gameInvite" BOOLEAN NOT NULL DEFAULT false,
     "twoFactorAuthActive" BOOLEAN NOT NULL DEFAULT false,
     "twoFactorAuthSecret" BYTEA,
 
@@ -101,11 +102,11 @@ CREATE TABLE "UserAchievement" (
 );
 
 -- CreateTable
-CREATE TABLE "Backgound" (
+CREATE TABLE "Background" (
     "id" SERIAL NOT NULL,
     "picture" TEXT NOT NULL,
 
-    CONSTRAINT "Backgound_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Background_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable

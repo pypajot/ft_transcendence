@@ -4,6 +4,7 @@ import { GameState } from '../../../../backend/src/game/game.lobby.ts';
 import './PongGame.css';
 import { Link } from 'react-router-dom';
 import { useGameContext } from '../../context/GameContext.tsx';
+import Navbar from '../../components/Navbar.tsx';
 
 const PongGame : React.FC = () => {
     const {socket} = useSocketContext(); // Access the WebSocket context
@@ -20,46 +21,46 @@ const PongGame : React.FC = () => {
     const [userName2, setUserName2] = useState<string>('');
     const gameEndRef = useRef(gameEnd);
 
-  useEffect(() => {
-    gameEndRef.current = gameEnd; // update the ref value when gameEnd changes
-  }, [gameEnd]);
+    useEffect(() => {
+        gameEndRef.current = gameEnd; // update the ref value when gameEnd changes
+    }, [gameEnd]);
 
-  useEffect(() => {
-    // Send custom event to request game state from the server
-    socket?.on('createLobby', (lobbyId: string, mode: string, userName1: string, userName2: string) => {
-        setLobbyId(lobbyId);
-        setGameMode(mode);
-        setUserName1(userName1);
-        setUserName2(userName2);
-        sessionStorage.setItem('gameInProgress', 'true');
-        socket?.emit('getGameState', { lobbyId });
-        setCountdown(3);
-        setTimeout(() => { if (!gameEndRef.current) setCountdown(2)}, 1000);
-        setTimeout(() => { if (!gameEndRef.current) setCountdown(1)}, 2000);
-        setTimeout(() => { if (!gameEndRef.current) { setShowGo(true), setCountdown(null)}}, 3000);
-        setTimeout(() => { 
-            if (!gameEndRef.current && sessionStorage.getItem('gameInProgress') === 'true') {
-                socket?.emit('launchBall', { lobbyId }),
-                setShowBall(true)
-            }
-        }, 3000);
-    },);
-    // Set up WebSocket event listener to receive the game state from the server
-    socket?.on('gameState', (data) => {
-      // update the game state
-      setGameState(data);
-    });
+    useEffect(() => {
+        // Send custom event to request game state from the server
+        socket?.on('createLobby', (lobbyId: string, mode: string, userName1: string, userName2: string) => {
+            setLobbyId(lobbyId);
+            setGameMode(mode);
+            setUserName1(userName1);
+            setUserName2(userName2);
+            sessionStorage.setItem('gameInProgress', 'true');
+            socket?.emit('getGameState', { lobbyId });
+            setCountdown(3);
+            setTimeout(() => { if (!gameEndRef.current) setCountdown(2)}, 1000);
+            setTimeout(() => { if (!gameEndRef.current) setCountdown(1)}, 2000);
+            setTimeout(() => { if (!gameEndRef.current) { setShowGo(true), setCountdown(null)}}, 3000);
+            setTimeout(() => { 
+                if (!gameEndRef.current && sessionStorage.getItem('gameInProgress') === 'true') {
+                    socket?.emit('launchBall', { lobbyId }),
+                    setShowBall(true)
+                }
+            }, 3000);
+        },);
+        // Set up WebSocket event listener to receive the game state from the server
+        socket?.on('gameState', (data) => {
+        // update the game state
+        setGameState(data);
+        });
 
-    socket?.on('gameEnd', (data: any, forfait: boolean) => {
-      handleGameEnd(data, forfait);
-    });
+        socket?.on('gameEnd', (data: any, forfait: boolean) => {
+        handleGameEnd(data, forfait);
+        });
 
-        return () => {
-            socket?.off('createLobby');
-            socket?.off('gameState');
-            socket?.off('gameEnd');
-        };
-    }, [lobbyId]);
+            return () => {
+                socket?.off('createLobby');
+                socket?.off('gameState');
+                socket?.off('gameEnd');
+            };
+        }, [lobbyId]);
 
     const handleKeyPress = (event: any) => {
         if (!gameEnd) {
@@ -78,24 +79,25 @@ const PongGame : React.FC = () => {
         }
     };
 
-  const handleGameEnd = (data: any, forfait: boolean) => {
-    // display game end message
-    setGameEnd(true);
-    setShowBall(false);
-    setShowGo(false);
-    setCountdown(null);
-    if (data === socket?.id) {
-        setGameEndMessage('You win!');
-        console.log('LobbyId: ', lobbyId);
-        setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
-      }
-      else {
-        if (forfait) {
-            setGameStart(false);
+    const handleGameEnd = (data: any, forfait: boolean) => {
+        // display game end message
+        setGameEnd(true);
+        setShowBall(false);
+        setShowGo(false);
+        setCountdown(null);
+        if (data === socket?.id) {
+            setGameEndMessage('You win!');
+            console.log('LobbyId: ', lobbyId);
+            setTimeout(() =>{socket?.emit('destroyLobby', { lobbyId })}, 1000);
+            socket?.emit('gameInviteOn');
         }
-        setGameEndMessage('You lose!');
-      }
-  }
+        else {
+            if (forfait) {
+                setGameStart(false);
+            }
+            setGameEndMessage('You lose!');
+        }
+    }
 
     useEffect(() => {
         // Add event listener for user input (arrow keys)
@@ -146,6 +148,7 @@ const PongGame : React.FC = () => {
         window.addEventListener('resize', handleResize);
         return () => {
             window.removeEventListener('resize', handleResize);
+            socket?.emit('gameInviteOff');
         };
     }, []);
 
@@ -165,7 +168,7 @@ const PongGame : React.FC = () => {
                 )}
             </div>
             <div className={`game-board${gameMode === 'Party' ? ' party-game-board' : ''} glow-medium`}
-				style={gameMode === 'Party' ? {backgroundImage: `url(${partyBackground})`} : {}}>
+                style={gameMode === 'Party' ? {backgroundImage: `url(${partyBackground})`} : {}}>
                 {countdown && <div className="countdown">{countdown}</div>}
                 {showGo && <div className="go-message">GO!</div>}
                 {gameEnd && (

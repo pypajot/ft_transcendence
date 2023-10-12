@@ -2,12 +2,16 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import './Navbar.css';
 import First from "./Notifications";
+import { PopUpInvite } from '../pages/Message/PopUpInvite';
+import { useGameContext } from '../context/GameContext';
 
 const Navbar = () => {
 	const { logout } = useAuth();
+	const { gameInvite, inviter, inviter_id, mode, counter } = useGameContext();
 
 	return (
 		<nav >
+			{ gameInvite && (<PopUpInvite key={counter} from={inviter} from_id={inviter_id} mode={mode}/>)}
 			<div className="nav-home">
 				<li>
 					<Link to='/profile'>

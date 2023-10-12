@@ -22,14 +22,11 @@ function AppRoutes() {
 
   useEffect(() => {
     //if the user comes from the chat invite, we send a boolean to the server
-    console.log('location: ', location );
-    if (location?.state) {
-      socket?.emit('gameInvite', {
-        invite: true,
-      });
+    
+    if (!location?.state) {
+      console.log('location: ', location );
+      socket?.emit('locationChange', location);
     }
-
-    socket?.emit('locationChange', location);
   }, [location]);
 
   return (
