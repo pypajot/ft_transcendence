@@ -109,7 +109,8 @@ export const Contact = () => {
 				{username &&
 					conversationList.map((channel) => {
 						return (
-							<div key={"channel_" + channel.name}>
+							<div className='channel-name'
+								key={"channel_" + channel.name}>
 								<ContactElement
 									info={{
 										isChannel: true,

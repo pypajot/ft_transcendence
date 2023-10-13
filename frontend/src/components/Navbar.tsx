@@ -12,48 +12,52 @@ const Navbar = () => {
 	return (
 		<nav >
 			{ gameInvite && (<PopUpInvite key={counter} from={inviter} from_id={inviter_id} mode={mode}/>)}
-			<div className="nav-home">
-				<li>
-					<Link to='/profile'>
-						PROFILE
-					</Link>
-				</li>
+			<div className="nav-left">
+				<div className="nav-home">
+					<li>
+						<Link to='/profile'>
+							PROFILE
+						</Link>
+					</li>
+				</div>
+				<div className="nav-home">
+					<li>
+						<Link to='/home'>
+							HOME
+						</Link>
+					</li>
+				</div>
+				<div className="nav-home">
+					<li>
+						<Link to='/game'>
+							GAME
+						</Link>
+					</li>
+				</div>
+				<div className="nav-home">
+					<li>
+						<Link to='/friends'>
+							FRIENDS
+						</Link>
+					</li>
+				</div>
+				<div className="nav-home">
+					<li>
+						<Link to='/chatapp'>
+							CHAT
+						</Link>
+					</li>
+				</div>
 			</div>
-			<div className="nav-home">
-				<li>
-					<Link to='/home'>
-						HOME
-					</Link>
-				</li>
-			</div>
-			<div className="nav-home">
-				<li>
-					<Link to='/game'>
-						GAME
-					</Link>
-				</li>
-			</div>
-			<div className="nav-home">
-				<li>
-					<Link to='/friends'>
-						FRIENDS
-					</Link>
-				</li>
-			</div>
-			<div className="nav-home">
-				<li>
-					<Link to='/chatapp'>
-						CHAT
-					</Link>
-				</li>
-			</div>
-			<div>
-				<First></First>
-			</div>
-			<div className="logout-button">
-				<button className="button" onClick={logout}>
-					Logout
-				</button>
+			<div className="nav-right">
+				<div className="friends-notif">
+					<First></First>
+				</div>
+				<div className="logout-button">
+					<button className="button" onClick={logout}>
+						Logout
+					</button>
+				</div>
 			</div>
 		</nav>
 	);

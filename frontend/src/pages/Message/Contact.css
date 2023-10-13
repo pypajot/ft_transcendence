@@ -4,6 +4,7 @@
 	background: #000000;
 	width: 30%;
 	margin: 0 auto;
+	padding-right : 32px;
   }
   .tabs {
 	height: 3.5rem;
@@ -11,21 +12,19 @@
   }
 
   .active-tab {
-	background-color : #510779;
 	border-color:#663880;
 	border-width: 0.2rem;
 	border-style: solid;
 	border-bottom-style: hidden;
-	border-radius: 1rem;
+	border-radius: 1rem 1rem 0 0;
   }
 
   .inactive-tab {
-	background-color : #510779;
 	border-color:#663880;
 	border-width: 0.2rem;
 	border-style: hidden;
 	border-bottom-style: solid;
-	border-radius: 1rem;
+	border-radius: 1rem 1rem 0 0;
   }
 
   .tabs > div {
@@ -42,11 +41,43 @@
 	position: relative;
 	z-index: 1;
 	padding: 1.618rem;
-	background-color: #510779;
 	transition: all 0.35s;
 	border-color:#663880;
 	border-width: 0.2rem;
 	border-style: solid;
 	border-top-style: hidden;
-	border-radius: 1rem;
+	border-radius: 0 0 1rem 1rem;
   }
+
+  .css-hv74hu {
+	background-color:rgba(0, 0, 0, 0) !important;
+  }
+
+  .channel-name {
+	transition: 0.4s ease all ;
+  }
+
+  .channel-name:hover {
+	cursor: pointer !important;
+	transition: 0.4s ease all ;
+	color: #994dc2;
+  }
+
+::-webkit-scrollbar {
+	width: 12px;
+	border-radius: 10px;
+	background: #470660;
+}
+
+::-webkit-scrollbar-track {
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+	background:#772ba0;
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background:rgb(54, 56, 58); 
+}

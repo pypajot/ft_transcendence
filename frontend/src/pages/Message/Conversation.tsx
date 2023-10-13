@@ -167,9 +167,9 @@ export const Conversation = () => {
     ]);
 
     useEffect(() => {
-        //if (info && info.ischannel) {
+        // if (info && info.ischannel) {
         // setRenderConversation(false);
-        //return;
+        // return;
         // }
         if (receivedMessage && user) {
             receivedMessage.forEach(function (obj) {

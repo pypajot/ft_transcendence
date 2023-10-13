@@ -25,7 +25,9 @@ export const ContactElement = ({ info }: { info: ConversationInformation }) => {
             );
         return (
             <div className="contact">
-                <img className='contact-image' src={info?.user?.avatar} width={50} height={50} />
+                <div className="img-container">
+                    <img className='contact-image' src={info?.user?.avatar} />
+                </div>
                 <h3
                     className="contact-name"
                     color="white"
@@ -34,7 +36,7 @@ export const ContactElement = ({ info }: { info: ConversationInformation }) => {
                         ? info.user.username.substring(12, 0) + '...'
                         : info?.user?.username}
                 </h3>
-                <h3>
+                <h3 className="status-icon">
                     {statusIcon[info?.user?.status as keyof typeof statusIcon]}
                 </h3>
             </div>

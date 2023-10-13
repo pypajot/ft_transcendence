@@ -24,6 +24,7 @@
     transition: .5s;
     background: transparent;
 	margin-bottom: 1rem;
+    width: 100%;
 }
 
 .create-conv-button:hover {

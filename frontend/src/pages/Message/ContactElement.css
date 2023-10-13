@@ -2,8 +2,26 @@
 	display: flex;
 	justify-content: space-between;
 	width: 100%;
+	gap: 8px;
+	align-items: center;
 }
 
 .contact-image {
-	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	display: block;
+}
+
+.contact-name {
+	width: 68%;
+	text-align: left;
+	font-size: 12px;
+}
+
+.img-container {
+	width: 16%;
+}
+
+.status-icon {
+	width: 16%;
 }
