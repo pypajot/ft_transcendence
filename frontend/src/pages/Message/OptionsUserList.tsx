@@ -16,7 +16,7 @@ interface OptionUserListProps {
     me: User | null;
 }
 export const OptionsUserList = (props: OptionUserListProps) => {
-    const { onClose, target, open, me } = props;
+    const { onClose, target, open } = props;
     const [options, setOptions] = useState<string[]>([]);
     const chatContext = useChatContext();
     const channelContext = useChannelContext();

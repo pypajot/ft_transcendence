@@ -4,7 +4,6 @@ import { GameState } from '../../../../backend/src/game/game.lobby.ts';
 import './PongGame.css';
 import { Link } from 'react-router-dom';
 import { useGameContext } from '../../context/GameContext.tsx';
-import Navbar from '../../components/Navbar.tsx';
 
 const PongGame : React.FC = () => {
     const {socket} = useSocketContext(); // Access the WebSocket context

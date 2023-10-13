@@ -1,11 +1,10 @@
 import './Profile.css';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
-import { Button, Checkbox, HelpText } from '@twilio-paste/core';
-import { useContext, useEffect, useRef } from 'react';
+import { Checkbox } from '@twilio-paste/core';
+import { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
-
 import {Uploader} from "uploader"
 import { UploadButton } from "react-uploader";
 import HelperText from '../../components/HelperText';
@@ -39,7 +38,6 @@ const Profile = () => {
 	const [codeError, setCodeError] = useState<string | null>(null);
 	const [searchParams] = useSearchParams();
 	const [currentUser, setCurrentUser] = useState<{id: number, username: string, avatar: string, matchHistory: GameType[], elo: number} | null>(null);
-	const [displayMyProfile, setDisplayMyProfile] = useState<boolean>(true);
 	const navigate = useNavigate();
 	const run = useRef(true);
 
@@ -62,7 +60,6 @@ const Profile = () => {
 				return ;
 			}
 			setCurrentUser(await response.json());
-			setDisplayMyProfile(id === user?.id.toString());
 		}
 		if (profileId) {
 			navigate("/profile" + `?id=${profileId}`);

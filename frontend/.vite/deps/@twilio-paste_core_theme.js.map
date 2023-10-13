@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../node_modules/@twilio-paste/core/dist/theme.js"],
+  "sourcesContent": ["\"use strict\";Object.defineProperty(exports,\"__esModule\",{value:!0});var _theme=require(\"@twilio-paste/theme\");Object.keys(_theme).forEach((function(e){\"default\"!==e&&\"__esModule\"!==e&&(e in exports&&exports[e]===_theme[e]||Object.defineProperty(exports,e,{enumerable:!0,get:function(){return _theme[e]}}))}));"],
+  "mappings": ";;;;;;;;;;;;AAAA;AAAA;AAAa,WAAO,eAAe,SAAQ,cAAa,EAAC,OAAM,KAAE,CAAC;AAAE,QAAI,SAAO;AAA+B,WAAO,KAAK,MAAM,EAAE,QAAS,SAAS,GAAE;AAAC,oBAAY,KAAG,iBAAe,MAAI,KAAK,WAAS,QAAQ,CAAC,MAAI,OAAO,CAAC,KAAG,OAAO,eAAe,SAAQ,GAAE,EAAC,YAAW,MAAG,KAAI,WAAU;AAAC,eAAO,OAAO,CAAC;AAAA,MAAC,EAAC,CAAC;AAAA,IAAE,CAAE;AAAA;AAAA;",
+  "names": []
+}

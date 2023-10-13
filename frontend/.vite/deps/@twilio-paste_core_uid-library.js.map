@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../node_modules/@twilio-paste/core/dist/uid-library.js"],
+  "sourcesContent": ["\"use strict\";Object.defineProperty(exports,\"__esModule\",{value:!0});var _uidLibrary=require(\"@twilio-paste/uid-library\");Object.keys(_uidLibrary).forEach((function(e){\"default\"!==e&&\"__esModule\"!==e&&(e in exports&&exports[e]===_uidLibrary[e]||Object.defineProperty(exports,e,{enumerable:!0,get:function(){return _uidLibrary[e]}}))}));"],
+  "mappings": ";;;;;;;;;;;AAAA;AAAA;AAAa,WAAO,eAAe,SAAQ,cAAa,EAAC,OAAM,KAAE,CAAC;AAAE,QAAI,cAAY;AAAqC,WAAO,KAAK,WAAW,EAAE,QAAS,SAAS,GAAE;AAAC,oBAAY,KAAG,iBAAe,MAAI,KAAK,WAAS,QAAQ,CAAC,MAAI,YAAY,CAAC,KAAG,OAAO,eAAe,SAAQ,GAAE,EAAC,YAAW,MAAG,KAAI,WAAU;AAAC,eAAO,YAAY,CAAC;AAAA,MAAC,EAAC,CAAC;AAAA,IAAE,CAAE;AAAA;AAAA;",
+  "names": []
+}

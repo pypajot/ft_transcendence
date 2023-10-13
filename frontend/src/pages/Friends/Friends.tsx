@@ -98,7 +98,7 @@ const Friends = () => {
     }
 
     function FriendRequestList() {
-        const { user, setUser } = useAuth();
+        const { user } = useAuth();
         const { socket } = useSocketContext();
 
         const AcceptFriendRequest = async (id: number, accept: boolean) => {

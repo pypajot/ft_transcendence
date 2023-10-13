@@ -9,7 +9,7 @@ const statusIcon = {
 };
 
 export const ContactElement = ({ info }: { info: ConversationInformation }) => {
-    const {conversationInfo, setConversationInfo, renderConversation, setRenderConversation} = useChatContext();
+    const {conversationInfo, setConversationInfo} = useChatContext();
 
     const User = () => {
         if (info.isChannel && info.channel)

@@ -1,8 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ContactElement } from './ContactElement';
 import { useAuth } from '../../context/AuthContext';
 import { useChatContext } from '../../context/ChatContext';
-import { ProfileContext } from '../../context/ProfileContext';
 import { Channel } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
 import './Contact.css'
@@ -18,7 +17,6 @@ export const Contact = () => {
     const { user } = useAuth();
     const chatContext = useChatContext();
     const channelContext = useChannelContext();
-    const friends = useContext(ProfileContext).friendList;
 	const [open, setOpen] = useState<string | null>(null);
 	const [friendError, setFriendError] = useState<string>("");
 	const {socketError} = useSocketContext();

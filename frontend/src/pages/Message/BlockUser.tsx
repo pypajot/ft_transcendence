@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import './BlockUser.css';
 import './ChatPage.css';
 import { useAuth } from "../../context/AuthContext";
 import { useSocketContext } from "../../context/WebSocketContext";
 
 
-export const BlockUser = ({open, setOpen, friendError, setFriendError } : any) => {
+export const BlockUser = ({open, setOpen, setFriendError } : any) => {
 	const {user} = useAuth();
 	const { socket, socketError, setSocketError } = useSocketContext();
 

@@ -24,41 +24,12 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     const { socket } = useSocketContext();
-    const { user, refreshFetch } = useAuth();
+    const { user } = useAuth();
     const [friendRequestList, setFriendRequestList] = useState<User[]>([]);
     const [friendList, setFriendList] = useState<User[]>([]);
-    const [blockUser, setBlockedUser] = useState<User[]>([]);
 	const [profileId, setProfileId] = useState<number>(0);
 
     useEffect(() => {
-        const getFriendRequests = async () => {
-            const response = await refreshFetch(
-                'http://localhost:3333/user/friend/request',
-                {
-                    headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem(
-                            'access_token'
-                        )}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-            setFriendRequestList(await response.json());
-        };
-        const getFriendList = async () => {
-            const response = await refreshFetch(
-                'http://localhost:3333/user/friend/list',
-                {
-                    headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem(
-                            'access_token'
-                        )}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-            setFriendList(await response.json());
-        };
         if (!socket) return;
         if (!user) {
             setFriendRequestList([]);

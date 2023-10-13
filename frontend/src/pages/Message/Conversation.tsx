@@ -1,11 +1,5 @@
-import { ChatComposer } from '@twilio-paste/chat-composer';
 import { useCallback, useEffect, useState, useRef } from 'react';
-import {
-    $getRoot,
-    EditorState,
-    ClearEditorPlugin,
-} from '@twilio-paste/lexical-library';
-import { Box, Flex } from '@twilio-paste/core';
+import { Flex } from '@twilio-paste/core';
 import { Message } from '../../../Types/message.entity';
 import { MessageInfo } from '../../../Types/messageInfo.entity';
 import { BasicInMessage, BasicOutMessage } from './BasicMessage';
@@ -13,7 +7,6 @@ import { useSocketContext } from '../../context/WebSocketContext';
 import { useAuth } from '../../context/AuthContext';
 import { useChatContext } from '../../context/ChatContext';
 import { OptionMenu } from './OptionMenu';
-import { EnterKeySubmitPlugin, SendButtonPlugin } from './Plugins';
 import sendIcon from '../../assets/send.png';
 import './Conversation.css';
 
@@ -35,10 +28,9 @@ export const Conversation = () => {
     const [receivedMessage, setReceivedMessage] = useState<Message[]>();
     const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
     const [username, setUsername] = useState<string>('');
-    const [convName, setConvName] = useState<string>('');
     const convContainerRef = useRef<HTMLDivElement>(null); 
 
-    const {conversationInfo, isBlocked, renderConversation} = useChatContext();
+    const {conversationInfo, isBlocked} = useChatContext();
     //Make a component to get the previous messsage
     const { socket } = useSocketContext();
 
@@ -125,15 +117,6 @@ export const Conversation = () => {
     // useEffect(() => {}, [conversationInfo, username]);
 
     useEffect(() => {
-		const updateMessages = async (info: any) => {
-			await getMessageReceived({
-				sender: convName,
-				receiver: username,
-				isUser: info.isUser,
-			}).then((res: any) => {
-				setReceivedMessage(res);
-			});
-		}
         const info = conversationInfo;
         if (!info) {
 			return;
@@ -143,7 +126,7 @@ export const Conversation = () => {
         // } else if (info && info.isUser && info.user) {
 		// 	setConvName(info.user.username);
         // }
-		console.log('username conversation: ', username, convName)
+		console.log('username conversation: ', username)
 		// if (username === '' || convName === '') {
 			// 	setRenderConversation(false);
 			// 	return ;
@@ -190,13 +173,13 @@ export const Conversation = () => {
         }
     }, [sentMessage, receivedMessage]);
 
-    const handleComposerChange = (editorState: EditorState): void => {
-        editorState.read(() => {
-            const root = $getRoot();
-            const text = root.getTextContent();
-            setContent(text);
-        });
-    };
+    // const handleComposerChange = (editorState: EditorState): void => {
+    //     editorState.read(() => {
+    //         const root = $getRoot();
+    //         const text = root.getTextContent();
+    //         setContent(text);
+    //     });
+    // };
 
     const channelMessage = useCallback(
         (message: Message) => {

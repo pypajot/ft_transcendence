@@ -12,7 +12,6 @@ function JoinChannelDropdown (
 		friendError,
       } : any
 ) {
-	const {socketError} = useSocketContext();
     return (
             <div className='chat-dropdown-menu'>
 				<form onSubmit={joinChannel}>

@@ -4,7 +4,6 @@ import { Channel } from '../../Types/inferfaceList';
 import { useChatContext } from './ChatContext';
 import { useSocketContext } from './WebSocketContext';
 import { useAuth } from './AuthContext';
-import { array } from 'prop-types';
 
 type ChannelContext = {
     isAdmin: () => boolean;
@@ -39,8 +38,8 @@ export default function ChannelContextProvider(
         const buff: Channel[] = [];
         if (channels) {
             console.log(buff, channels);
-            for (const [key, value] of channels) {
-                buff.push(value);
+            for (const channel of channels) {
+                buff.push(channel[1]);
             }
         }
         setArrayChannels(buff);

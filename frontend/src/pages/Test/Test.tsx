@@ -1,4 +1,4 @@
-import { Avatar, Box, ChatAttachment, ChatAttachmentDescription, ChatAttachmentLink, ChatEvent } from '@twilio-paste/core';
+import { Avatar, Box, ChatEvent } from '@twilio-paste/core';
 import {
     ChatLog,
     ChatMessage,
