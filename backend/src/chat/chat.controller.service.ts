@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Conversation } from 'src/types/conversation.entity';
 import { Message } from 'src/types/message.entity';
 import { UtilsService } from './utills.service';
@@ -53,8 +53,8 @@ export class ChatControllerService {
     }
 
     async getLogsUserToUser(sender_name: string, receiver_name: string) {
-        try {
-            console.log(`From  : ${sender_name} To : ${receiver_name}`);
+        // try {
+            // console.log(`From  : ${sender_name} To : ${receiver_name}`);
             const sender = await this.prisma.user.findUnique({
                 where: {
                     username: sender_name,
@@ -67,13 +67,13 @@ export class ChatControllerService {
             });
             const json_messages = await this.getMessages(sender, receiver);
             return json_messages;
-        } catch (error) {
-            console.log(error);
-        }
+        // } catch (error) {
+        //     console.log(error);
+        // }
     }
 
     async getChannelLogsToUser(channel_name: string, user_name: string) {
-        try {
+        // try {
             const channel = await this.prisma.channel.findUnique({
                 where: {
                     name: channel_name,
@@ -87,6 +87,10 @@ export class ChatControllerService {
                     username: user_name,
                 },
             });
+			if (!channel)
+				throw new BadRequestException("Channel not found");
+			if (!user)
+				throw new BadRequestException("User not found");
             const res: Message[] = [];
             for (
                 let i = 0;
@@ -105,15 +109,15 @@ export class ChatControllerService {
                 }
             }
             // console.log(`msgRCV from : ${channel_name} to ${user_name}:`);
-            // console.log(res);
+            console.log(res);
             return JSON.stringify(res);
-        } catch (error) {
-            console.log(error);
-        }
+        // } catch (error) {
+        //     console.log(error);
+        // }
     }
 
     async getLogsUserToChannel(user_name: string, channel_name: string) {
-        try {
+        // try {
             const user = await this.prisma.user.findUnique({
                 where: {
                     username: user_name,
@@ -127,36 +131,39 @@ export class ChatControllerService {
                     messages: true,
                 },
             });
-            if (channel && user) {
-                const res: Message[] = [];
-                for (let i = 0; i < channel.messages.length; i++) {
-                    if (channel.messages[i].authorId == user.id) {
-                        const msg: Message = {
-                            ...channel.messages[i],
-                            senderName:
-                                await this.serviceUtils.findUsernameFromId(
-                                    channel.messages[i].authorId
-                                ),
-                            sent: true,
-                        };
-                        res.push(msg);
-                    }
-                }
-                // console.log(`msgSent from : ${user_name} :`);
-                // console.log(res);
-                return JSON.stringify(res);
-            }
-        } catch (error) {
-            console.log(error);
-        }
+			if (!channel)
+				throw new BadRequestException("Channel not found");
+			if (!user)
+				throw new BadRequestException("User not found");
+			const res: Message[] = [];
+			for (let i = 0; i < channel.messages.length; i++) {
+				if (channel.messages[i].authorId == user.id) {
+					const msg: Message = {
+						...channel.messages[i],
+						senderName:
+							await this.serviceUtils.findUsernameFromId(
+								channel.messages[i].authorId
+							),
+						sent: true,
+					};
+					res.push(msg);
+				}
+			}
+			// console.log(`msgSent from : ${user_name} :`);
+			console.log(res);
+			return JSON.stringify(res);
+        // } catch (error) {
+        //     console.log(error);
+        // }
     }
 
     async getMessages(sender: any, receiver: any) {
-        try {
-            if (!sender || !receiver) {
-                return;
-            }
-            console.log(`Hello ${sender.id}, ${receiver.id}`);
+        // try {
+            if (!sender)
+				throw new BadRequestException("Channel not found");
+			if (!receiver)
+				throw new BadRequestException("User not found");
+            // console.log(`Hello ${sender.id}, ${receiver.id}`);
             const messages = await this.prisma.message.findMany({
                 where: {
                     authorId: sender.id,
@@ -174,9 +181,10 @@ export class ChatControllerService {
                 };
                 res.push(msg);
             }
+			console.log(res);
             return JSON.stringify(res);
-        } catch (error) {
-            console.log(error);
-        }
+        // } catch (error) {
+        //     console.log(error);
+        // }
     }
 }

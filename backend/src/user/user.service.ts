@@ -9,6 +9,7 @@ import { UserDTO } from './dto/user.dto';
 import { WsException } from '@nestjs/websockets';
 import { v2 as cloudinary } from 'cloudinary';
 import { Socket } from 'socket.io';
+import { AuthService } from 'src/auth/auth.service';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUDNAME,
@@ -370,8 +371,8 @@ export class UserService {
     }
 
 	async getPartyBackground(socket: Socket) {
-		const picture = await this.prisma.background.findUnique({
-			where: {id: 1}
+		const picture = await this.prisma.background.findFirst({
+			where: { id: 1 }
 		});
 		if (picture)
 			socket.emit('getPartyBackground', picture.picture);

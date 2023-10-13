@@ -43,10 +43,11 @@ export const ContactElement = ({ info }: { info: ConversationInformation }) => {
     const handleClick = () => {
 		if (info?.channel?.name !== conversationInfo?.channel?.name ||
 			info?.user?.username !== conversationInfo?.user?.username) {
+			console.log("set conversation info");
 			setConversationInfo(info);
 		}
-		if (!renderConversation)
-			setRenderConversation(true);
+		// if (!renderConversation)
+		// 	setRenderConversation(true);
     };
 
     return (

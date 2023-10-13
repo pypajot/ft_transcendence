@@ -8,6 +8,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { RefreshStrategy } from './strategies';
 import { HttpModule } from '@nestjs/axios';
 import { TwofaStrategy } from './strategies/twofa.strategy';
+import { UserService } from 'src/user/user.service';
 
 @Module({
 	imports: [

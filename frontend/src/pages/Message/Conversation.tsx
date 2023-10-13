@@ -51,7 +51,7 @@ export const Conversation = () => {
     }, [user]);
 
     const getMessageReceived = async (obj: {
-        sender: string;
+        sender?: string;
         receiver: string;
         isUser: boolean;
     }) => {
@@ -75,11 +75,14 @@ export const Conversation = () => {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                return [];
             }
 			
 
-            return await response.json();
+            const text = await response.text();
+			console.log("text received: ", text)
+			const json = JSON.parse(text);
+			setReceivedMessage(json);
         } catch (error) {
             console.error('There was an error fetching the data', error);
         }
@@ -87,7 +90,7 @@ export const Conversation = () => {
 
 	const getMessageSent = async (obj: {
         sender: string;
-        receiver: string;
+        receiver?: string;
         isUser: boolean;
     }) => {
         const url = 'http://localhost:3333/chat/getMessageSent';
@@ -104,19 +107,22 @@ export const Conversation = () => {
 				isUser: obj.isUser,
 			  }),
 			});
-		
+			console.log("response ok: ", response.ok, response.status)
 			if (!response.ok) {
-			  throw new Error(`HTTP error! Status: ${response.status}`);
+			  return [];
 			}
 			// console.log(response)
-			response.json().then((res: any) => setSentMessage(res))
+			const text = await response.text();
+			console.log("text sent: ", text)
+			const json = (text === "[]") ? [] : JSON.parse(text);
+			setSentMessage(json);
 			// return ();
 		//   } catch (error) {
 		// 	console.error("There was an error fetching the data", error);
 		//   }
     };
 
-    useEffect(() => {}, [conversationInfo, username]);
+    // useEffect(() => {}, [conversationInfo, username]);
 
     useEffect(() => {
 		const updateMessages = async (info: any) => {
@@ -132,28 +138,31 @@ export const Conversation = () => {
         if (!info) {
 			return;
         }
-        if (info && info.isChannel && info.channel) {
-			setConvName(info.channel.name);
-        } else if (info && info.isUser && info.user) {
-			setConvName(info.user.username);
-        }
+        // if (info && info.isChannel && info.channel) {
+		// 	setConvName(info.channel.name);
+        // } else if (info && info.isUser && info.user) {
+		// 	setConvName(info.user.username);
+        // }
 		console.log('username conversation: ', username, convName)
 		// if (username === '' || convName === '') {
 			// 	setRenderConversation(false);
 			// 	return ;
 			// }
-			if (!convName || !username)
+		if (!convName || !username)
 			return ;
-		updateMessages(info);
 		getMessageSent({
 			sender: username,
-			receiver: convName,
+			receiver: info.isUser ? info.user?.username : info.channel?.name,
+			isUser: info.isUser,
+		});
+		getMessageReceived({
+			sender: info.isUser ? info.user?.username : info.channel?.name,
+			receiver: username,
 			isUser: info.isUser,
 		});
     }, [
         conversationInfo,
-        renderConversation,
-        convName,
+        // renderConversation,
         username,
     ]);
 
@@ -221,7 +230,7 @@ export const Conversation = () => {
         if (content && content != '' && conversationInfo) {
             const message_content: MessageInfo = {
                 content: content,
-                target: convName,
+                target: conversationInfo.user ? conversationInfo.user.username : conversationInfo.channel?.name,
                 ToUser: conversationInfo.isUser,
             };
             socket?.emit('message', message_content);
@@ -261,7 +270,7 @@ export const Conversation = () => {
                 <div className='conversation-name'>
                 <Flex>
                     <Flex grow shrink basis="1px">
-                        <Flex>{convName}</Flex>
+                        <Flex>{conversationInfo.isUser ? conversationInfo.user?.username : conversationInfo.channel?.name}</Flex>
                     </Flex>
                     <OptionMenu />
                 </Flex>

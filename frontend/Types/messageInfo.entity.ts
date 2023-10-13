@@ -1,5 +1,5 @@
 export interface MessageInfo {
   content: string;
-  target: string;
+  target?: string;
   ToUser: boolean;
 }

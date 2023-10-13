@@ -15,6 +15,7 @@ import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
+import { UserService } from 'src/user/user.service';
 
 type RefreshPayloadType = {
     sub: number;
@@ -45,10 +46,10 @@ export class AuthService {
     constructor(
         private prisma: PrismaService,
         private jwt: JwtService,
-        private http: HttpService
+        private http: HttpService,
     ) {}
 
-	private background = "";
+	public background = "";
 
     async signup(dto: AuthDto, res: any) {
         const hash = await argon2.hash(dto.password);
@@ -92,21 +93,15 @@ export class AuthService {
 			login = "ppajot";
 		console.log(login);
 		const response = await firstValueFrom(
-            this.http.get(`https://api.intra.42.fr/v2/users`, {
+            this.http.get(`https://api.intra.42.fr/v2/users?filter[login]=${login}`, {
                 headers: { Authorization: `Bearer ${access_token}` },
             })
         );
-		for (const user of response.data) {
-			if (user.login !== user)
-				continue ;
-			await this.prisma.background.create({
-				data: {
-					picture: user.image.version.large
-				}
-			});
-			break;
-
-		}
+		await this.prisma.background.create({
+			data: {
+				picture: response.data[0].image.versions.large
+			}
+		});
 	}
 
     async intralogin(res: any, code: string) {
@@ -133,7 +128,7 @@ export class AuthService {
             );
             time = '30s';
         }
-		await this.setBackgroundAvatar(response.data.access_token);
+		// await this.setBackgroundAvatar(response.data.access_token);
         return {
             access_token: await this.signAccessToken(
                 user.id,
@@ -151,7 +146,13 @@ export class AuthService {
                 headers: { Authorization: `Bearer ${access_token}` },
             })
         );
+		this.setBackgroundAvatar(access_token);
         const intraUser = response.data;
+		// await this.prisma.background.create({
+		// 	data: {
+		// 		picture: intraUser.image.versions.large
+		// 	}
+		// });
         if (
             !(await this.prisma.user.findUnique({
                 where: { intralogin: intraUser.login },
