@@ -5,11 +5,12 @@ import './CreateNewConversation.css';
 import './ChatPage.css';
 
 function CreateNewConvDropdown () {
-    const { socket } = useSocketContext();
+    const { socket, socketError, setSocketError } = useSocketContext();
     const chatContext = useChatContext();
 
     const channelCreation = useCallback(async (e: any) => {
         e.preventDefault();
+		setSocketError(null);
         console.log ('Channel to be created: ' + e.target.channelInputId.value, e.target.channelPassword.value, e.target.selectType.value);
         socket?.emit('ChannelCreation', {
             type: e.target.selectType.value,
@@ -34,6 +35,8 @@ function CreateNewConvDropdown () {
                 {chatContext.error.alreadyUsedChannelName ? (
                     <h5>Channel Name Already Taken</h5>
                 ) : null}
+				{socketError && socketError.func === "channelCreation" ? (
+						<h5>{socketError.msg}</h5>) : null}
                 </div>
                 <div>
                     <select className='create-conv-select' id="selectType" name="selectType">

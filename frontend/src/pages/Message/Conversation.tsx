@@ -148,7 +148,7 @@ export const Conversation = () => {
 			// 	setRenderConversation(false);
 			// 	return ;
 			// }
-		if (!convName || !username)
+		if (!username)
 			return ;
 		getMessageSent({
 			sender: username,

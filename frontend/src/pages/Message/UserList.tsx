@@ -84,7 +84,7 @@ export const UserList = (props: UserListProps) => {
                                     </ListItem>
                                 );
                             })}
-							{chatContext.conversationInfo?.channel?.info.map((moderation) => {
+							{chatContext.conversationInfo?.channel?.info?.map((moderation) => {
 								if (moderation.type !== 'ban' || moderation.ChannelName !== chatContext.conversationInfo?.channel?.name)
 								 	return ;
 								return (

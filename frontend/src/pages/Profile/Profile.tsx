@@ -10,6 +10,7 @@ import {Uploader} from "uploader"
 import { UploadButton } from "react-uploader";
 import HelperText from '../../components/HelperText';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useProfileContext } from '../../context/ProfileContext';
 
 const uploader = Uploader({
 	apiKey: "free"
@@ -31,8 +32,9 @@ type GameType = {
 const Profile = () => {
 
 	const { user, setUser, refreshFetch } = useAuth();
+	const { socket, socketError, setSocketError } = useSocketContext();
+	const {profileId, setProfileId} = useProfileContext();
 	const [imagePath, setImagePath] = useState<string | null>(null);
-	const { socket } = useSocketContext();
 	const [usernameError, setUsernameError] = useState<string | null>(null);
 	const [codeError, setCodeError] = useState<string | null>(null);
 	const [searchParams] = useSearchParams();
@@ -44,6 +46,8 @@ const Profile = () => {
 	// useEffect(() => {
 	// 	run.current = true;
 	// }, [searchParams.get("id")])
+
+
 
 	useEffect(() => {
 		const getCurrentUser = async (id: string | null) => {
@@ -60,6 +64,10 @@ const Profile = () => {
 			setCurrentUser(await response.json());
 			setDisplayMyProfile(id === user?.id.toString());
 		}
+		if (profileId) {
+			navigate("/profile" + `?id=${profileId}`);
+			return ;
+		}
 		if (!user || !run.current)
 			return ;
 		if (!searchParams.get("id"))
@@ -67,10 +75,35 @@ const Profile = () => {
 		else
 			getCurrentUser(searchParams.get("id"));
 		run.current = false;
-	}, [user, searchParams.get("id")])
+	}, [user, searchParams.get("id"), profileId])
 	
 	if (!currentUser || !user)
 		return ;
+
+	async function GetUserProfile(e: any) {
+		e.preventDefault();
+		setSocketError(null);
+		setProfileId(0);
+		socket?.emit('getProfileId',
+			e.target.username.value,
+		);
+	}
+
+	function UserProfileForm() {
+		return (
+			<>
+				<div className="search-profile">
+					<form onSubmit={GetUserProfile}>
+							<label>
+								Username: <input type="text" name="username" />
+							</label>
+							<h5>{socketError?.func === "getProfileId" ? socketError.msg : null}</h5>
+							<button type="submit">View Profile</button>
+					</form>
+				</div>
+			</>
+		);
+	}
 
 	const DisplayAvatar = (props: {img: string}) => {
 		return (
@@ -162,19 +195,21 @@ const Profile = () => {
 			return ;
 		return (
 			<>
-				<form onSubmit={HandleChangeUsername}>
-					<div className='div-submit-button-new'>
-						<label>
-							<input type="text" name="username"  placeholder="  new username" className='user-input-new' />
-							<HelperText errorText={usernameError} />
-						</label>
-					</div>
-					<div className='submit-button-new-div'>
-						<button type="submit" className='submit-button-new'>
-							Submit
-						</button>
-					</div>
-				</form>
+				<div>
+					<form onSubmit={HandleChangeUsername}>
+						<div className='div-submit-button-new'>
+							<label>
+								<input type="text" name="username"  placeholder="  new username" className='user-input-new' />
+								<HelperText errorText={usernameError} />
+							</label>
+						</div>
+						<div className='submit-button-new-div'>
+							<button type="submit" className='submit-button-new'>
+								Submit
+							</button>
+						</div>
+					</form>
+				</div>
 			</>
 		)
 	}
@@ -240,7 +275,7 @@ const Profile = () => {
 		// }, []);
 	  
 		return (
-		  <div>
+		  <div className='match-history'>
 			<img src='https://i.imgur.com/bZsILPR.png' className='match-img'></img>
 			<div className='stats'>
 				<div className='game-stats'>
@@ -265,9 +300,11 @@ const Profile = () => {
 	  
 	function  DisplayUsername(props: {username: string}) {
 		return (
-			<p>
+
+			<div className='display-username'>
 				{props.username}
-			</p>
+			</div>
+			
 		)
 	}
 
@@ -305,18 +342,15 @@ const Profile = () => {
 			<div className='logo-profile'>
 				<img src='https://i.imgur.com/2xFFdd3.png' className='logo-profile-size'></img>
 			</div>
-			<DisplayAvatar img={currentUser?.avatar} />
-			<ChangeAvatar />
-			<div>
-				<div className='display-username'>
-					<DisplayUsername username={currentUser.username} />
-				</div>
-						<div>
-							<ChangeUsernameForm />
-						</div>
-					<DisplayActivate2fa />
-					<MatchHistoryDisplay />
+			<div className='left-profile'>
+				<DisplayAvatar img={currentUser?.avatar} />
+				<ChangeAvatar />
+				<DisplayUsername username={currentUser.username} />
+				<ChangeUsernameForm />
+				<DisplayActivate2fa />
 			</div>
+			<MatchHistoryDisplay />
+			<UserProfileForm />
 			
 		</>
 	);

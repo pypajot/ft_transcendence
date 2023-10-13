@@ -61,4 +61,9 @@ export class UserGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async  handleGetPartyBackgound(client: Socket) {
 		await this.userService.getPartyBackground(client);
 	}
+
+	@SubscribeMessage('getProfileId')
+	async handleGetProfileId(client: Socket, username: string) {
+		await this.userService.getProfileId(client, username);
+	}
 }

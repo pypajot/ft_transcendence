@@ -379,4 +379,14 @@ export class UserService {
 		else
 			socket.emit('getPartyBackground', process.env.DEFAULT_PARTY_BACKGROUND);
 	}
+	
+	async getProfileId(client: Socket, username: string) {
+		const user = await this.prisma.user.findUnique({
+			where: { username: username }
+		});
+		if (!user)
+			throw new WsException({func: 'getProfileId', msg: 'User not found'});
+		client.emit('profileId', user.id);
+	}
 }
+

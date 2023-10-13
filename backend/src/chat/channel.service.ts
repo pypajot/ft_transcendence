@@ -382,6 +382,8 @@ export class ChannelService {
         client_id: string,
         client: any
     ) {
+		if (data_chan.name === "")
+			throw new WsException({func: "channelCreation", msg: "Channel name cannot be empty"})
         try {
             let public_chan = false;
             if (data_chan.type == 'Public') {
@@ -483,11 +485,13 @@ export class ChannelService {
 				id: (
 					await this.serviceUtils.findIdFromSocketId(client.id)
 					)[0],
-				},
-			});
+			},
+		});
+		console.log("info pass: ", info.pass === undefined,"channel pass: ",  existingChannel.password === "","channel member? : ",  existingChannel.members.includes(user))
+		console.log(user, existingChannel.members);
 		if (!existingChannel)
 			throw new WsException({func: "joinChannel", msg: "No such channel"})
-		if (existingChannel.members.includes(user))
+		if (existingChannel.members.findIndex(member => (member.id === user.id)) !== -1)
 			throw new WsException({func: "joinChannel", msg: "You are already in this channel"})
 		if (this.serviceUtils.isBan(user.id, existingChannel)) {
 			throw new WsException({func: "joinChannel", msg: "You are banned"})
@@ -508,11 +512,11 @@ export class ChannelService {
 			if (!find) {
 				throw new WsException({func: "joinChannel", msg: "You need an invite"})
 			}
-		} else if (info.pass === undefined && existingChannel.password) {
+		} else if (info.pass === undefined && existingChannel.password !== "") {
 			console.log("test 1");
 			client.emit('requestPassword');
 			return;
-		} else if (info.pass !== existingChannel.password) {
+		} else if (info.pass !== undefined && info.pass !== existingChannel.password) {
 			console.log("test 2");
 			throw new WsException({func: "joinChannel", msg: "Invalid password"})
 		}
