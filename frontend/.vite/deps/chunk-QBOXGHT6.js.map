@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../node_modules/@twilio-paste/paragraph/dist/index.es.js"],
-  "sourcesContent": ["import*as React from\"react\";import PropTypes from\"prop-types\";import{Text,safelySpreadTextProps}from\"@twilio-paste/text\";var Paragraph=React.forwardRef(({children,element=\"PARAGRAPH\",marginBottom,...props},ref)=>React.createElement(Text,{...safelySpreadTextProps(props),as:\"p\",color:\"colorText\",element,fontSize:\"fontSize30\",fontWeight:\"fontWeightNormal\",lineHeight:\"lineHeight40\",marginBottom:marginBottom||\"space70\",ref},children));Paragraph.displayName=\"Paragraph\";Paragraph.propTypes={element:PropTypes.string,marginBottom:PropTypes.oneOf([\"space0\"])};export{Paragraph};\n"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA,WAA4B,mBAAiG;AAA7H,IAAAA,iBAAA;AAAA;AAAA,YAAoB;AAAQ,wBAAqB;AAAa;AAA2D,IAAI,YAAgB,iBAAW,CAAC,EAAC,UAAS,UAAQ,aAAY,cAAa,GAAG,MAAK,GAAE,QAAY,oBAAc,MAAK,EAAC,GAAG,sBAAsB,KAAK,GAAE,IAAG,KAAI,OAAM,aAAY,SAAQ,UAAS,cAAa,YAAW,oBAAmB,YAAW,gBAAe,cAAa,gBAAc,WAAU,IAAG,GAAE,QAAQ,CAAC;AAAE,cAAU,cAAY;AAAY,cAAU,YAAU,EAAC,SAAQ,kBAAAC,QAAU,QAAO,cAAa,kBAAAA,QAAU,MAAM,CAAC,QAAQ,CAAC,EAAC;AAAA;AAAA;",
-  "names": ["init_index_es", "PropTypes"]
-}
