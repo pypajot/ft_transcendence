@@ -14,9 +14,10 @@ interface OptionUserListProps {
     onClose: () => void;
     target: User | undefined;
     me: User | null;
+    handleInviteGame: () => void;
 }
 export const OptionsUserList = (props: OptionUserListProps) => {
-    const { onClose, target, open } = props;
+    const { onClose, target, open, handleInviteGame } = props;
     const [options, setOptions] = useState<string[]>([]);
     const chatContext = useChatContext();
     const channelContext = useChannelContext();
@@ -54,29 +55,8 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         }
     };
 
-    const handleInviteGame = (target: User | undefined) => {
-        const targetId = target?.id;
-        //const targetSocketId = target?.socketId;
-        // get the username of the user who sent the invite
-        const mode = 'Classic';
-        // console.log('you invited someone to play: ', target?.username);
-        // notify the other user that he has been invited to play
-        socket?.emit('sendInviteToPlay', { targetId, mode });
-        //navigate('/game', { state: { mode: true } });
-    };
-
     const handleProfile = () => {
         navigate(`/profile?id=${target?.id}`);
-        console.log(`Want to see profile of ${target?.username}`);
-    };
-
-    const handleBlock = () => {
-        if (target && user) {
-            socket?.emit('blockUser', {
-                targetName: target.username,
-                userId: user.id,
-            });
-        }
     };
 
     const handleSudo = () => {
@@ -101,13 +81,10 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 handleKick();
                 break;
             case 'Play with':
-                handleInviteGame(target);
+                handleInviteGame();
                 break;
             case 'View Profile':
                 handleProfile();
-                break;
-            case 'Block':
-                handleBlock();
                 break;
             case 'Promote to admin':
                 handleSudo();

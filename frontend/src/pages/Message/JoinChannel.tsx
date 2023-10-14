@@ -11,10 +11,10 @@ function JoinChannelDropdown({
     friendError,
 }: any) {
     return (
-        <div className="chat-dropdown-menu">
+        <div className="chat-dropdown-joinmenu">
             <form onSubmit={joinChannel}>
                 <div>
-                    <h4> Channel Name </h4>
+                    <h4> Join Channel Form </h4>
                     <input
                         className="chat-input-field"
                         name="id"

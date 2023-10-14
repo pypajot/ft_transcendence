@@ -26,7 +26,7 @@ export const OptionMenu = () => {
         useState<boolean>(false);
     const channelContext = useChannelContext();
     const { user } = useAuth();
-	const navigate = useNavigate();
+    const navigate = useNavigate();
     const handleCloseUserList = (user: User | undefined) => {
         if (user) {
             setDisplayOptionUserList(true);
@@ -56,7 +56,7 @@ export const OptionMenu = () => {
         // console.log('me, the user infos: ' + user?.username + ' ' + user?.id);
         // print infos about the target, the user
         // console.log(
-            // 'target infos: ' + target?.username + ' ' + target?.socketId
+        // 'target infos: ' + target?.username + ' ' + target?.socketId
         // );
     }, [chatContext, info]);
 
@@ -68,15 +68,21 @@ export const OptionMenu = () => {
         // console.log('you invited someone to play: ', target?.username);
         // notify the other user that he has been invited to play
         setInvite(true);
-        socket?.emit('sendInviteToPlay', {targetId, mode});
-        setKey(prevkey => prevkey + 1);
+        socket?.emit('sendInviteToPlay', { targetId, mode });
+        setKey((prevkey) => prevkey + 1);
         //navigate('/game', { state: { mode: true } });
-    }
+    };
 
     //do we set the invite to play to any member of a channel ?
     return (
         <div>
-            {Invite && (<InvitePending key={key} target={target?.username || ''} target_id={target?.id || 0} />)}
+            {Invite && (
+                <InvitePending
+                    key={key}
+                    target={target?.username || ''}
+                    target_id={target?.id || 0}
+                />
+            )}
             <MenuButton {...menu} variant="reset" size="reset">
                 <MoreIcon decorative={false} title="More options" />
             </MenuButton>
@@ -97,6 +103,7 @@ export const OptionMenu = () => {
                         target={target}
                         open={displayOptionUserList}
                         me={user}
+                        handleInviteGame={handleInviteGame}
                     />
                     <Menu {...menu} aria-label="Preferences">
                         <MenuItem
@@ -132,9 +139,16 @@ export const OptionMenu = () => {
                         {user && channelContext.isChannelOwner(user.id) && (
                             <div>
                                 <MenuSeparator {...menu} />
-                                <MenuItem {...menu} onClick={() => {
-									info.channel?.name && channelContext.emitDeleteChannel(info.channel?.name)
-								}}>Delete Channel</MenuItem>
+                                <MenuItem
+                                    {...menu}
+                                    onClick={() => {
+                                        info.channel?.name &&
+                                            channelContext.emitDeleteChannel(
+                                                info.channel?.name
+                                            );
+                                    }}>
+                                    Delete Channel
+                                </MenuItem>
                             </div>
                         )}
                     </Menu>{' '}
@@ -153,7 +167,13 @@ export const OptionMenu = () => {
                             Invite to Play{' '}
                         </MenuItem>
                         <MenuSeparator {...menu} />
-                        <MenuItem {...menu} onClick={() => {navigate(`/profile?id=${info?.user?.id}`)}}>Profile</MenuItem>
+                        <MenuItem
+                            {...menu}
+                            onClick={() => {
+                                navigate(`/profile?id=${info?.user?.id}`);
+                            }}>
+                            Profile
+                        </MenuItem>
                     </Menu>{' '}
                 </div>
             )}
