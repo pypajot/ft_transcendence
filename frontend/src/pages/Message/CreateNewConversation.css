@@ -8,9 +8,10 @@
 
 .chat-error {
 	color: red;
-	font-size: 1rem;
+	font-size: 0.85rem;
 	text-align: center;
     margin: 0.5rem 0;
+	font-style: italic;
 }
 
 .create-conv-button {

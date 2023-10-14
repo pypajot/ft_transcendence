@@ -55,16 +55,20 @@ const Signup = () => {
 				<form onSubmit={HandleSubmit}>
 					<div>
 						<div className='username'>
-							<label>
+							<div className="auth-input">
 								<input type="text" name="username" className='user-input' placeholder="username"/>
-								<HelperText errorText={usernameError} />
-							</label>
+							</div>
+							<div className="auth-error">
+								<span className="chat-error">{usernameError}</span>
+							</div>
 						</div>
-						<div>
-							<label>
+						<div className='username'>
+							<div className="auth-input">
 								<input type="password" name="password" className='user-input' placeholder="password"/>
-								<HelperText errorText={passwordError} />
-							</label>
+							</div>
+							<div className="auth-error">
+								<span className="chat-error">{passwordError}</span>
+							</div>
 						</div>
 					</div>
 					<div className='submit'>

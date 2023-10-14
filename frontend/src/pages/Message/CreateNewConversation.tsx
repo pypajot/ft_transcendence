@@ -37,9 +37,6 @@ const CreateNewConvDropdown: React.FC<ConvDropDownProps> = ({ setOpen } : any) =
                     />
                 </div>
                 <div className='chat-error'>
-                {chatContext.error.alreadyUsedChannelName ? (
-                    <h5>Channel Name Already Taken</h5>
-                ) : null }
                 {socketError && socketError.func === "channelCreation" ? (
 						<h5>{socketError.msg}</h5>) : null}
                 </div>

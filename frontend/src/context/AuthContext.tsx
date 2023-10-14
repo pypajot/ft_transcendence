@@ -56,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const refreshFetch = async (address: any, params?: any) => {
         let response = await fetch(address, params);
-        if (response.status !== 401) return response;
+        if (response.ok) return response;
         response = await fetch('http://localhost:3333/auth/refresh', {
             method: 'GET',
             headers: {

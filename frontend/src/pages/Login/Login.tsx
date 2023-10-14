@@ -36,10 +36,12 @@ function Login() {
 				setUsernameError("Username should not be empty")
 			if (body.includes("password should not be empty"))
 				setPasswordError("Password should not be empty")
-			if (body.includes("Username"))
+			if (body.includes("not found"))
 				setUsernameError("Username not found")
 			if (body.includes("Invalid"))
 				setPasswordError("Invalid password")
+			if (body.includes("connected"))
+				setUsernameError("User already connected")
 			return ;
 		}
 		const responseJson = await response.json();
@@ -69,16 +71,20 @@ function Login() {
 				<form onSubmit={HandleSubmit}>
 					<div>
 						<div className='username'>
-							<label>
+							<div className="auth-input">
 								<input type="text" name="username" className='user-input' placeholder="username"/>
-								<HelperText errorText={usernameError} />
-							</label>
+							</div>
+							<div className="auth-error">
+								<span className="chat-error">{usernameError}</span>
+							</div>
 						</div>
-						<div>
-							<label>
+						<div className="username">
+							<div className="auth-input">
 								<input type="password" name="password" className='user-input' placeholder="password"/>
-								<HelperText errorText={passwordError} />
-							</label>
+							</div>
+							<div className="auth-error">
+								<span className="chat-error">{passwordError}</span>
+							</div>
 						</div>
 					</div>
 					<div className='submit'>
@@ -89,19 +95,19 @@ function Login() {
 				</form>
 			</div>
 			<div className='login-other-options'>
-				<div className='login42'>
-					<a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3aaed99808e42f414bc3012769d17d2df75acba4efc662238fb0e9ad81b91339&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fintralogin&response_type=code">
-							<button className="login-button42">
-									42 login
-							</button>
-					</a>
-				</div>
 				<div>
 					<Link to='/signup'>
 						<button className='login-register-button'>
 							Register
 						</button>
 					</Link>
+				</div>
+				<div className='login42'>
+					<a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3aaed99808e42f414bc3012769d17d2df75acba4efc662238fb0e9ad81b91339&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fintralogin&response_type=code">
+							<button className="login-button42">
+									42 login
+							</button>
+					</a>
 				</div>
 			</div>
 		</>

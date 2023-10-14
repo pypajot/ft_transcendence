@@ -47,39 +47,6 @@ const Profile = () => {
 	const navigate = useNavigate();
 	const run = useRef(true);
 
-    useEffect(() => {
-        const getCurrentUser = async (id: string | null) => {
-            const response = await refreshFetch(
-                'http://localhost:3333/user/' + id,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${sessionStorage.getItem(
-                            'access_token'
-                        )}`,
-                    },
-                }
-            );
-            if (response.status === 400) {
-                navigate('/error');
-                return;
-            }
-            setCurrentUser(await response.json());
-        };
-
-        if (profileId) {
-            navigate('/profile' + `?id=${profileId}`);
-            return;
-        }
-        if (!user || !run.current) 
-			return;
-        if (!searchParams.get('id')) 
-			getCurrentUser(user.id.toString());
-        else 
-			getCurrentUser(searchParams.get('id'));
-        run.current = false;
-    }, [user, searchParams.get('id'), profileId]);
-
 	async function GetUserProfile(e: any) {
         e.preventDefault();
         setSocketError(null);
@@ -114,8 +81,8 @@ const Profile = () => {
 		run.current = false;
 	}, [user, searchParams.get("id"), profileId])
 	
-	if (!currentUser || !user)
-		return ;
+	// if (!currentUser || !user)
+	// 	return ;
 
     const DisplayAvatar = (props: { img: string }) => {
         return (
@@ -193,28 +160,26 @@ const Profile = () => {
 	}
 
     async function HandleSubmit(e: any) {
-        e.preventDefault();
-        setCodeError(null);
-        const response = await refreshFetch(
-            'http://localhost:3333/auth/2fa/confirm',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${sessionStorage.getItem(
-                        'access_token'
-                    )}`,
-                },
-                body: JSON.stringify({ code: e.target.code.value }),
-            }
-        );
-        if (response.status === 201) {
-            setImagePath(null);
-            sessionStorage.setItem('access_token', await response.json().token);
-            user && setUser({ ...user, twoFactorAuthActive: true });
-        } else if (response.status !== 401)
-            setCodeError((await response.json()).message);
-    }
+		e.preventDefault();
+		setCodeError(null);
+		console.log(e.target.code.value);
+		const response = await refreshFetch('http://localhost:3333/auth/2fa/confirm', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
+			},
+			body: JSON.stringify({code: e.target.code.value})
+		});
+		console.log("response status: ", response.status, response.ok);
+		if (response.status == 403)
+			setCodeError((await response.json()).message);
+		if (!response.ok)
+			return ;
+		setImagePath(null);
+		sessionStorage.setItem("access_token", (await response.json().token))
+		user && setUser({...user, twoFactorAuthActive: true})
+	}
 
     function ChangeUsernameForm() {
         async function HandleChangeUsername(e: any) {
@@ -262,68 +227,49 @@ const Profile = () => {
         );
     }
 
-    function QrDisplay() {
-        if (!imagePath) return <></>;
-        return (
-            <>
-                <div>
-                    <img src={imagePath} />
-                </div>
-                <div>
-                    <form onSubmit={HandleSubmit}>
-                        <div>
-                            <label>
-                                Authenticator code:{' '}
-                                <input type="text" name="code" />
-                                <HelperText errorText={codeError} />
-                            </label>
-                        </div>
-                        <div>
-                            <button type="submit" className="submit-button-new">
-                                Submit
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </>
-        );
-    }
+		
 
-    const activate2FA = async () => {
-        await refreshFetch('http://localhost:3333/auth/2fa/activate', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${sessionStorage.getItem(
-                    'access_token'
-                )}`,
-            },
-        })
-            .then((response: any) => response.json())
-            .then((response: any) => setImagePath(response.imagePath.path));
-    };
+	
+	function QrDisplay() {
+		if (!imagePath)
+			return (<></>)
+		return (
+			<>
+				<div>
+					<img src={imagePath}/>
+				</div>
+				<div>
+					<form onSubmit={HandleSubmit}>
+						<div>
+							<label>
+								Authenticator code: <input type="text" name="code" />
+								<HelperText errorText={codeError} />
+							</label>
+						</div>
+						<div>
+							<button type="submit" className='submit-button-new'>
+								Submit
+							</button>
+						</div>
+					</form>
+				</div>
+			</>
+		)
+	}
+
+	const activate2FA = async () => {
+		await refreshFetch('http://localhost:3333/auth/2fa/activate', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
+			}
+		})
+		.then((response: any) => response.json())
+		.then((response: any) => setImagePath(response.imagePath.path));
+	}
 
 	function MatchHistoryDisplay() {
-		// const run = useRef(false);
-		// const [matchHistory, setMatchHistory] = useState<GameType[]>([]);
-	  
-		// useEffect(() => {
-		//   const fetchMatchHistory = async () => {
-		// 	try {
-		// 	  const response = await refreshFetch('http://localhost:3333/profile/match-history/' + `${props.id}`, {
-		// 		headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` }
-		// 	  });
-		// 	  const games = await response.json();
-		// 	  setMatchHistory(games);
-		// 	} catch (error) {
-		// 	  console.error('Error fetching match history:', error);
-		// 	}
-		//   };
-		//   if (!run.current)
-		// 	fetchMatchHistory();
-		//   run.current = true;
-		// }, []);
-	  
 		return (
 		  <div className='match-history'>
 			<img src='https://i.imgur.com/bZsILPR.png' className='match-img'></img>
@@ -415,9 +361,9 @@ const Profile = () => {
 			</div>
 			<div className='profile-wrapper'>
 				<div className='left-profile'>
-					<DisplayAvatar img={currentUser?.avatar} />
+					<DisplayAvatar img={currentUser ? currentUser?.avatar : ""} />
 					<ChangeAvatar />
-					<DisplayUsername username={currentUser.username} />
+					<DisplayUsername username={currentUser ? currentUser.username : ""} />
 					<ChangeUsernameForm />
 					<DisplayActivate2fa />
 				</div>

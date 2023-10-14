@@ -81,22 +81,15 @@ export const JoinChannel = ({
         e.preventDefault();
         setSocketError(null);
         setFriendError('');
-        // chatContext.resetError();
-        // if (e.target.password === undefined)
-        // 	socket?.emit('JoinChannel', { name: e.target.id.value, pass: "" });
-        // else
         console.log('password: ', e.target?.password?.value);
         socket?.emit('JoinChannel', {
             name: e.target.id.value,
             pass: e.target?.password?.value,
         });
-        //Checker que on a bien join puis
-        // setConversation(channelName);
     };
 
     const handleReqPassword = () => {
         setReqPassword(true);
-        //Reset Error ?
     };
 
     const enterConversation = (arg: any) => {
@@ -116,15 +109,6 @@ export const JoinChannel = ({
             socket?.off('successfullyJoinedChannel', enterConversation);
         };
     }, [socket]);
-
-    // const errorName =
-    //     chatContext.error.noSuchChannelName &&
-    //     !chatContext.error.wrongPrivileges;
-    // const errorPriv =
-    //     !chatContext.error.noSuchChannelName &&
-    //     chatContext.error.wrongPrivileges;
-    // const banned = !errorPriv && !errorName && chatContext.error.Banned;
-    // const wrongPassword = !errorPriv && !errorName && !banned && chatContext.error.wrongPassword;
 
     return (
         <div className="join-channel-dropdown" ref={dropdownRef}>

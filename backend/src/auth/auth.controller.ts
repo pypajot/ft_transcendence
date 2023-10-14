@@ -59,9 +59,9 @@ export class AuthController {
 
 	@Post('2fa/confirm')
 	@UseGuards(JwtAuthGuard)
-	async confirm2fa(@Req() req: any) {
-		const response = await this.authservice.confirm2fa(req);
-		return response ;
+	async confirm2fa(@Req() req: any, @Res() res: any) {
+		const response = await this.authservice.confirm2fa(req, res);
+		res.send(response) ;
 	}
 
 	@Post('2fa/login')
