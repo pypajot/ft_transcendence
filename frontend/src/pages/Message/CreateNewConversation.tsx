@@ -1,10 +1,15 @@
-import { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
-import { useChatContext } from '../../context/ChatContext';
+import { ChatContext, useChatContext } from '../../context/ChatContext';
 import './CreateNewConversation.css';
 import './ChatPage.css';
 
-function CreateNewConvDropdown () {
+
+interface ConvDropDownProps {
+    setOpen: any;
+};
+
+const CreateNewConvDropdown: React.FC<ConvDropDownProps> = ({ setOpen } : any) => {
     const { socket, socketError, setSocketError } = useSocketContext();
     const chatContext = useChatContext();
 
@@ -34,8 +39,8 @@ function CreateNewConvDropdown () {
                 <div className='chat-error'>
                 {chatContext.error.alreadyUsedChannelName ? (
                     <h5>Channel Name Already Taken</h5>
-                ) : null}
-				{socketError && socketError.func === "channelCreation" ? (
+                ) : null }
+                {socketError && socketError.func === "channelCreation" ? (
 						<h5>{socketError.msg}</h5>) : null}
                 </div>
                 <div>
@@ -61,6 +66,7 @@ function CreateNewConvDropdown () {
 
 export const CreateNewConversation = ({open, setOpen} : any) => {
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const chatContext = useChatContext();
 
 
     const handleClickOutside = (event: any) => {
@@ -78,6 +84,7 @@ export const CreateNewConversation = ({open, setOpen} : any) => {
     }, []);
 
     const handleOpen = () => {
+        chatContext.resetError();
         if (open === "CreateNewConversation") {
             setOpen(null);
         } else {
@@ -92,8 +99,9 @@ export const CreateNewConversation = ({open, setOpen} : any) => {
                 Create a Channel
             </button>
             {open === "CreateNewConversation" ? (
-                <CreateNewConvDropdown/>
+                <CreateNewConvDropdown setOpen={setOpen}/>
             ) : null}
         </div>
     );
 };
+ 

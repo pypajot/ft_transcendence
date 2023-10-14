@@ -247,13 +247,23 @@ export const Conversation = () => {
             container.scrollTop = container.scrollHeight - container.clientHeight;
     }, [conversationMsg]);
 
+    const renderName = () => {
+        if (conversationInfo && conversationInfo.isUser && conversationInfo.user) {
+            return conversationInfo.user.username;
+        } else if (conversationInfo && conversationInfo.isChannel && conversationInfo.channel) {
+            return conversationInfo.channel.name;
+        }
+        return '';
+    }
     return (
         <>
             {conversationInfo && (
                 <div className='conversation-name'>
                 <Flex>
                     <Flex grow shrink basis="1px">
-                        <Flex>{conversationInfo.isUser ? conversationInfo.user?.username : conversationInfo.channel?.name}</Flex>
+                        <Flex>{renderName().length > 20 
+                            ? renderName().substring(20, 0) + '...'
+                            : renderName()}</Flex>
                     </Flex>
                     <OptionMenu />
                 </Flex>

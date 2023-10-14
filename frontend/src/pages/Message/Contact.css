@@ -12,6 +12,7 @@
   }
 
   .active-tab {
+	cursor: pointer;
 	border-color:#663880;
 	border-width: 0.2rem;
 	border-style: solid;
@@ -20,6 +21,7 @@
   }
 
   .inactive-tab {
+	cursor: pointer;
 	border-color:#663880;
 	border-width: 0.2rem;
 	border-style: hidden;
@@ -53,11 +55,11 @@
 	background-color:rgba(0, 0, 0, 0) !important;
   }
 
-  .channel-name {
+  .channel-name, .friend-name {
 	transition: 0.4s ease all ;
   }
 
-  .channel-name:hover {
+  .channel-name:hover, .friend-name:hover {
 	cursor: pointer !important;
 	transition: 0.4s ease all ;
 	color: #994dc2;
@@ -74,7 +76,6 @@
 }
 
 ::-webkit-scrollbar-thumb {
-	background:#772ba0;
 	border-radius: 10px;
 }
 

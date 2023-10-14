@@ -79,7 +79,7 @@ export const Contact = () => {
 							return;
 						}
 						return (
-							<div key={"user_" + user.username}>
+							<div className='friend-name' key={"user_" + user.username}>
 								<ContactElement
 									info={{
 										isChannel: false,
