@@ -31,6 +31,9 @@ export class UserService {
 		if (!user)
 			throw new BadRequestException('Invalid user id');
 		const matchHistory = await this.getMatchHistory(Number(params.id));
+        const achievements = await this.getAchievements(Number(params.id));
+        console.log('your achievements : ', achievements);
+        console.log('your match history : ', matchHistory);
 		const elo = await this.getElo(Number(params.id), user.wins, user.losses);
         return {
             ...user,
@@ -41,6 +44,7 @@ export class UserService {
 			blocked: undefined,
 			matchHistory: matchHistory,
 			elo: elo,
+            achievements: achievements,
         };
     }
 
@@ -94,6 +98,27 @@ export class UserService {
 		  },
 		});
 	}
+
+    async getAchievements(userId: number) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+            select: {
+                achievements: {
+                    select: {
+                        achievement: true,
+                    },
+                },
+            },
+        });
+    
+        if (!user) {
+            throw new Error('User not found');
+        }
+        return user.achievements.map((ua) => ua.achievement);
+    }
+    
 
     async getMe(id: number) {
         const user = await this.prisma.user.findUnique({

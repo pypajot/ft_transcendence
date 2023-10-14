@@ -26,23 +26,28 @@ export class PrismaService extends PrismaClient {
 	const achievements = [
 		{
 		name: 'First Blood',
-		description: 'Win your first game.'
+		description: 'Win your first game.',
+		icon: 'src/assets/firstBlood.png'
 		},
 		{
 		name: 'Friendly Competitor',
-		description: 'Play a game with a friend.'
+		description: 'Play a game with a friend.',
+		icon: 'src/assets/friendly.png'
 		},
 		{
 			name: 'Hat Trick',
-			description: 'Win three games in a row.'
+			description: 'Win three games in a row.',
+			icon: 'src/assets/hatTrick.png'
 		},
 		{
 			name: 'Underdog victory',
-			description: 'Win a game against a player with more wins than you.'
+			description: 'Win a game against a player with more wins than you.',
+			icon: 'src/assets/underdog.png'
 		},
 		{
 			name: 'Hardcore Veteran',
-			description: 'Win 5 games in Hardcore mode.'
+			description: 'Win 5 games in Hardcore mode.',
+			icon: 'src/assets/veteran.png'
 		}
 	];
 

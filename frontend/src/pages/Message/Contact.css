@@ -68,7 +68,7 @@
 ::-webkit-scrollbar {
 	width: 12px;
 	border-radius: 10px;
-	background: #470660;
+	background-color: rgb(49, 46, 46);
 }
 
 ::-webkit-scrollbar-track {
@@ -80,5 +80,5 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background:rgb(54, 56, 58); 
+	background:rgb(66, 68, 70); 
 }

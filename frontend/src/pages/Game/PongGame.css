@@ -122,14 +122,15 @@
 /* Party mode */
 .party-ball {
   background: rgb(255,255,255);
-  background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(199,159,221,1) 42%, rgba(149,11,217,1) 100%);    
   animation: glow 1s ease-in-out infinite alternate;
 }
 
 .party-game-board {
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  /* background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
   background-size: 400% 400%;
-  animation: gradient 5s ease infinite;
+  animation: gradient 5s ease infinite; */
+  background : center center no-repeat;
+  background-size : cover;
 }
 
 @keyframes gradient {
@@ -175,18 +176,6 @@
 .glow-small {
   filter: drop-shadow(0px 0px 40px rgba(154,46,255,0.1));
 }
-
-/* .glow-medium {
-  -webkit-box-shadow:0px 0px 72px 10px rgba(154,46,255,0.79);
-  -moz-box-shadow: 0px 0px 72px 10px rgba(154,46,255,0.79);
-  box-shadow: 0px 0px 72px 10px rgba(154,46,255,0.79);
-} */
-
-/* .glow-small {
-  -webkit-box-shadow:0px 0px 40px 6px rgba(154,46,255,0.79);
-  -moz-box-shadow: 0px 0px 40px 6px rgba(154,46,255,0.79);
-  box-shadow: 0px 0px 40px 6px rgba(154,46,255,0.79);
-} */
 
 @keyframes glow {
   from {

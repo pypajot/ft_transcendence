@@ -109,7 +109,7 @@ model Achievement {
   id       Int              @id @default(autoincrement())
   name     String           @unique  
   description String        
-  icon     String?          // URL of an icon for the achievement
+  icon     String          // URL of an icon for the achievement
   userAchievements UserAchievement[]
 }
 

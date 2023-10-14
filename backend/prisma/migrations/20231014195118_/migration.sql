@@ -86,7 +86,7 @@ CREATE TABLE "Achievement" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "icon" TEXT,
+    "icon" TEXT NOT NULL,
 
     CONSTRAINT "Achievement_pkey" PRIMARY KEY ("id")
 );

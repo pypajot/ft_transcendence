@@ -27,28 +27,25 @@ type GameType = {
     loserScore: number;
     mode: string;
 };
+  
+
+type AchievementType = {
+	name: string;
+	description: string;
+	icon: string;
+};
 
 const Profile = () => {
-    const { user, setUser, refreshFetch } = useAuth();
-    const { socket, socketError, setSocketError } = useSocketContext();
-    const { profileId, setProfileId } = useProfileContext();
-    const [imagePath, setImagePath] = useState<string | null>(null);
-    const [usernameError, setUsernameError] = useState<string | null>(null);
-    const [codeError, setCodeError] = useState<string | null>(null);
-    const [searchParams] = useSearchParams();
-    const [currentUser, setCurrentUser] = useState<{
-        id: number;
-        username: string;
-        avatar: string;
-        matchHistory: GameType[];
-        elo: number;
-    } | null>(null);
-    const navigate = useNavigate();
-    const run = useRef(true);
-
-    // useEffect(() => {
-    // 	run.current = true;
-    // }, [searchParams.get("id")])
+	const { user, setUser, refreshFetch } = useAuth();
+	const { socket, socketError, setSocketError } = useSocketContext();
+	const {profileId, setProfileId} = useProfileContext();
+	const [imagePath, setImagePath] = useState<string | null>(null);
+	const [usernameError, setUsernameError] = useState<string | null>(null);
+	const [codeError, setCodeError] = useState<string | null>(null);
+	const [searchParams] = useSearchParams();
+	const [currentUser, setCurrentUser] = useState<{id: number, username: string, avatar: string, matchHistory: GameType[], elo: number, achievements: AchievementType[]} | null>(null);
+	const navigate = useNavigate();
+	const run = useRef(true);
 
     useEffect(() => {
         const getCurrentUser = async (id: string | null) => {
@@ -69,44 +66,56 @@ const Profile = () => {
             }
             setCurrentUser(await response.json());
         };
+
         if (profileId) {
             navigate('/profile' + `?id=${profileId}`);
             return;
         }
-        if (!user || !run.current) return;
-        if (!searchParams.get('id')) getCurrentUser(user.id.toString());
-        else getCurrentUser(searchParams.get('id'));
+        if (!user || !run.current) 
+			return;
+        if (!searchParams.get('id')) 
+			getCurrentUser(user.id.toString());
+        else 
+			getCurrentUser(searchParams.get('id'));
         run.current = false;
     }, [user, searchParams.get('id'), profileId]);
 
-    if (!currentUser || !user) return;
-
-    async function GetUserProfile(e: any) {
+	async function GetUserProfile(e: any) {
         e.preventDefault();
         setSocketError(null);
         setProfileId(0);
         socket?.emit('getProfileId', e.target.username.value);
     }
 
-    function UserProfileForm() {
-        return (
-            <>
-                <div className="search-profile">
-                    <form onSubmit={GetUserProfile}>
-                        <label>
-                            Username: <input type="text" name="username" />
-                        </label>
-                        <h5>
-                            {socketError?.func === 'getProfileId'
-                                ? socketError.msg
-                                : null}
-                        </h5>
-                        <button type="submit">View Profile</button>
-                    </form>
-                </div>
-            </>
-        );
-    }
+	useEffect(() => {
+		const getCurrentUser = async (id: string | null) => {
+			const response = await refreshFetch('http://localhost:3333/user/' + id, {
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
+				},
+			});
+			if (response.status === 400) {
+				navigate("/error");
+				return ;
+			}
+			setCurrentUser(await response.json());
+		}
+		if (profileId) {
+			navigate("/profile" + `?id=${profileId}`);
+			return ;
+		}
+		if (!user || !run.current)
+			return ;
+		if (!searchParams.get("id"))
+			getCurrentUser(user.id.toString());
+		else
+			getCurrentUser(searchParams.get("id"));
+		run.current = false;
+	}, [user, searchParams.get("id"), profileId])
+	
+	if (!currentUser || !user)
+		return ;
 
     const DisplayAvatar = (props: { img: string }) => {
         return (
@@ -123,6 +132,7 @@ const Profile = () => {
         );
     };
 
+	//chgmt
     function ChangeAvatar() {
         async function HandleChangeAvatar(files: any) {
             const fileUrl = files.map((x: any) => x.fileUrl)[0];
@@ -158,6 +168,29 @@ const Profile = () => {
             </>
         );
     }
+
+//chgmt
+
+	function UserProfileForm() {
+		return (
+			<>
+				<div className="search-profile">
+					<form onSubmit={GetUserProfile}>
+							<label>
+								<h4>Consult a profile :</h4>
+								<input 
+									className='user-input-new'
+									placeholder="Enter a username"
+									type="text"
+									name="username"/>
+							</label>
+							<h5>{socketError?.func === "getProfileId" ? socketError.msg : null}</h5>
+							<button className='submit-button-new' type="submit">View Profile</button>
+					</form>
+				</div>
+			</>
+		);
+	}
 
     async function HandleSubmit(e: any) {
         e.preventDefault();
@@ -270,62 +303,75 @@ const Profile = () => {
             .then((response: any) => setImagePath(response.imagePath.path));
     };
 
-    function MatchHistoryDisplay() {
-        // const run = useRef(false);
-        // const [matchHistory, setMatchHistory] = useState<GameType[]>([]);
-
-        // useEffect(() => {
-        //   const fetchMatchHistory = async () => {
-        // 	try {
-        // 	  const response = await refreshFetch('http://localhost:3333/profile/match-history/' + `${props.id}`, {
-        // 		headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` }
-        // 	  });
-        // 	  const games = await response.json();
-        // 	  setMatchHistory(games);
-        // 	} catch (error) {
-        // 	  console.error('Error fetching match history:', error);
-        // 	}
-        //   };
-        //   if (!run.current)
-        // 	fetchMatchHistory();
-        //   run.current = true;
-        // }, []);
-
-        return (
-            <div className="match-history">
-                <img
-                    src="https://i.imgur.com/bZsILPR.png"
-                    className="match-img"></img>
-                <div className="stats">
-                    <div className="game-stats">
-                        <div className="elo">
-                            <h2>ELO : {currentUser?.elo}</h2>
-                        </div>
-                        <ul>
-                            {currentUser?.matchHistory &&
-                                currentUser.matchHistory.map((game) => (
-                                    <li key={game.id} className="match-history">
-                                        Opponent :{' '}
-                                        {game.winner.username ===
-                                        currentUser?.username
-                                            ? game.loser.username
-                                            : game.winner.username}{' '}
-                                        -
-                                        {game.winner.username ===
-                                        currentUser?.username
-                                            ? 'Win'
-                                            : 'Loss'}{' '}
-                                        - Score : {game.winnerScore} -{' '}
-                                        {game.loserScore} - Game Mode :{' '}
-                                        {game.mode}
-                                    </li>
-                                ))}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+	function MatchHistoryDisplay() {
+		// const run = useRef(false);
+		// const [matchHistory, setMatchHistory] = useState<GameType[]>([]);
+	  
+		// useEffect(() => {
+		//   const fetchMatchHistory = async () => {
+		// 	try {
+		// 	  const response = await refreshFetch('http://localhost:3333/profile/match-history/' + `${props.id}`, {
+		// 		headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` }
+		// 	  });
+		// 	  const games = await response.json();
+		// 	  setMatchHistory(games);
+		// 	} catch (error) {
+		// 	  console.error('Error fetching match history:', error);
+		// 	}
+		//   };
+		//   if (!run.current)
+		// 	fetchMatchHistory();
+		//   run.current = true;
+		// }, []);
+	  
+		return (
+		  <div className='match-history'>
+			<img src='https://i.imgur.com/bZsILPR.png' className='match-img'></img>
+			<div className='stats'>
+				<div className='game-stats'>
+					<div className='elo'>
+						<h2>ELO : {currentUser?.elo}</h2>
+					</div>
+					<ul>
+					{currentUser?.matchHistory && currentUser.matchHistory.map(game => (
+						<li key={game.id} className='match'>
+							<div className='game-outcome'>
+								<h4> {game.winner.username === currentUser?.username ? ' Won' : ' Lost'} against :</h4>
+							</div>
+							<div className='game-opponent'>
+								<h4>{game.winner.username === currentUser?.username ? game.loser.username : game.winner.username}</h4>
+							</div>
+							<div className='game-score'>
+								<h4>{game.winnerScore} - {game.loserScore}</h4>
+							</div>
+							<div className='game-mode'>
+								<h4>{game.mode} game</h4>
+							</div>
+						</li>
+					))}
+					</ul>
+				</div>
+				<div className='achievements'>
+					<h2>Achievements</h2>
+					<ul>
+					{currentUser?.achievements && currentUser.achievements.map(achievement => (
+						<li key={achievement.name} className='achievement'>
+							<img className='achievement-icon' 
+								src={achievement.icon} width={50} height={50} />
+							<div className='achievement-name'>
+								<h4>{achievement.name}</h4>
+							</div>
+							<div className='achievement-description'>
+								<h4>{achievement.description}</h4>
+							</div>
+						</li>
+					))}
+					</ul>
+				</div>
+			</div>
+		  </div>
+		);
+	  }
 
     function DisplayUsername(props: { username: string }) {
         return <div className="display-username">{props.username}</div>;
@@ -358,25 +404,27 @@ const Profile = () => {
         );
     }
 
-    return (
-        <>
-            <Navbar />
-            <div className="logo-profile">
-                <img
-                    src="https://i.imgur.com/2xFFdd3.png"
-                    className="logo-profile-size"></img>
-            </div>
-            <div className="left-profile">
-                <DisplayAvatar img={currentUser?.avatar} />
-                <ChangeAvatar />
-                <DisplayUsername username={currentUser.username} />
-                <ChangeUsernameForm />
-                <DisplayActivate2fa />
-            </div>
-            <MatchHistoryDisplay />
-            <UserProfileForm />
-        </>
-    );
+	return (
+		<>
+			<Navbar/>
+			<div className='profile-title'>
+				<div className='logo-profile'>
+					<img src='https://i.imgur.com/2xFFdd3.png' className='logo-profile-size'></img>
+				</div>
+				<UserProfileForm />
+			</div>
+			<div className='profile-wrapper'>
+				<div className='left-profile'>
+					<DisplayAvatar img={currentUser?.avatar} />
+					<ChangeAvatar />
+					<DisplayUsername username={currentUser.username} />
+					<ChangeUsernameForm />
+					<DisplayActivate2fa />
+				</div>
+				<MatchHistoryDisplay />
+			</div>
+		</>
+	);
 };
 
 export default Profile;
