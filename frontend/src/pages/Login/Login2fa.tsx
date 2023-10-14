@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import HelperText from "../../components/HelperText";
+import "./Login.css"
 
 function Login2fa() {
   const { setAccessToken } = useAuth();
@@ -32,16 +33,18 @@ function Login2fa() {
   }
 
   return (
-    <div>
+    <div style={{margin: "25% 25% 25% 25%"}}>
       <form onSubmit={HandleSubmit}>
-        <div>
-          <label>
-            Authenticator code: <input type="text" name="code" />
-			<HelperText errorText={codeError} />
-          </label>
-        </div>
-        <div>
-          <button type="submit">Submit</button>
+		<div className="username">
+			<div className="auth-input">
+			<input className="user-input" type="text" name="code" placeholder="Code" />
+			</div>
+			<div className="auth-error">
+				<span className="chat-error">{codeError}</span>
+			</div>
+		</div>
+		<div>
+          <button className="login-button42" type="submit">Submit</button>
         </div>
       </form>
     </div>

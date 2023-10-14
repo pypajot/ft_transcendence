@@ -2,39 +2,42 @@
 	position: relative;
 }
 
-.friend-request-list {
+.notification-dropdown-menu {
 	position: absolute;
 
 	list-style-type: none;
 	margin: 5px 0;
 	padding: 0;
 
-	border: 2px solid grey;
 	width: 250px;
 	z-index: 999;
-
+	background-color: #510779;
+	padding: 0;
+	border: 0.2rem solid #994dc2;
+	border-radius: 1rem;
+	
 }
 
-.friend-request-list > div {
+.notification-dropdown-menu > div {
 	margin: 0;
 	height: 45px;
-	background-color: rgb(17, 17, 17);
+	border: 0px solid #994dc2;
 	display: flex;
 	justify-content: space-between;
 }
 
-.friend-request-list > div > h4 {
+.notification-dropdown-menu > div > h4 {
 	width: 70%;
 	margin: 10px 10px 0 0;
 }
 
-.friend-request-list > div > div {
+.notification-dropdown-menu > div > div {
 	width: 15%;
 	justify-content: center;
 	position: relative;
 }
 
-.friend-request-list > div > div > img {
+.notification-dropdown-menu > div > div > img {
 	/* background-color: black; */
 	/* border: 5px; */
 	width: 35px;

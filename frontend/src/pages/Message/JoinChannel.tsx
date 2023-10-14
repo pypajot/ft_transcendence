@@ -24,7 +24,7 @@ function JoinChannelDropdown (
                         placeholder="Enter a Channel"
                     />
                 </div>
-                {(friendError !== "Invalid password") && <span>{friendError}</span>}
+                {<h6 className="chat-error">{friendError}</h6>}
                 {(requestPassword || friendError === "Invalid password") && (
                 <div>
                     <h4> Password is required </h4>
@@ -37,7 +37,7 @@ function JoinChannelDropdown (
                 </div>
                 )}
                 <div>
-					{friendError === "Invalid password" && <span>{friendError}</span>}
+					{friendError === "Invalid password" && <span className="chat-error">{friendError}</span>}
                     <button className='chat-submit-button'
                         type="submit">Join !
                     </button>

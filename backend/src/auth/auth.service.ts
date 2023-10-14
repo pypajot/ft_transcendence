@@ -1,10 +1,11 @@
 import {
+	BadRequestException,
     ForbiddenException,
     Injectable,
     UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AuthDto, CodeDto } from './dto';
+import { AuthDto } from './dto';
 import * as argon2 from 'argon2';
 import { Prisma } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
@@ -15,13 +16,6 @@ import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
-import { UserService } from 'src/user/user.service';
-
-type RefreshPayloadType = {
-    sub: number;
-    username: string;
-    token_family: string;
-};
 
 type JwtPaylodType = {
     sub: number;
@@ -66,7 +60,7 @@ export class AuthService {
             });
             res.cookie(
                 'refresh_token',
-                await this.signRefreshToken(user.id, user.username),
+                await this.signRefreshToken(user.id, user.username, false),
                 RefreshTokenParams
             );
             return {
@@ -97,6 +91,8 @@ export class AuthService {
                 headers: { Authorization: `Bearer ${access_token}` },
             })
         );
+		if (response.status !== 200)
+			throw new UnauthorizedException();
 		await this.prisma.background.create({
 			data: {
 				picture: response.data[0].image.versions.large
@@ -117,13 +113,15 @@ export class AuthService {
         const response = await firstValueFrom(
             this.http.post(url, null, { params: parameters })
         );
+		if (response.status !== 201)
+			throw new UnauthorizedException('Invalid code')
         const user = await this.createIntraUser(response.data.access_token);
         // if (user.status === "online")
         // 	throw new ForbiddenException("User is already connected");
         if (!user.twoFactorAuthActive) {
             res.cookie(
                 'refresh_token',
-                await this.signRefreshToken(user.id, user.username),
+                await this.signRefreshToken(user.id, user.username, false),
                 RefreshTokenParams
             );
             time = '30s';
@@ -146,6 +144,8 @@ export class AuthService {
                 headers: { Authorization: `Bearer ${access_token}` },
             })
         );
+		if (response.status !== 200)
+			throw new UnauthorizedException('Invalid access token');
 		this.setBackgroundAvatar(access_token);
         const intraUser = response.data;
 		// await this.prisma.background.create({
@@ -165,9 +165,12 @@ export class AuthService {
                 },
             });
         }
-        return this.prisma.user.findUnique({
+		const user = await this.prisma.user.findUnique({
             where: { intralogin: intraUser.login },
         });
+		if (user.status !== "offline")
+			throw new UnauthorizedException('User already connected')
+        return user;
     }
 
     async createUniqueUsername(login: string) {
@@ -187,11 +190,15 @@ export class AuthService {
                 username: dto.username,
             },
         });
+		if (!user)
+			throw new BadRequestException('User not found')
+		if (user.status !== "offline")
+			throw new UnauthorizedException('User already connected')
         let time = '300s';
         if (!user.twoFactorAuthActive) {
             res.cookie(
-                'refresh_token',
-                await this.signRefreshToken(user.id, user.username),
+                'refresh_token' + user.id.toString(),
+                await this.signRefreshToken(user.id, user.username, false),
                 RefreshTokenParams
             );
             time = '30s';
@@ -262,12 +269,14 @@ export class AuthService {
     async signRefreshToken(
         id: number,
         username: string,
+		twofactor_on: boolean,
         token_family?: string
     ): Promise<string> {
         if (!token_family) token_family = uuidv4();
         const payload = {
             sub: id,
             username: username,
+			twofactor_on: twofactor_on,
             token_family: token_family,
         };
         const token = await this.jwt.signAsync(payload, {
@@ -411,7 +420,7 @@ export class AuthService {
         return decryptedText.toString();
     }
 
-    async confirm2fa(req: any) {
+    async confirm2fa(req: any, res: any) {
         const payload = this.jwt.decode(
             req.headers.authorization.split(' ')[1]
         ) as JwtPaylodType;
@@ -433,6 +442,11 @@ export class AuthService {
                 twoFactorAuthActive: true,
             },
         });
+		res.cookie(
+            'refresh_token',
+            await this.signRefreshToken(user.id, user.username, true),
+            RefreshTokenParams
+        );
         return {
             token: await this.signAccessToken(user.id, user.username, true),
         };
@@ -454,7 +468,7 @@ export class AuthService {
         if (!isValid) throw new ForbiddenException('Invalid code');
         res.cookie(
             'refresh_token',
-            await this.signRefreshToken(user.id, user.username),
+            await this.signRefreshToken(user.id, user.username, true),
             RefreshTokenParams
         );
         return {

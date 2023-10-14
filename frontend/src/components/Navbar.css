@@ -76,3 +76,25 @@ a{
     transition: .5s;
     background: transparent;
 }
+
+.friends-notif-on button {
+	font-size: 15px;
+    color: white;
+    border: 2px solid #775d85;
+    border-radius:30px;
+    padding: 5px 20px;
+    cursor: pointer;
+	will-change: filter;
+    filter: contrast(2) brightness(2);
+    transition: .5s;
+    background: transparent;
+	animation: glow-notif 1s ease-in-out infinite alternate;
+}
+@keyframes glow-notif {
+  from {
+	filter: contrast(1) brightness(2.25);
+  }
+  to {
+	filter: contrast(4) brightness(2);
+  }
+}

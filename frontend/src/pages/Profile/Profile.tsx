@@ -74,8 +74,8 @@ const Profile = () => {
 		run.current = false;
 	}, [user, searchParams.get("id"), profileId])
 	
-	if (!currentUser || !user)
-		return ;
+	// if (!currentUser || !user)
+	// 	return ;
 
 	async function GetUserProfile(e: any) {
 		e.preventDefault();
@@ -151,6 +151,7 @@ const Profile = () => {
 	async function HandleSubmit(e: any) {
 		e.preventDefault();
 		setCodeError(null);
+		console.log(e.target.code.value);
 		const response = await refreshFetch('http://localhost:3333/auth/2fa/confirm', {
 			method: 'POST',
 			headers: {
@@ -159,13 +160,14 @@ const Profile = () => {
 			},
 			body: JSON.stringify({code: e.target.code.value})
 		});
-		if (response.status === 201) {
-			setImagePath(null);
-			sessionStorage.setItem("access_token", (await response.json().token))
-			user && setUser({...user, twoFactorAuthActive: true})
-		}
-		else if (response.status !== 401)
+		console.log("response status: ", response.status, response.ok);
+		if (response.status == 403)
 			setCodeError((await response.json()).message);
+		if (!response.ok)
+			return ;
+		setImagePath(null);
+		sessionStorage.setItem("access_token", (await response.json().token))
+		user && setUser({...user, twoFactorAuthActive: true})
 	}
 
 	function ChangeUsernameForm() {
@@ -174,19 +176,6 @@ const Profile = () => {
 			e.preventDefault();
 			setUsernameError(null);
 			socket?.emit("changeUsername", e.target.username.value);
-
-			// const response = await refreshFetch('http://localhost:3333/user/username', {
-			// 	method: 'POST',
-			// 	headers: {
-			// 		'Content-Type': 'application/json',
-			// 		'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
-			// 	},
-			// 	body: JSON.stringify({newName: e.target.username.value})
-			// });
-			// if (response.status === 201)
-			// 	user && setUser({...user, username: e.target.username.value})
-			// else if (response.status !== 401)
-			// 	setUsernameError((await response.json()).message);
 		}
 		if (!user || !currentUser || user.id !== currentUser?.id)
 			return ;
@@ -251,26 +240,6 @@ const Profile = () => {
 	}
 
 	function MatchHistoryDisplay() {
-		// const run = useRef(false);
-		// const [matchHistory, setMatchHistory] = useState<GameType[]>([]);
-	  
-		// useEffect(() => {
-		//   const fetchMatchHistory = async () => {
-		// 	try {
-		// 	  const response = await refreshFetch('http://localhost:3333/profile/match-history/' + `${props.id}`, {
-		// 		headers: { 'Authorization': `Bearer ${sessionStorage.getItem("access_token")}` }
-		// 	  });
-		// 	  const games = await response.json();
-		// 	  setMatchHistory(games);
-		// 	} catch (error) {
-		// 	  console.error('Error fetching match history:', error);
-		// 	}
-		//   };
-		//   if (!run.current)
-		// 	fetchMatchHistory();
-		//   run.current = true;
-		// }, []);
-	  
 		return (
 		  <div className='match-history'>
 			<img src='https://i.imgur.com/bZsILPR.png' className='match-img'></img>
@@ -340,9 +309,9 @@ const Profile = () => {
 				<img src='https://i.imgur.com/2xFFdd3.png' className='logo-profile-size'></img>
 			</div>
 			<div className='left-profile'>
-				<DisplayAvatar img={currentUser?.avatar} />
+				<DisplayAvatar img={currentUser ? currentUser?.avatar : ""} />
 				<ChangeAvatar />
-				<DisplayUsername username={currentUser.username} />
+				<DisplayUsername username={currentUser ? currentUser.username : ""} />
 				<ChangeUsernameForm />
 				<DisplayActivate2fa />
 			</div>

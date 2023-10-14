@@ -6,7 +6,7 @@ import { PopUpInvite } from '../pages/Message/PopUpInvite';
 import { useGameContext } from '../context/GameContext';
 
 const Navbar = () => {
-	const { logout } = useAuth();
+	const { user, logout } = useAuth();
 	const { gameInvite, inviter, inviter_id, mode, counter } = useGameContext();
 
 	return (
@@ -36,13 +36,6 @@ const Navbar = () => {
 				</div>
 				<div className="nav-home">
 					<li>
-						<Link to='/friends'>
-							FRIENDS
-						</Link>
-					</li>
-				</div>
-				<div className="nav-home">
-					<li>
 						<Link to='/chatapp'>
 							CHAT
 						</Link>
@@ -50,7 +43,7 @@ const Navbar = () => {
 				</div>
 			</div>
 			<div className="nav-right">
-				<div className="friends-notif">
+				<div className={user && user?.friendsRequest.length > 0 ? "friends-notif-on" : "friends-notif"}>
 					<First></First>
 				</div>
 				<div className="logout-button">

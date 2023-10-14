@@ -25,8 +25,10 @@ function IntraLogin() {
 				body: JSON.stringify({ "code": searchParams.get("code")}),
 				credentials: 'include',
 			})
-			if (response.status !== 201)
+			if (response.status !== 201) {
+				navigate("/")
 				return ;
+			}
 			const responseJson = await response.json();
 			if (responseJson.user2fa) {
 				sessionStorage.setItem('2faToken', responseJson.access_token);
