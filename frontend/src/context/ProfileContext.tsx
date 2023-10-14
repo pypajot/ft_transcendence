@@ -8,8 +8,8 @@ export interface ProfileContextData {
     setFriendRequestList: React.Dispatch<React.SetStateAction<User[]>>;
     friendList: User[];
     setFriendList: React.Dispatch<React.SetStateAction<User[]>>;
-	profileId: number;
-	setProfileId: React.Dispatch<React.SetStateAction<number>>;
+    profileId: number;
+    setProfileId: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const ProfileContext = createContext<ProfileContextData>(
@@ -17,8 +17,8 @@ export const ProfileContext = createContext<ProfileContextData>(
 );
 
 export const useProfileContext = () => {
-	return useContext(ProfileContext);
-}
+    return useContext(ProfileContext);
+};
 
 export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
@@ -27,7 +27,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
     const { user } = useAuth();
     const [friendRequestList, setFriendRequestList] = useState<User[]>([]);
     const [friendList, setFriendList] = useState<User[]>([]);
-	const [profileId, setProfileId] = useState<number>(0);
+    const [profileId, setProfileId] = useState<number>(0);
 
     useEffect(() => {
         if (!socket) return;
@@ -46,14 +46,14 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
             const newFriend: User = user;
             setFriendList((current) => [...current, newFriend]);
         });
-		socket.on('profileId', (id: number) => {
-			console.log("profileId context: ", id)
-			setProfileId(id);
-		})
+        socket.on('profileId', (id: number) => {
+            console.log('profileId context: ', id);
+            setProfileId(id);
+        });
         return () => {
             socket.off('friendRequestFrom');
             socket.off('friendAdded');
-			socket.off('profileId');
+            socket.off('profileId');
         };
     }, [user, socket]);
 
@@ -68,10 +68,17 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
             setFriendRequestList,
             friendList,
             setFriendList,
-			profileId,
-			setProfileId,
+            profileId,
+            setProfileId,
         }),
-        [friendRequestList, setFriendRequestList, friendList, setFriendList, profileId, setProfileId]
+        [
+            friendRequestList,
+            setFriendRequestList,
+            friendList,
+            setFriendList,
+            profileId,
+            setProfileId,
+        ]
     );
 
     return (

@@ -42,7 +42,8 @@
     width: 30px;
     height: 25px; 
     padding: 0;
-    border: none; 
+    border: none;
+    cursor: pointer;
     background-color: transparent;
 }
 

@@ -21,8 +21,8 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     const chatContext = useChatContext();
     const channelContext = useChannelContext();
     const { socket } = useSocketContext();
-	const navigate = useNavigate();
-	const { user } = useAuth();
+    const navigate = useNavigate();
+    const { user } = useAuth();
 
     const handleClose = () => {
         onClose();
@@ -61,12 +61,12 @@ export const OptionsUserList = (props: OptionUserListProps) => {
         const mode = 'Classic';
         // console.log('you invited someone to play: ', target?.username);
         // notify the other user that he has been invited to play
-        socket?.emit('sendInviteToPlay', {targetId, mode});
+        socket?.emit('sendInviteToPlay', { targetId, mode });
         //navigate('/game', { state: { mode: true } });
     };
 
     const handleProfile = () => {
-		navigate(`/profile?id=${target?.id}`);
+        navigate(`/profile?id=${target?.id}`);
         console.log(`Want to see profile of ${target?.username}`);
     };
 
@@ -116,7 +116,8 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 if (target) {
                     socket?.emit('UnbanUser', {
                         targetId: target.id,
-                        channelName: chatContext.conversationInfo?.channel?.name,
+                        channelName:
+                            chatContext.conversationInfo?.channel?.name,
                     });
                 }
                 break;
@@ -124,7 +125,8 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                 if (target) {
                     socket?.emit('UnmuteUser', {
                         targetId: target.id,
-                        channelName: chatContext.conversationInfo?.channel?.name,
+                        channelName:
+                            chatContext.conversationInfo?.channel?.name,
                     });
                 }
                 break;
@@ -145,26 +147,31 @@ export const OptionsUserList = (props: OptionUserListProps) => {
             // 'Block',
         ];
         const choices2: string[] = ['Play with', 'View profile'];
-		const choices3: string[] = ['Ban', 'View Profile'];
+        const choices3: string[] = ['Ban', 'View Profile'];
 
-        if (user && channelContext.isChannelOwner(user.id) && !channelContext.isAdmin()) {
+        if (user && channelContext.isChannelOwner(user.id)) {
             setOptions(['Promote to admin', ...choices]);
         } else if (target && channelContext.isBan(target.id)) {
-			setOptions(choices3);
+            setOptions(choices3);
         } else if (
             target &&
+            user &&
             channelContext.isAdmin() &&
-            !channelContext.isChannelOwner(target.id)
+            !channelContext.isChannelOwner(user.id)
         ) {
             setOptions(choices);
-		} else {
+        } else {
             setOptions(choices2);
         }
     }, [chatContext, channelContext]);
 
     return (
         <Dialog onClose={handleClose} open={open}>
-            <DialogTitle>{target?.username}<br />Choose an option below</DialogTitle>
+            <DialogTitle>
+                {target?.username}
+                <br />
+                Choose an option below
+            </DialogTitle>
             <List sx={{ pt: 0 }}>
                 {' '}
                 {options.map((choice, i) => {
@@ -190,9 +197,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
                                     //If Mute Unmute
                                     handleOptionClick(choice);
                                 }}>
-                                <ListItemText
-                                    primary={choice}
-                                />
+                                <ListItemText primary={choice} />
                             </ListItemButton>
                         </ListItem>
                     );

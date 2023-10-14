@@ -49,10 +49,10 @@ class ChatGateway
                 client.handshake.query.username
             );
             await this.userService.changeStatus(client.id, 'online', this.io);
-            await this.channelService.responsePendingRequest(
-                client,
-                client.handshake.query.username
-            );
+//            await this.channelService.responsePendingRequest(
+ //               client,
+  //              client.handshake.query.username
+   //         );
         }
         this.socket_arr[client.id] = client;
         this.logger.log(

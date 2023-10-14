@@ -10,8 +10,10 @@ import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class ChannelService {
-    constructor(private readonly serviceUtils: UtilsService, 
-        private prisma: PrismaService) {}
+    constructor(
+        private readonly serviceUtils: UtilsService,
+        private prisma: PrismaService
+    ) {}
 
     async unMute(userId: number, channel: any, moderationId: number, io: any) {
         //Delete moderation elem
@@ -29,10 +31,15 @@ export class ChannelService {
                 },
             },
         });
-		this.updateChannel(io, channel.name);
+        this.updateChannel(io, channel.name);
     }
 
-    async muteUser(client: any, targetId: number, channelName: string, io: any) {
+    async muteUser(
+        client: any,
+        targetId: number,
+        channelName: string,
+        io: any
+    ) {
         try {
             const moderation = await this.prisma.managementChannel.create({
                 data: {
@@ -55,7 +62,7 @@ export class ChannelService {
                     },
                 },
             });
-			this.updateChannel(io, channelName);
+            this.updateChannel(io, channelName);
         } catch (error) {
             console.log(error);
         }
@@ -105,7 +112,7 @@ export class ChannelService {
                 },
             });
             io.to(user.socketId).emit('Kicked', channelName);
-			this.updateChannel(io, channelName);
+            this.updateChannel(io, channelName);
         } catch (error) {
             console.log(error);
         }
@@ -143,7 +150,7 @@ export class ChannelService {
                 },
             });
         });
-		this.updateChannel(io, channel.name);
+        this.updateChannel(io, channel.name);
     }
 
     async BanUser(io: Server, targetId: number, channelName: string) {
@@ -183,7 +190,7 @@ export class ChannelService {
                 },
             });
             io.to(user.socketId).emit('Kicked', channel.name);
-			this.updateChannel(io, channel.name);
+            this.updateChannel(io, channel.name);
         } catch (error) {
             console.log(error);
         }
@@ -281,7 +288,7 @@ export class ChannelService {
             console.log(error);
         }
     }
-
+    /*
     async responsePendingRequest(client: any, username: string) {
         const user = await this.prisma.user.findUnique({
             where: {
@@ -300,41 +307,39 @@ export class ChannelService {
             }
         });
         client.emit('InitChannelsRequest', channelReqList);
-    }
+    }*/
 
-	async deleteFromChannel(channelName: string, id: number) {
-		let channel = await this.prisma.channel.update({
-			where: {
-				name: channelName,
-			},
-			include: { members: true },
-			data: {
-				members: {
-					disconnect: { id: id },
-				},
-			},
-		});
-		if (channel.admins.includes(id))
-			channel.admins.splice(channel.admins.indexOf(id), 1);
-		if (channel.owner !== id)
-			return ;
-		if (channel.admins.length > 0) {
-			channel.owner = channel.admins[0];
-		}
-		else if (channel.members.length > 0) {
-			channel.admins.push(channel.members[0].id);
-			channel.owner = channel.members[0].id;
-		}
-		return await this.prisma.channel.update({
-			where: {
-				name: channelName,
-			},
-			data: {
-				owner: channel.owner,
-				admins: channel.admins,
-			}
-		})
-	}
+    async deleteFromChannel(channelName: string, id: number) {
+        const channel = await this.prisma.channel.update({
+            where: {
+                name: channelName,
+            },
+            include: { members: true },
+            data: {
+                members: {
+                    disconnect: { id: id },
+                },
+            },
+        });
+        if (channel.admins.includes(id))
+            channel.admins.splice(channel.admins.indexOf(id), 1);
+        if (channel.owner !== id) return;
+        if (channel.admins.length > 0) {
+            channel.owner = channel.admins[0];
+        } else if (channel.members.length > 0) {
+            channel.admins.push(channel.members[0].id);
+            channel.owner = channel.members[0].id;
+        }
+        return await this.prisma.channel.update({
+            where: {
+                name: channelName,
+            },
+            data: {
+                owner: channel.owner,
+                admins: channel.admins,
+            },
+        });
+    }
 
     async leaveChannel(io, client: any, info: any) {
         try {
@@ -351,7 +356,10 @@ export class ChannelService {
                     members: true,
                 },
             });
-            const channelLeft = await this.deleteFromChannel(info.channelName, user.id);
+            const channelLeft = await this.deleteFromChannel(
+                info.channelName,
+                user.id
+            );
             const leavingUser = await this.prisma.user.update({
                 where: {
                     username: info.user,
@@ -366,11 +374,10 @@ export class ChannelService {
                 },
             });
             client.leave(info.channelName);
-			console.log('channel left: ', channelLeft);
-			if (channelLeft.admins.length === 0)
-				this.deleteChannel(io, client, info.channelName)
-			else
-				this.updateChannel(io, info.channelName);
+            console.log('channel left: ', channelLeft);
+            if (channelLeft.admins.length === 0)
+                this.deleteChannel(io, client, info.channelName);
+            else this.updateChannel(io, info.channelName);
         } catch (error) {
             console.log(error);
         }
@@ -382,8 +389,11 @@ export class ChannelService {
         client_id: string,
         client: any
     ) {
-		if (data_chan.name === "")
-			throw new WsException({func: "channelCreation", msg: "Channel name cannot be empty"})
+        if (data_chan.name === '')
+            throw new WsException({
+                func: 'channelCreation',
+                msg: 'Channel name cannot be empty',
+            });
         try {
             let public_chan = false;
             if (data_chan.type == 'Public') {
@@ -454,89 +464,100 @@ export class ChannelService {
                     members: true,
                 },
             });
-			const info = await this.prisma.managementChannel.findMany({
-				where: {
-					channelName: channel.name
-				},
-				include: {
-					target: true,
-				}
-
-			})
+            const info = await this.prisma.managementChannel.findMany({
+                where: {
+                    channelName: channel.name,
+                },
+                include: {
+                    target: true,
+                },
+            });
             channel.members.map((user) => {
-                io.to(user.socketId).emit('updateChannel', {...channel, info: info});
+                io.to(user.socketId).emit('updateChannel', {
+                    ...channel,
+                    info: info,
+                });
             });
         } catch (error) {
             console.log(error);
         }
     }
     async newChannelMember(io: Server, client: any, info: joinChannelInfo) {
-		const existingChannel = await this.prisma.channel.findUnique({
-			where: {
-				name: info.name,
-			},
-			include: {
-				info: true,
-				members: true,
-			},
-		});
-		const user = await this.prisma.user.findUnique({
-			where: {
-				id: (
-					await this.serviceUtils.findIdFromSocketId(client.id)
-					)[0],
-			},
-		});
-		console.log("info pass: ", info.pass === undefined,"channel pass: ",  existingChannel.password === "","channel member? : ",  existingChannel.members.includes(user))
-		console.log(user, existingChannel.members);
-		if (!existingChannel)
-			throw new WsException({func: "joinChannel", msg: "No such channel"})
-		if (existingChannel.members.findIndex(member => (member.id === user.id)) !== -1)
-			throw new WsException({func: "joinChannel", msg: "You are already in this channel"})
-		if (this.serviceUtils.isBan(user.id, existingChannel)) {
-			throw new WsException({func: "joinChannel", msg: "You are banned"})
-		} else if (!existingChannel.public) {
-			let find = false;
-			if (existingChannel.invited) {
-				for (
-					let i = 0;
-					i < existingChannel.invited.length;
-					i++
-				) {
-					if (existingChannel.invited[i] == user.id) {
-						find = true;
-						break;
-					}
-				}
-			}
-			if (!find) {
-				throw new WsException({func: "joinChannel", msg: "You need an invite"})
-			}
-		} else if (info.pass === undefined && existingChannel.password !== "") {
-			console.log("test 1");
-			client.emit('requestPassword');
-			return;
-		} else if (info.pass !== undefined && info.pass !== existingChannel.password) {
-			console.log("test 2");
-			throw new WsException({func: "joinChannel", msg: "Invalid password"})
-		}
-		const newUpdatedChannel = await this.prisma.channel.update({
-			where: {
-				name: info.name,
-			},
-			data: {
-				members: { connect: { id: user.id } },
-			},
-			include: {
-				members: true,
-			},
-		});
-		client.join(newUpdatedChannel.name);
-		client.emit('successfullyJoinedChannel', newUpdatedChannel);
-		this.updateChannel(io, info.name);
-            
+        const existingChannel = await this.prisma.channel.findUnique({
+            where: {
+                name: info.name,
+            },
+            include: {
+                info: true,
+                members: true,
+            },
+        });
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: (await this.serviceUtils.findIdFromSocketId(client.id))[0],
+            },
+        });
+        if (!existingChannel)
+            throw new WsException({
+                func: 'joinChannel',
+                msg: 'No such channel',
+            });
+        if (
+            existingChannel.members.findIndex(
+                (member) => member.id === user.id
+            ) !== -1
+        )
+            throw new WsException({
+                func: 'joinChannel',
+                msg: 'You are already in this channel',
+            });
+        if (this.serviceUtils.isBan(user.id, existingChannel)) {
+            throw new WsException({
+                func: 'joinChannel',
+                msg: 'You are banned',
+            });
+        } else if (!existingChannel.public) {
+            let find = false;
+            if (existingChannel.invited) {
+                for (let i = 0; i < existingChannel.invited.length; i++) {
+                    if (existingChannel.invited[i] == user.id) {
+                        find = true;
+                        break;
+                    }
+                }
+            }
+            if (!find) {
+                throw new WsException({
+                    func: 'joinChannel',
+                    msg: 'You need an invite',
+                });
+            }
+        } else if (
+            info.pass !== undefined &&
+            info.pass !== existingChannel.password
+        ) {
+            throw new WsException({
+                func: 'joinChannel',
+                msg: 'Invalid password',
+            });
+        }
+        const newUpdatedChannel = await this.prisma.channel.update({
+            where: {
+                name: info.name,
+            },
+            data: {
+                members: { connect: { id: user.id } },
+            },
+            include: {
+                members: true,
+            },
+        });
+        client.join(newUpdatedChannel.name);
+        client.emit('successfullyJoinedChannel', newUpdatedChannel);
+        this.updateChannel(io, info.name);
+
         // } catch (error) {
-			// console.log("error", error.error)
+        // console.log("error", error.error)
         //     throw new WsException(error.error);
         // }
     }
@@ -572,12 +593,12 @@ export class ChannelService {
         }
     }
 
-	async deleteChannel(server: any, client: any, channelName: string) {
-		const channel = await this.prisma.channel.delete({
-			where: {
-				name: channelName,
-			},
-		});
-		server.to(channelName).emit("deleteChannel", channelName);
-	}
+    async deleteChannel(server: any, client: any, channelName: string) {
+        const channel = await this.prisma.channel.delete({
+            where: {
+                name: channelName,
+            },
+        });
+        server.to(channelName).emit('deleteChannel', channelName);
+    }
 }
