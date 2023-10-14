@@ -5,11 +5,7 @@ import { useChatContext } from '../../context/ChatContext';
 import './JoinChannel.css';
 import './ChatPage.css';
 
-function JoinChannelDropdown({
-    requestPassword,
-    joinChannel,
-    friendError,
-}: any) {
+function JoinChannelDropdown({ joinChannel, friendError }: any) {
     return (
         <div className="chat-dropdown-joinmenu">
             <form onSubmit={joinChannel}>
@@ -137,7 +133,6 @@ export const JoinChannel = ({
             </button>
             {open === 'joinChannel' ? (
                 <JoinChannelDropdown
-                    requestPassword={requestPassword}
                     joinChannel={joinChannel}
                     friendError={friendError}
                 />
