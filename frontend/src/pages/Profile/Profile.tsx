@@ -28,6 +28,13 @@ type GameType = {
 	mode: string;
 };
   
+
+type AchievementType = {
+	name: string;
+	description: string;
+	icon: string;
+};
+
 const Profile = () => {
 
 	const { user, setUser, refreshFetch } = useAuth();
@@ -37,14 +44,13 @@ const Profile = () => {
 	const [usernameError, setUsernameError] = useState<string | null>(null);
 	const [codeError, setCodeError] = useState<string | null>(null);
 	const [searchParams] = useSearchParams();
-	const [currentUser, setCurrentUser] = useState<{id: number, username: string, avatar: string, matchHistory: GameType[], elo: number} | null>(null);
+	const [currentUser, setCurrentUser] = useState<{id: number, username: string, avatar: string, matchHistory: GameType[], elo: number, achievements: AchievementType[]} | null>(null);
 	const navigate = useNavigate();
 	const run = useRef(true);
 
 	// useEffect(() => {
 	// 	run.current = true;
 	// }, [searchParams.get("id")])
-
 
 
 	useEffect(() => {
@@ -92,10 +98,15 @@ const Profile = () => {
 				<div className="search-profile">
 					<form onSubmit={GetUserProfile}>
 							<label>
-								Username: <input type="text" name="username" />
+								<h4>Consult a profile :</h4>
+								<input 
+									className='user-input-new'
+									placeholder="Enter a username"
+									type="text"
+									name="username"/>
 							</label>
 							<h5>{socketError?.func === "getProfileId" ? socketError.msg : null}</h5>
-							<button type="submit">View Profile</button>
+							<button className='submit-button-new' type="submit">View Profile</button>
 					</form>
 				</div>
 			</>
@@ -281,11 +292,36 @@ const Profile = () => {
 					</div>
 					<ul>
 					{currentUser?.matchHistory && currentUser.matchHistory.map(game => (
-						<li key={game.id} className='match-history'>
-						Opponent : {game.winner.username === currentUser?.username ? game.loser.username : game.winner.username} - 
-						{game.winner.username === currentUser?.username ? 'Win' : 'Loss'} -
-						Score : {game.winnerScore} - {game.loserScore} - 
-						Game Mode : {game.mode}
+						<li key={game.id} className='match'>
+							<div className='game-outcome'>
+								<h4> {game.winner.username === currentUser?.username ? ' Won' : ' Lost'} against :</h4>
+							</div>
+							<div className='game-opponent'>
+								<h4>{game.winner.username === currentUser?.username ? game.loser.username : game.winner.username}</h4>
+							</div>
+							<div className='game-score'>
+								<h4>{game.winnerScore} - {game.loserScore}</h4>
+							</div>
+							<div className='game-mode'>
+								<h4>{game.mode} game</h4>
+							</div>
+						</li>
+					))}
+					</ul>
+				</div>
+				<div className='achievements'>
+					<h2>Achievements</h2>
+					<ul>
+					{currentUser?.achievements && currentUser.achievements.map(achievement => (
+						<li key={achievement.name} className='achievement'>
+							<img className='achievement-icon' 
+								src={achievement.icon} width={50} height={50} />
+							<div className='achievement-name'>
+								<h4>{achievement.name}</h4>
+							</div>
+							<div className='achievement-description'>
+								<h4>{achievement.description}</h4>
+							</div>
 						</li>
 					))}
 					</ul>
@@ -336,19 +372,22 @@ const Profile = () => {
 	return (
 		<>
 			<Navbar/>
-			<div className='logo-profile'>
-				<img src='https://i.imgur.com/2xFFdd3.png' className='logo-profile-size'></img>
+			<div className='profile-title'>
+				<div className='logo-profile'>
+					<img src='https://i.imgur.com/2xFFdd3.png' className='logo-profile-size'></img>
+				</div>
+				<UserProfileForm />
 			</div>
-			<div className='left-profile'>
-				<DisplayAvatar img={currentUser?.avatar} />
-				<ChangeAvatar />
-				<DisplayUsername username={currentUser.username} />
-				<ChangeUsernameForm />
-				<DisplayActivate2fa />
+			<div className='profile-wrapper'>
+				<div className='left-profile'>
+					<DisplayAvatar img={currentUser?.avatar} />
+					<ChangeAvatar />
+					<DisplayUsername username={currentUser.username} />
+					<ChangeUsernameForm />
+					<DisplayActivate2fa />
+				</div>
+				<MatchHistoryDisplay />
 			</div>
-			<MatchHistoryDisplay />
-			<UserProfileForm />
-			
 		</>
 	);
 };
