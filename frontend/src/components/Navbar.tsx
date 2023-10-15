@@ -43,15 +43,21 @@ const Navbar = () => {
 				</div>
 			</div>
 			<div className="nav-right">
-				<div className="img-avatar">
-                    <img
-                        className="contact-image"
-                        src={useAuth().user?.avatar}
-                    />
-                </div>
-                <div className="username-navbar">{useAuth().user?.username}</div>
 				<div className={user && user?.friendsRequest.length > 0 ? "friends-notif-on" : "friends-notif"}>
 					<First></First>
+				</div>
+				<div className='nav-user-display'>
+					<div className="img-avatar">
+						<img
+							className="contact-image"
+							src={user?.avatar}
+						/>
+					</div>
+					<div className="username-navbar">
+						<h4>{user && user?.username.length > 10
+							? user?.username.substring(10, 0) + "..."
+							: user?.username}</h4>
+					</div>
 				</div>
 				<div className="logout-button">
 					<button className="button" onClick={logout}>

@@ -14,9 +14,16 @@ li{
 .nav-left, .nav-right {
     display: flex;
     align-items: center;
-    gap: 17px;
+    gap: 25px;
     justify-content: flex-start;
     flex-wrap: wrap;
+}
+
+.nav-user-display {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
 }
 
 .nav-home{
@@ -67,7 +74,7 @@ a{
 
 .friends-notif button {
     color: white;
-    border: 0px solid #775d85;
+    border: 2px transparent;
     border-radius:30px;
     padding: 3px 7px;
     cursor: pointer;
@@ -86,7 +93,7 @@ a{
     color: white;
     border: 2px solid #775d85;
     border-radius:30px;
-    padding: 5px 20px;
+    padding: 3px 7px;
     cursor: pointer;
 	will-change: filter;
     filter: contrast(2) brightness(2);
@@ -94,6 +101,13 @@ a{
     background: transparent;
 	animation: glow-notif 1s ease-in-out infinite alternate;
 }
+
+.friends-notif-on button:hover{
+    color: white;
+    background-color: #775d85;
+    filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
+}
+
 @keyframes glow-notif {
   from {
 	filter: contrast(1) brightness(2.25);
