@@ -147,7 +147,7 @@ const Profile = () => {
 							<label>
 								<input 
 									className='user-input-new'
-									placeholder="Enter a username"
+									placeholder="  enter a username"
 									type="text"
 									name="username"/>
 							</label>

@@ -49,7 +49,7 @@ const Navbar = () => {
                         src={useAuth().user?.avatar}
                     />
                 </div>
-                <div className="username-navbar">{useAuth().user?.username}</div>
+                <h4 className="username-navbar">{useAuth().user?.username}</h4>
 				<div className={user && user?.friendsRequest.length > 0 ? "friends-notif-on" : "friends-notif"}>
 					<First></First>
 				</div>
