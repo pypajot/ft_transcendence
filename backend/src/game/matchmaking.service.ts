@@ -32,7 +32,7 @@ const hardcoreGameConfig: GameConfiguration = {
   paddleWidth: 10,
   paddleHeight: 45,
   paddleMoveSpeed: 12,
-  goalLimit: 1,
+  goalLimit: 10,
 };
 
 @Injectable()

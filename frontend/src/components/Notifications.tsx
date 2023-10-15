@@ -75,7 +75,7 @@ export const First = () => {
   return (
     <div className="dropdown"  ref={dropdownRef}>
       <button onClick={handleOpen}>
-		<img src="https://i.imgur.com/R0m4Bfy.png" className="friend-request-logo"></img>
+		<img src="src/assets/friend-request.png" className="friend-request-logo"></img>
 	  </button>
       {open ? (
         <FriendRequestList />
