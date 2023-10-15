@@ -46,12 +46,12 @@ export const First = () => {
 			</h4>
 			<div>
 				<img
-					src="https://i.imgur.com/mcvzebj.png"
+					src="https://i.imgur.com/S2a3Zn9.png"
 					onClick={() => AcceptFriendRequest(friend.id, true)} />
 			</div>
 			<div>
 				<img
-					src="https://clipart-library.com/images/yikroKr4T.png"
+					src="https://i.imgur.com/ZhQ6mZL.png"
 					onClick={() => AcceptFriendRequest(friend.id, false)} />
 			</div>
 		</div>

@@ -3,9 +3,9 @@ import { useChatContext } from '../../context/ChatContext';
 import './ContactElement.css';
 
 const statusIcon = {
-    online: '\u{1F7E2}',
-    offline: '\u{1F534}',
-    ingame: '\u{1F3AE}',
+    online: <img src='https://i.imgur.com/4xHiH5S.png' className='online-button'></img>,
+    offline: <img src='https://i.imgur.com/MqO4Ymr.png' className='online-button'></img>,
+    ingame: <img src='https://i.imgur.com/wNqOZav.png' className='online-button'></img>,
 };
 
 export const ContactElement = ({ info }: { info: ConversationInformation }) => {
