@@ -25,7 +25,7 @@ const CreateNewConvDropdown: React.FC<ConvDropDownProps> = ({ setOpen } : any) =
     }, [socket]);
 
     return (
-        <div className={'chat-dropdown-menu'}>
+        <div className={'create-conv-dropdown-menu'}>
             <form onSubmit={channelCreation}>
                 <div>
                     <h4>Create new Channel</h4>
@@ -55,6 +55,7 @@ const CreateNewConvDropdown: React.FC<ConvDropDownProps> = ({ setOpen } : any) =
                         placeholder="Enter a Channel Password"
                     />
                 </div>
+                <div className='chat-error'></div>
                 <button className='chat-submit-button' type="submit">Create!</button>
             </form>
         </div>
