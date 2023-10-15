@@ -109,7 +109,7 @@
 .avatar-div{
 	display: flex;
 	justify-content: center;
-	padding-bottom: 1%;
+	padding-bottom: 2%;
 }
 
 .avatar-dimensions{
@@ -119,6 +119,7 @@
 .avatar-button-div{
 	display: flex;
 	justify-content: center;
+	padding-bottom: 3%;
 }
 
 .avatar-button{
@@ -146,7 +147,7 @@
 .div-submit-button-new{
 	display: flex;
 	justify-content: center;
-	padding-top: 2%;
+	padding-top: 5%;
 }
 
 .user-input-new{
@@ -162,7 +163,7 @@
 .submit-button-new-div{
 	display: flex;
 	justify-content: center;
-	padding-top: 8px;
+	padding-top: 2%;
 }
 
 .submit-button-new {
@@ -185,8 +186,7 @@
 
 
 .fa-div{
-	padding-top: 3%;
-	padding-bottom: 3%;
+	padding-top: 14%;
 }
 
 .match-img{

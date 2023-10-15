@@ -46,12 +46,12 @@ export const First = () => {
 			</h4>
 			<div>
 				<img
-					src="https://i.imgur.com/mcvzebj.png"
+					src="https://i.imgur.com/S2a3Zn9.png"
 					onClick={() => AcceptFriendRequest(friend.id, true)} />
 			</div>
 			<div>
 				<img
-					src="https://clipart-library.com/images/yikroKr4T.png"
+					src="https://i.imgur.com/ZhQ6mZL.png"
 					onClick={() => AcceptFriendRequest(friend.id, false)} />
 			</div>
 		</div>
@@ -74,7 +74,9 @@ export const First = () => {
 
   return (
     <div className="dropdown"  ref={dropdownRef}>
-      <button onClick={handleOpen}>Friend Requests</button>
+      <button onClick={handleOpen}>
+		<img src="https://i.imgur.com/R0m4Bfy.png" className="friend-request-logo"></img>
+	  </button>
       {open ? (
         <FriendRequestList />
       ) : null}
