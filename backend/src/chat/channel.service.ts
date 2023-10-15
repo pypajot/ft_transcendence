@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, MisdirectedException } from '@nestjs/common';
 import { UtilsService } from './utills.service';
 import { Channel } from 'src/types/interfacesList';
 import { Server, Socket } from 'socket.io';
@@ -210,6 +210,8 @@ export class ChannelService {
             });
             if (!channel.invited) {
                 channel.invited = [user.id];
+            } else if (channel.invited.includes(user.id)) {
+                return;
             }
             const updatedChannel = await this.prisma.channel.update({
                 where: {
@@ -226,6 +228,10 @@ export class ChannelService {
                 name: updatedChannel.name,
                 member: this.serviceUtils.getChannelMember(updatedChannel),
             };
+            io.to(user.socketId).emit(
+                'updateInvited',
+                await this.serviceUtils.listAllInvitedChannel(user.id)
+            );
             io.to(user.socketId).emit('joinRequest', res);
         } catch (error) {
             console.log(error);
@@ -375,7 +381,11 @@ export class ChannelService {
             });
             client.leave(info.channelName);
             console.log('channel left: ', channelLeft);
-            if (channelLeft.admins.length === 0)
+            if (
+                channelLeft &&
+                channelLeft.admins &&
+                channelLeft.admins.length === 0
+            )
                 this.deleteChannel(io, client, info.channelName);
             else this.updateChannel(io, info.channelName);
         } catch (error) {
@@ -389,59 +399,63 @@ export class ChannelService {
         client_id: string,
         client: any
     ) {
-		if (data_chan.name === "")
-			throw new WsException({func: "channelCreation", msg: "Channel name cannot be empty"})
-		let public_chan = false;
-		if (data_chan.type == 'Public') {
-			public_chan = true;
-		}
-		const existingChannel = await this.prisma.channel.findUnique({
-			where: {
-				name: data_chan.name,
-			},
-		});
-		const user = await this.prisma.user.findUnique({
-			where: {
-				id: (
-					await this.serviceUtils.findIdFromSocketId(client_id)
-				)[0],
-			},
-		});
-		if (existingChannel) {
-			throw new WsException({func: "channelCreation", msg: "Channel name alreay taken"})
-		} else {
-			const moderation = await this.prisma.managementChannel.create({
-				data: {
-					type: 'init',
-					target: {
-						connect: { id: user.id },
-					},
-				},
-			});
-			const newchannel = await this.prisma.channel.create({
-				data: {
-					name: data_chan.name,
-					owner: user.id,
-					members: {
-						connect: { id: user.id },
-					},
-					public: public_chan,
-					password: data_chan.pwd,
-					invited: [],
-					admins: [user.id],
-					info: {
-						connect: { id: moderation.id },
-					},
-				},
-				include: {
-					members: true,
-					info: true,
-				},
-			});
-			client.join(data_chan.name);
-			console.log(newchannel);
-			client.emit('successfullyJoinedChannel', newchannel);
-		}
+        if (data_chan.name === '')
+            throw new WsException({
+                func: 'channelCreation',
+                msg: 'Channel name cannot be empty',
+            });
+        let public_chan = false;
+        if (data_chan.type == 'Public') {
+            public_chan = true;
+        }
+        const existingChannel = await this.prisma.channel.findUnique({
+            where: {
+                name: data_chan.name,
+            },
+        });
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: (await this.serviceUtils.findIdFromSocketId(client_id))[0],
+            },
+        });
+        if (existingChannel) {
+            throw new WsException({
+                func: 'channelCreation',
+                msg: 'Channel name alreay taken',
+            });
+        } else {
+            const moderation = await this.prisma.managementChannel.create({
+                data: {
+                    type: 'init',
+                    target: {
+                        connect: { id: user.id },
+                    },
+                },
+            });
+            const newchannel = await this.prisma.channel.create({
+                data: {
+                    name: data_chan.name,
+                    owner: user.id,
+                    members: {
+                        connect: { id: user.id },
+                    },
+                    public: public_chan,
+                    password: data_chan.pwd,
+                    invited: [],
+                    admins: [user.id],
+                    info: {
+                        connect: { id: moderation.id },
+                    },
+                },
+                include: {
+                    members: true,
+                    info: true,
+                },
+            });
+            client.join(data_chan.name);
+            console.log(newchannel);
+            client.emit('successfullyJoinedChannel', newchannel);
+        }
     }
 
     async updateChannel(io: Server, channel_name) {
@@ -473,68 +487,90 @@ export class ChannelService {
         }
     }
     async newChannelMember(io: Server, client: any, info: joinChannelInfo) {
-		const existingChannel = await this.prisma.channel.findUnique({
-			where: {
-				name: info.name,
-			},
-			include: {
-				info: true,
-				members: true,
-			},
-		});
-		const user = await this.prisma.user.findUnique({
-			where: {
-				id: (
-					await this.serviceUtils.findIdFromSocketId(client.id)
-					)[0],
-			},
-		});
-		if (!existingChannel)
-			throw new WsException({func: "joinChannel", msg: "No such channel"})
-		if (existingChannel.members.findIndex(member => (member.id === user.id)) !== -1)
-			throw new WsException({func: "joinChannel", msg: "You are already in this channel"})
-		if (this.serviceUtils.isBan(user.id, existingChannel)) {
-			throw new WsException({func: "joinChannel", msg: "You are banned"})
-		} else if (!existingChannel.public) {
-			let find = false;
-			if (existingChannel.invited) {
-				for (
-					let i = 0;
-					i < existingChannel.invited.length;
-					i++
-				) {
-					if (existingChannel.invited[i] == user.id) {
-						find = true;
-						break;
-					}
-				}
-			}
-			if (!find) {
-				throw new WsException({func: "joinChannel", msg: "You need an invite"})
-			}
-		} else if (info.pass === undefined && existingChannel.password !== "") {
-			console.log("test 1");
-			client.emit('requestPassword');
-			return;
-		} else if (info.pass !== undefined && info.pass !== existingChannel.password) {
-			console.log("test 2");
-			throw new WsException({func: "joinChannel", msg: "Invalid password"})
-		}
-		const newUpdatedChannel = await this.prisma.channel.update({
-			where: {
-				name: info.name,
-			},
-			data: {
-				members: { connect: { id: user.id } },
-			},
-			include: {
-				members: true,
-			},
-		});
-		client.join(newUpdatedChannel.name);
-		client.emit('successfullyJoinedChannel', newUpdatedChannel);
-		this.updateChannel(io, info.name);
-            
+        const existingChannel = await this.prisma.channel.findUnique({
+            where: {
+                name: info.name,
+            },
+            include: {
+                info: true,
+                members: true,
+            },
+        });
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: (await this.serviceUtils.findIdFromSocketId(client.id))[0],
+            },
+        });
+        if (!existingChannel)
+            throw new WsException({
+                func: 'joinChannel',
+                msg: 'No such channel',
+            });
+        if (
+            existingChannel.members.findIndex(
+                (member) => member.id === user.id
+            ) !== -1
+        )
+            throw new WsException({
+                func: 'joinChannel',
+                msg: 'You are already in this channel',
+            });
+        if (this.serviceUtils.isBan(user.id, existingChannel)) {
+            throw new WsException({
+                func: 'joinChannel',
+                msg: 'You are banned',
+            });
+        } else if (!existingChannel.public) {
+            let find = false;
+            if (existingChannel.invited) {
+                existingChannel.invited = existingChannel.invited.filter(
+                    (id) => {
+                        if (id == user.id) {
+                            find = true;
+                            return false;
+                        }
+                        return true;
+                    }
+                );
+            }
+            if (!find) {
+                throw new WsException({
+                    func: 'joinChannel',
+                    msg: 'You need an invite',
+                });
+            }
+        } else if (info.pass === undefined && existingChannel.password !== '') {
+            client.emit('requestPassword');
+            return;
+        } else if (
+            info.pass !== undefined &&
+            info.pass !== existingChannel.password
+        ) {
+            throw new WsException({
+                func: 'joinChannel',
+                msg: 'Invalid password',
+            });
+        }
+        const newUpdatedChannel = await this.prisma.channel.update({
+            where: {
+                name: info.name,
+            },
+            data: {
+                invited: existingChannel.invited,
+                members: { connect: { id: user.id } },
+            },
+            include: {
+                members: true,
+            },
+        });
+        client.join(newUpdatedChannel.name);
+        client.emit('successfullyJoinedChannel', newUpdatedChannel);
+        this.updateChannel(io, info.name);
+        client.emit(
+            'updateInvited',
+            await this.serviceUtils.listAllInvitedChannel(user.id)
+        );
+
         // } catch (error) {
         // console.log("error", error.error)
         //     throw new WsException(error.error);

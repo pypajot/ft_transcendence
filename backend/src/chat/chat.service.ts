@@ -7,24 +7,26 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ChatGatewayService {
-    constructor(private readonly utilsService: UtilsService,
-        private prisma: PrismaService) {}
+    constructor(
+        private readonly utilsService: UtilsService,
+        private prisma: PrismaService
+    ) {}
     private readonly logger = new Logger(ChatGatewayService.name);
 
-	async getChannelsWithMod(channel_name: string) {
-		const channel = await this.prisma.channel.findUnique({
-			where: {name: channel_name},
-			include: {members: true}
-		})
-		const info = await this.prisma.managementChannel.findMany({
-			where: {channelName: channel.name},
-			include: {target: true}
-		})
-		return {
-			...channel,
-			info: info
-		}
-	}
+    async getChannelsWithMod(channel_name: string) {
+        const channel = await this.prisma.channel.findUnique({
+            where: { name: channel_name },
+            include: { members: true },
+        });
+        const info = await this.prisma.managementChannel.findMany({
+            where: { channelName: channel.name },
+            include: { target: true },
+        });
+        return {
+            ...channel,
+            info: info,
+        };
+    }
 
     async requestFriends(io: Server, socket_id, userToAdd: string) {
         try {
@@ -202,10 +204,14 @@ export class ChatGatewayService {
             for (let i = 0; i < chatUser.channels.length; i++) {
                 client.join(chatUser.channels[i].name);
                 channelArr.push(
-					await this.getChannelsWithMod(chatUser.channels[i].name)
+                    await this.getChannelsWithMod(chatUser.channels[i].name)
                 );
             }
             client.emit('InitChannels', channelArr);
+            client.emit(
+                'updateInvited',
+                await this.utilsService.listAllInvitedChannel(chatUser.id)
+            );
         } catch (error) {
             console.log(error);
         }

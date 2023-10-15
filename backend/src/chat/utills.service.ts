@@ -3,6 +3,7 @@ import { Client_elem } from 'src/types/client.entity';
 import { User } from 'src/types/interfacesList';
 import { ChannelService } from './channel.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { channel } from 'diagnostics_channel';
 
 @Injectable()
 export class UtilsService {
@@ -128,17 +129,29 @@ export class UtilsService {
                         ) {
                             res = true;
                         } else {
-                            this.unMute(
-                                userId,
-                                channel,
-                                elem.id
-                            );
+                            this.unMute(userId, channel, elem.id);
                         }
                     }
                 }
             });
         }
         console.log(`Thweree : ${res}`);
+        return res;
+    }
+
+    async listAllInvitedChannel(userId: number) {
+        const channels = await this.prisma.channel.findMany({});
+
+        const res: any = [];
+        channels.map((map_channel) => {
+            map_channel.invited.map((id) => {
+                if (id == userId) {
+                    res.push(map_channel);
+                }
+            });
+        });
+        console.log('cool');
+        console.log(res);
         return res;
     }
 }
