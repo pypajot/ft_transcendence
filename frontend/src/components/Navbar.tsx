@@ -43,19 +43,19 @@ const Navbar = () => {
 				</div>
 			</div>
 			<div className="nav-right">
-				<div className={user && user?.friendsRequest.length > 0 ? "friends-notif-on" : "friends-notif"}>
-					<First></First>
-				</div>
 				<div className="img-avatar">
                     <img
                         className="contact-image"
                         src={useAuth().user?.avatar}
                     />
                 </div>
-                <div className="username">{useAuth().user?.username}</div>
+                <div className="username-navbar">{useAuth().user?.username}</div>
+				<div className={user && user?.friendsRequest.length > 0 ? "friends-notif-on" : "friends-notif"}>
+					<First></First>
+				</div>
 				<div className="logout-button">
 					<button className="button" onClick={logout}>
-						Logout
+						<img src='https://i.imgur.com/lw3OcoM.png' className='logout-logo'></img>
 					</button>
 				</div>
 			</div>

@@ -66,19 +66,23 @@ a{
 }
 
 .friends-notif button {
-    font-size: 15px;
     color: white;
-    border: 2px solid #775d85;
+    border: 0px solid #775d85;
     border-radius:30px;
-    padding: 5px 20px;
+    padding: 3px 7px;
     cursor: pointer;
     filter: drop-shadow(0 0 15px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
     transition: .5s;
     background: transparent;
 }
 
+.friends-notif button:hover{
+    color: white;
+    background-color: #775d85;
+    filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
+}
+
 .friends-notif-on button {
-	font-size: 15px;
     color: white;
     border: 2px solid #775d85;
     border-radius:30px;
@@ -97,4 +101,14 @@ a{
   to {
 	filter: contrast(4) brightness(2);
   }
+}
+
+.username-navbar{
+    display: flex;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.logout-logo{
+    width: 16px;
 }
