@@ -11,7 +11,6 @@ const Game : React.FC = () => {
 	const location = useLocation();
 	
 	useEffect(() => {
-		console.log ('comp mount : game start set to false');
 		setGameStart(false);
 	}, []);
 	// we use location to check if the user is coming from the chat invite
@@ -20,11 +19,9 @@ const Game : React.FC = () => {
 	useEffect(() => {
 		console.log ('location changed');
 		if (sessionStorage.getItem('gameInProgress') !== 'true' && location?.state) {
-			console.log ('set game start to true');
 			setGameStart(true);
 		} 
 		else { 
-			console.log ('set game start to false');
 			setGameStart(false);
 		}
 	}, [location]);

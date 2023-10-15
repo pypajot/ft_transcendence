@@ -161,10 +161,10 @@ const PongGame : React.FC = () => {
                 {gameState && (
                     <>
                         <div className="score">
-                            {userName1}: {gameState.player1Score}
+                            <h4>{userName1.length > 10 ? userName1.substring(10, 0) + "..." : userName1} : {gameState.player1Score}</h4>
                         </div>
                         <div className="score">
-                            {userName2}: {gameState.player2Score}
+                            <h4>{userName2.length > 10 ? userName2.substring(10, 0) + "..." : userName2} : {gameState.player2Score}</h4>
                         </div>
                     </>
                 )}

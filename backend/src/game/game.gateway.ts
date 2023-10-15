@@ -457,7 +457,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('locationChange')
     handleLocationChange(client: Socket, location: any): void {
-        console.log('user goes to : ', location.pathname);
         // Check if a player was in a queue
         const player = this.matchmakingService.findPlayerBySocketId(client.id);
         if (player) {

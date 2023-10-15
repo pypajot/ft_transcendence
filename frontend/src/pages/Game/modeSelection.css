@@ -1,7 +1,7 @@
 .choice{
     display: flex;
     justify-content: center;
-    padding-top: 5%;
+    padding-top: 3%;
 }
 
 .choice-img{
@@ -22,8 +22,8 @@
     justify-content: space-around;
     margin-left: 30%;
     margin-right: 30%;
-    padding-top: 6%;
-    padding-bottom: 8%;
+    padding-top: 3%;
+    padding-bottom: 3%;
 }
 
 .choose-button{
@@ -42,4 +42,12 @@
     color: white;
     background-color: #775d85;
     filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
+}
+
+.loading-message {
+    height : 20px;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 5%;
+    filter: drop-shadow(0 0 15px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
 }

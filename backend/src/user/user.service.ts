@@ -32,8 +32,6 @@ export class UserService {
 			throw new BadRequestException('Invalid user id');
 		const matchHistory = await this.getMatchHistory(Number(params.id));
         const achievements = await this.getAchievements(Number(params.id));
-        console.log('your achievements : ', achievements);
-        console.log('your match history : ', matchHistory);
 		const elo = await this.getElo(Number(params.id), user.wins, user.losses);
         return {
             ...user,
