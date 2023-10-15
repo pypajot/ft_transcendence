@@ -29,6 +29,8 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
     const [friendList, setFriendList] = useState<User[]>([]);
     const [profileId, setProfileId] = useState<number>(0);
 
+    ///    function check_empty
+
     useEffect(() => {
         if (!socket) return;
         if (!user) {
