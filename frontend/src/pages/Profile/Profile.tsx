@@ -56,7 +56,7 @@ const Profile = () => {
 
 	useEffect(() => {
 		const getCurrentUser = async (id: string | null) => {
-			const response = await refreshFetch('http://localhost:3333/user/' + id, {
+			const response = await refreshFetch('http://localhost:3333/api/user/' + id, {
 				headers: {
 					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
@@ -163,7 +163,7 @@ const Profile = () => {
 		e.preventDefault();
 		setCodeError(null);
 		console.log(e.target.code.value);
-		const response = await refreshFetch('http://localhost:3333/auth/2fa/confirm', {
+		const response = await refreshFetch('http://localhost:3333/api/auth/2fa/confirm', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -258,7 +258,7 @@ const Profile = () => {
 	}
 
 	const activate2FA = async () => {
-		await refreshFetch('http://localhost:3333/auth/2fa/activate', {
+		await refreshFetch('http://localhost:3333/api/auth/2fa/activate', {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',

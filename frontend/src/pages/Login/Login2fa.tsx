@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import HelperText from "../../components/HelperText";
 import "./Login.css"
 
 function Login2fa() {
@@ -10,7 +9,7 @@ function Login2fa() {
   async function HandleSubmit(e: any) {
     e.preventDefault();
 	setCodeError(null);
-    const response = await fetch("http://localhost:3333/auth/2fa/login", {
+    const response = await fetch("http://localhost:3333/api/auth/2fa/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

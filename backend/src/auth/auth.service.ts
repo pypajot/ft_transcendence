@@ -46,6 +46,8 @@ export class AuthService {
 	public background = "";
 
     async signup(dto: AuthDto, res: any) {
+		if (dto.username.indexOf(' ') !== -1)
+			throw new BadRequestException('Username cannot contain spaces')
         const hash = await argon2.hash(dto.password);
         try {
             const user = await this.prisma.user.create({
@@ -107,7 +109,7 @@ export class AuthService {
             client_id: process.env.INTRA_USER,
             client_secret: process.env.INTRA_SECRET,
             code: code,
-            redirect_uri: 'http://localhost:5173/intralogin',
+            redirect_uri: `http://localhost:${process.env.REACT_APP_PORT}/intralogin`,
         };
         let time = '300s';
         const response = await firstValueFrom(

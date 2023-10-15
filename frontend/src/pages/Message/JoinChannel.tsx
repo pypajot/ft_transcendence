@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { ConversationInformation } from '../../../Types/conversationInformation.entity';
 import { useChatContext } from '../../context/ChatContext';
@@ -48,7 +48,6 @@ export const JoinChannel = ({
     friendError,
     setFriendError,
 }: any) => {
-    const [requestPassword, setReqPassword] = useState(true);
     const { socket, setSocketError } = useSocketContext();
     const { setConversationInfo } = useChatContext();
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -88,10 +87,6 @@ export const JoinChannel = ({
         });
     };
 
-    const handleReqPassword = () => {
-        setReqPassword(true);
-    };
-
     const enterConversation = (arg: any) => {
         const convInfo: ConversationInformation = {
             isChannel: true,
@@ -102,10 +97,8 @@ export const JoinChannel = ({
     };
 
     useEffect(() => {
-        socket?.on('requestPassword', handleReqPassword);
         socket?.on('successfullyJoinedChannel', enterConversation);
         return () => {
-            socket?.off('requestPassword', handleReqPassword);
             socket?.off('successfullyJoinedChannel', enterConversation);
         };
     }, [socket]);

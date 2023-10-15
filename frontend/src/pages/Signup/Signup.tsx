@@ -2,7 +2,6 @@ import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import "./Signup.css";
 import { useState } from "react";
-import HelperText from "../../components/HelperText";
 
 const Signup = () => {
   const { setAccessToken } = useAuth();
@@ -20,7 +19,7 @@ const Signup = () => {
       password: formData.get("password"),
     };
     const body = JSON.stringify(formBody);
-    const response = await fetch("http://localhost:3333/auth/signup", {
+    const response = await fetch("http://localhost:3333/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: body,
@@ -87,7 +86,7 @@ const Signup = () => {
 					</Link>
 				</div>
 				<div className='login42'>
-					<a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3aaed99808e42f414bc3012769d17d2df75acba4efc662238fb0e9ad81b91339&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fintralogin&response_type=code">
+					<a href={`https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3aaed99808e42f414bc3012769d17d2df75acba4efc662238fb0e9ad81b91339&redirect_uri=http%3A%2F%2Flocalhost%3A${process.env.REACT_APP_PORT}%2Fintralogin&response_type=code`}>
 							<button className="signup-button42">
 									42 login
 							</button>

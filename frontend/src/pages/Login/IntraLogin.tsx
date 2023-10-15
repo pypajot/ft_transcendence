@@ -19,7 +19,7 @@ function IntraLogin() {
 				navigate("/landing");
 				return ;
 			}
-			const response = await fetch("http://localhost:3333/auth/intralogin", {
+			const response = await fetch("http://localhost:3333/api/auth/intralogin", {
 				method: "POST",
 				headers: { "Content-type" : "application/json" },
 				body: JSON.stringify({ "code": searchParams.get("code")}),

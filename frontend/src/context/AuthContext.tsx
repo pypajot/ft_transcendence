@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     useEffect(() => {
         const getCurrentUser = async () => {
             const response = await refreshFetch(
-                'http://localhost:3333/user/me',
+                'http://localhost:3333/api/user/me',
                 {
                     headers: {
                         Authorization: `Bearer ${sessionStorage.getItem(
@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const refreshFetch = async (address: any, params?: any) => {
         let response = await fetch(address, params);
         if (response.ok) return response;
-        response = await fetch('http://localhost:3333/auth/refresh', {
+        response = await fetch('http://localhost:3333/api/auth/refresh', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const logout = async () => {
         try {
-            await refreshFetch('http://localhost:3333/auth/logout', {
+            await refreshFetch('http://localhost:3333/api/auth/logout', {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${sessionStorage.getItem(

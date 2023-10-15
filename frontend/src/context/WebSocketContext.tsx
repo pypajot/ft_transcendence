@@ -35,7 +35,7 @@ export default function SocketContextProvider(
     const [token, setToken] = useState<string | null>(null);
 
     const refresh = async () => {
-        const response = await fetch('http://localhost:3333/auth/refresh', {
+        const response = await fetch('http://localhost:3333/api/auth/refresh', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ export default function SocketContextProvider(
 
     useEffect(() => {
         if (!user) return;
-		const newSocket = io('http://localhost:3333/', {
+		const newSocket = io('http://localhost:3333/api/', {
             reconnectionDelay: 3000,
             query: {
                 token: sessionStorage.getItem('access_token'),
