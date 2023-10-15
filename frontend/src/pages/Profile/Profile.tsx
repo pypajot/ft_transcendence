@@ -143,8 +143,8 @@ const Profile = () => {
 			<>
 				<div className="search-profile">
 					<form onSubmit={GetUserProfile}>
+						<div className='input-ctn'>
 							<label>
-								<h4>Consult a profile :</h4>
 								<input 
 									className='user-input-new'
 									placeholder="Enter a username"
@@ -152,6 +152,7 @@ const Profile = () => {
 									name="username"/>
 							</label>
 							<h5>{socketError?.func === "getProfileId" ? socketError.msg : null}</h5>
+						</div>
 							<button className='submit-button-new' type="submit">View Profile</button>
 					</form>
 				</div>
@@ -272,12 +273,11 @@ const Profile = () => {
 	function MatchHistoryDisplay() {
 		return (
 		  <div className='match-history'>
+			<UserProfileForm/>
 			<img src='https://i.imgur.com/bZsILPR.png' className='match-img'></img>
 			<div className='stats'>
 				<div className='game-stats'>
-					<div className='elo'>
-						<h2>ELO : {currentUser?.elo}</h2>
-					</div>
+					<h2>ELO : {currentUser?.elo}</h2>
 					<ul>
 					{currentUser?.matchHistory && currentUser.matchHistory.map(game => (
 						<li key={game.id} className='match'>
@@ -357,7 +357,6 @@ const Profile = () => {
 				<div className='logo-profile'>
 					<img src='https://i.imgur.com/2xFFdd3.png' className='logo-profile-size'></img>
 				</div>
-				<UserProfileForm />
 			</div>
 			<div className='profile-wrapper'>
 				<div className='left-profile'>
