@@ -54,9 +54,11 @@ const Navbar = () => {
 						/>
 					</div>
 					<div className="username-navbar">
-						<h4>{user && user?.username.length > 10
-							? user?.username.substring(10, 0) + "..."
-							: user?.username}</h4>
+						<Link to='/profile'>
+							<h4>{user && user?.username.length > 10
+								? user?.username.substring(10, 0) + "..."
+								: user?.username}</h4>
+						</Link>
 					</div>
 				</div>
 				<div className="logout-button">

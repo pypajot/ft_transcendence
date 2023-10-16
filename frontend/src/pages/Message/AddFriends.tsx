@@ -53,32 +53,29 @@ export const AddFriends = ({
         },
         [user]
     );
-
-    function AddFriendsDropdown() {
-        return (
-            <>
-                <div className="chat-dropdown-menu">
-                    <h4>Add friend</h4>
-                    <form onSubmit={SendFriendRequest}>
-                        <div>
-                            <input
-                                className="chat-input-field"
-                                name="username"
-                                type="text"
-                                placeholder="Enter a username"
-                            />
-                        </div>
-                        <div>
-                            <h4 className="error">{friendError}</h4>
-                        </div>
-                        <div>
-                            <button
-                                className="chat-submit-button"
-                                type="submit">
-                                Send friend request
-                            </button>
-                        </div>
-                    </form>
+	function AddFriendsDropdown() {
+		return (
+			<>
+				<div className="chat-dropdown-menu">
+					<form onSubmit={SendFriendRequest}>
+					<div className="position-relative-input-friend">
+						<h4>Add friend</h4>
+						<div>
+							<input
+							className='chat-input-field'
+							name="username"
+							type="text"
+							placeholder="Enter a username" />
+						</div>
+						<div className="chat-error-add-friend ">
+							<span>{friendError}</span>
+						</div>
+					</div>
+						<div>
+							<button className='chat-submit-button'
+							type="submit">Send friend request</button>
+						</div>
+					</form>
                 </div>
             </>
         );

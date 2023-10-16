@@ -56,38 +56,41 @@ export const BlockUser = ({open, setOpen, setFriendError } : any) => {
 
 	function BlockUserDropdown() {
 		return (
-			<>
 				<div className="chat-dropdown-menu">
-					<h4>Block user</h4>
 					<form onSubmit={BlockUser}>
-						<div>
-							<input
-							className='chat-input-field'
-							name="username"
-							type="text"
-							placeholder="Enter a username" />
+						<div className="position-relative-input-block">
+							<h4>Block user</h4>
+							<div>
+								<input
+								className='chat-input-field'
+								name="username"
+								type="text"
+								placeholder="Enter a username" />
+							</div>
+							<div className="chat-error-block-users">
+							{socketError?.func === "blockUser" && <span>{socketError?.msg}</span>}
+							</div>
 						</div>
-						<div>
-						{socketError?.func === "blockUser" && <h4 className="chat-error">{socketError?.msg}</h4>}
-						</div>
-						<div>
-							<button 
-								className='chat-submit-button'
-								type="submit">Block user
-							</button>
-						</div>
-					</form>
-					<h4>Unblock user</h4>
-					<form onSubmit={UnblockUser}>
-						<div>
-							<input
-							className='chat-input-field'
-							name="username"
-							type="text"
-							placeholder="Enter a username" />
-						</div>
-						<div>
-							{socketError?.func === "unblockUser" && <h4 className="chat-error">{socketError?.msg}</h4>}
+							<div>
+								<button 
+									className='chat-submit-button'
+									type="submit">Block user
+								</button>
+							</div>
+						</form>
+						<form onSubmit={UnblockUser}>
+						<div className="position-relative-input-block">
+							<h4>Unblock user</h4>
+							<div>
+								<input
+								className='chat-input-field'
+								name="username"
+								type="text"
+								placeholder="Enter a username" />
+							</div>
+							<div className="chat-error-block-users">
+								{socketError?.func === "unblockUser" && <span>{socketError?.msg}</span>}
+							</div>
 						</div>
 						<div>
 							<button 
@@ -96,9 +99,7 @@ export const BlockUser = ({open, setOpen, setFriendError } : any) => {
 							</button>
 						</div>
 					</form>
-
 				</div>
-			</>
 		)
 	}
 

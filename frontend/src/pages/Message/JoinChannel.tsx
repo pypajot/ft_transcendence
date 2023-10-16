@@ -9,7 +9,7 @@ function JoinChannelDropdown({ joinChannel, friendError }: any) {
     return (
         <div className="chat-dropdown-joinmenu">
             <form onSubmit={joinChannel}>
-                <div>
+                <div className='position-relative-input-join'>
                     <h4> Join Channel Form </h4>
                     <input
                         className="chat-input-field"
@@ -17,26 +17,28 @@ function JoinChannelDropdown({ joinChannel, friendError }: any) {
                         type="text"
                         placeholder="Enter a Channel"
                     />
-                </div>
-                {friendError !== 'Invalid password' && (
-                    <span>{friendError}</span>
-                )}
-                {
-                    <input
-                        className="chat-input-field"
-                        type="password"
-                        name="password"
-                        placeholder="Enter a Password"
-                    />
-                }
-                <div>
-                    {friendError === 'Invalid password' && (
+                    <div className='chat-error-join'>
+                    {friendError !== 'Invalid password' && (
                         <span>{friendError}</span>
                     )}
-                    <button className="chat-submit-button" type="submit">
-                        Join !
-                    </button>
+                    </div>
                 </div>
+                <div className='position-relative-input-join'>
+                        <input
+                            className="chat-input-field"
+                            type="password"
+                            name="password"
+                            placeholder="Enter a Password"
+                        />
+                    <div className='chat-error-join'>
+                        {friendError === 'Invalid password' && (
+                            <span>{friendError}</span>
+                        )}
+                    </div>
+                </div>
+                <button className="chat-submit-button" type="submit">
+                    Join !
+                </button>
             </form>
         </div>
     );

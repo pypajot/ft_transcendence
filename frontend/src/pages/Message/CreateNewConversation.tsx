@@ -37,9 +37,9 @@ const CreateNewConvDropdown: React.FC<ConvDropDownProps> = ({
     );
 
     return (
-        <div className={'chat-dropdown-menu'}>
+        <div className={'create-conv-dropdown-menu'}>
             <form onSubmit={channelCreation}>
-                <div>
+                <div className='position-relative-input'>
                     <h4>Create new Channel</h4>
                     <input
                         className="chat-input-field"
@@ -47,11 +47,10 @@ const CreateNewConvDropdown: React.FC<ConvDropDownProps> = ({
                         id="channelInputId"
                         placeholder="Enter Channel Name"
                     />
-                </div>
-                <div className="chat-error">
-                    {socketError && socketError.func === 'channelCreation' ? (
-                        <h5>{socketError.msg}</h5>
-                    ) : null}
+                    <div className='chat-error-create-chan'>
+                    {socketError && socketError.func === "channelCreation" ? (
+                            <span>{socketError.msg}</span>) : null}
+                    </div>
                 </div>
                 <div>
                     <select

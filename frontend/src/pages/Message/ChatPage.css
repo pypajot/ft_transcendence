@@ -9,7 +9,7 @@
         contrast(2) brightness(2);
     transition: 0.5s;
     background: transparent;
-    margin-bottom: 1rem;
+    margin-bottom: 10px;
 }
 
 .chat-submit-button:hover {
@@ -21,39 +21,44 @@
 .chat-dropdown-menu {
     position: absolute;
     background-color: #510779;
-    padding: 0;
-
     border: 0.2rem solid #994dc2;
     border-radius: 1rem;
     width: 15rem;
-    height: 20rem;
+    height: 22rem;
     z-index: 999;
 }
 
 .chat-dropdown-joinmenu {
     position: absolute;
     background-color: #510779;
-    padding: 0;
-
     border: 0.2rem solid #994dc2;
     border-radius: 1rem;
     width: 15rem;
-    height: 12rem;
+    height: 17rem;
     z-index: 999;
 }
 
 .chat-input-field {
+    position: relative;
     border-color: #994dc2;
     border-radius: 1rem;
-    display: relative;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100%;
-    margin-bottom: 0.7rem;
+    height: 25px;
+    margin-bottom: 10px;
 }
 
 .chat-input-field:focus {
     border-color: #d386fd;
     outline: none;
+}
+
+.chat-error {
+    position : relative;
+	color: red;
+	font-size: 14px;
+	text-align: center;
+	font-style: italic;
+    height : 30px;
+    width: 100%;
 }
