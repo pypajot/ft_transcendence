@@ -6,7 +6,7 @@ import {
     useMenuState,
 } from '@twilio-paste/core';
 import { MoreIcon } from '@twilio-paste/icons/esm/MoreIcon';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { InviteToChannel } from './InviteToChannel';
 import { useAuth } from '../../context/AuthContext';
 import { UserList } from './UserList';
@@ -59,6 +59,13 @@ export const OptionMenu = () => {
         // 'target infos: ' + target?.username + ' ' + target?.socketId
         // );
     }, [chatContext, info]);
+    const handleBlock = useCallback(() => {
+        socket?.emit('blockUser', {
+            targetName: target?.username,
+            userId: user?.id,
+        });
+        chatContext.setRenderConversation(false);
+    }, [user, target, socket]);
 
     const handleInviteGame = () => {
         const targetId = target?.id;
@@ -157,7 +164,13 @@ export const OptionMenu = () => {
             {info?.isUser && (
                 <div>
                     <Menu {...menu} aria-label="Preferences">
-                        <MenuItem {...menu}>Block</MenuItem>
+                        <MenuItem
+                            {...menu}
+                            onClick={() => {
+                                handleBlock();
+                            }}>
+                            Block
+                        </MenuItem>
                         <MenuSeparator {...menu} />
                         <MenuItem
                             {...menu}

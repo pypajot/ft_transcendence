@@ -189,7 +189,11 @@ export default function ChannelContextProvider(
     const isBan = React.useCallback(
         (userId: number) => {
             let res = false;
-            if (chatContext.conversationInfo?.channel && channels) {
+            if (
+                chatContext.conversationInfo?.channel &&
+                channels &&
+                channels.get(chatContext.conversationInfo.channel.name)?.info
+            ) {
                 channels
                     .get(chatContext.conversationInfo.channel.name)
                     ?.info.map((moderation) => {
