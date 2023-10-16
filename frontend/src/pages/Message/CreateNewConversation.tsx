@@ -24,8 +24,8 @@ const CreateNewConvDropdown: React.FC<ConvDropDownProps> = ({
                 e.target.selectType.value
             );
             if (
-                e.target.username.value.trim() != '' &&
-                !e.target.username.value.includes(' ')
+                e.target.channelInputId.value.trim() != '' &&
+                !e.target.channelInputId.value.includes(' ')
             )
                 socket?.emit('ChannelCreation', {
                     type: e.target.selectType.value,
