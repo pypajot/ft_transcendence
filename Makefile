@@ -1,5 +1,5 @@
 db:
-	docker compose up -d --build --force-recreate
+	docker compose up --build
 
 fclean:
 	docker stop $$(docker ps -a -q);

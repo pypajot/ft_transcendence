@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import './Login.css';
 import { useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { useRef } from 'react';
+// import { useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 function IntraLogin() {
@@ -10,7 +10,7 @@ function IntraLogin() {
 	const [searchParams] = useSearchParams();
 	const { setAccessToken } = useAuth();
 	const navigate = useNavigate();
-	const run = useRef(0);
+	// const run = useRef(0);
 
 	useEffect(() => {
 		const HandleIntra = async () => {
@@ -40,9 +40,9 @@ function IntraLogin() {
 			}
 			return ;
 		};
-		if (run.current !== 0)
+		// if (run.current !== 0)
 			HandleIntra();
-		run.current++;
+		// run.current++;
 	}, []);
 	return (
 		<>	

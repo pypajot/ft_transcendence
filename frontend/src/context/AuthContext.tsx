@@ -1,7 +1,6 @@
 import { createContext, useState, useContext, useMemo } from 'react';
 import * as React from 'react';
 import { useEffect } from 'react';
-import { useRef } from 'react';
 import { User } from '../../Types/inferfaceList';
 
 export const useAuth = () => useContext(AuthContext);
@@ -26,7 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const [accessToken, setAccessToken] = useState<string | null>(
         sessionStorage.getItem('access_token')
     );
-    const run = useRef(false);
+    // const run = useRef(false);
 
     // useEffect(() => {
     // 	const token = sessionStorage.getItem('access_token');
@@ -50,8 +49,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             setUser(await response.json());
         };
         if (!accessToken) return;
-        if (run.current === false) getCurrentUser();
-        run.current = true;
+        getCurrentUser();
+        // run.current = true;
     }, [accessToken]);
 
     const refreshFetch = async (address: any, params?: any) => {
@@ -71,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             setUser(null);
             setAccessToken(null);
             sessionStorage.removeItem('access_token');
-            run.current = false;
+            // run.current = false;
             return response;
         }
         const token = (await response.json()).access_token;
@@ -98,7 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser(null);
         setAccessToken(null);
         sessionStorage.removeItem('access_token');
-        run.current = false;
+        // run.current = false;
     };
 
     const value = useMemo(

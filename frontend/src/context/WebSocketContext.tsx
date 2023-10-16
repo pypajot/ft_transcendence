@@ -1,11 +1,5 @@
 import * as React from 'react';
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
-} from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Socket, io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
@@ -51,7 +45,7 @@ export default function SocketContextProvider(
 
     useEffect(() => {
         if (!user) return;
-		const newSocket = io('http://localhost:3333/api/', {
+        const newSocket = io('http://localhost:3333', {
             reconnectionDelay: 3000,
             query: {
                 token: sessionStorage.getItem('access_token'),
@@ -73,16 +67,15 @@ export default function SocketContextProvider(
                 friends: newUser.friends,
                 friendsRequest: newUser.friendsRequest,
                 blocked: newUser.blocked,
-				status: newUser.status,
+                status: newUser.status,
             }));
         });
         newSocket.on('updateStatus', (args) => {
-            
-			let newUser = user;
-			const index = newUser?.friends.findIndex(
-				(obj: any) => obj.id === args.id
-			);
-			newUser.friends[index].status = args.status;
+            const newUser = user;
+            const index = newUser?.friends.findIndex(
+                (obj: any) => obj.id === args.id
+            );
+            newUser.friends[index].status = args.status;
 
             setUser(newUser);
         });

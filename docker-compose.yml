@@ -8,11 +8,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     networks:
       - transcendence
+    ports:
+      - "5432:5432"
     volumes:
       - type: volume
         target: /mnt/nfs/homes/odessein/Project/ft_transcendence/backend/docker-compose.yml
-    expose:
-      - "5432"
     restart: always
 
   node:

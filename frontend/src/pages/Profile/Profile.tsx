@@ -2,7 +2,7 @@ import './Profile.css';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
 import { Checkbox } from '@twilio-paste/core';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { Uploader } from 'uploader';
@@ -45,7 +45,7 @@ const Profile = () => {
 	const [searchParams] = useSearchParams();
 	const [currentUser, setCurrentUser] = useState<{id: number, username: string, avatar: string, matchHistory: GameType[], elo: number, achievements: AchievementType[]} | null>(null);
 	const navigate = useNavigate();
-	const run = useRef(true);
+	// const run = useRef(true);
 
 	async function GetUserProfile(e: any) {
         e.preventDefault();
@@ -68,17 +68,19 @@ const Profile = () => {
 			}
 			setCurrentUser(await response.json());
 		}
+		console.log("test here")
 		if (profileId) {
 			navigate("/profile" + `?id=${profileId}`);
+			setProfileId(0);
 			return ;
 		}
-		if (!user || !run.current)
+		if (!user)
 			return ;
 		if (!searchParams.get("id"))
 			getCurrentUser(user.id.toString());
 		else
 			getCurrentUser(searchParams.get("id"));
-		run.current = false;
+		// run.current = false;
 	}, [user, searchParams.get("id"), profileId])
 	
 	// if (!currentUser || !user)

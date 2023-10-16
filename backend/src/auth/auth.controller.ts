@@ -1,14 +1,15 @@
-import { Controller, Post, Body, Get, UseGuards, Res, Req, HttpCode, HttpStatus} from "@nestjs/common";
+import { Controller, Post, Body, Get, UseGuards, Res, Req, HttpCode, HttpStatus, Headers} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto, CodeDto } from "./dto";
 import { RefreshAuthGuard } from "./guards/refresh-auth.guard";
 import { JwtAuthGuard } from "./guards";
 import { get } from "http";
 import { TwofaAuthGuard } from "./guards/twofa-auth.guard";
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authservice: AuthService) {}
+	constructor(private authservice: AuthService, private jwt: JwtService) {}
 
 	@Get()
 	login_form() {
@@ -35,18 +36,28 @@ export class AuthController {
 	}
 
 	@Get('refresh')
-	async refresh(@Res() res: any, @Req() req: any) {
-		const token = await this.authservice.refresh(res, req.cookies.refresh_token);
+	async refresh(@Res() res: any, @Req() req: any, @Headers('Authorization') token: string, @Headers('Cookie') cookies: string) {
+		const payload = this.jwt.decode(token.split(' ')[1]) as {
+		  [key: string]: any;
+		};
+		const test = "refresh_token" + payload?.sub;
+		const refresh_token = req.cookies[test];
+		const result = await this.authservice.refresh(res, refresh_token);
 		res.send({
-			access_token: token
+			access_token: result
 		});
 	}
-	
+
 	@Post('logout')
 	@HttpCode(HttpStatus.OK)
 	@UseGuards(JwtAuthGuard)
-	async logout(@Res() res: any, @Req() req: any) {
-		const result = await this.authservice.logout(res, req.cookies.refresh_token);
+	async logout(@Res() res: any, @Req() req: any, @Headers('Authorization') token: string) {
+		const payload = this.jwt.decode(token.split(' ')[1]) as {
+		  [key: string]: any;
+		};
+		const test = "refresh_token" + payload?.sub;
+		const refresh_token = req.cookies[test];
+		const result = await this.authservice.logout(res, refresh_token);
 		res.send({ result });
 	}
 
