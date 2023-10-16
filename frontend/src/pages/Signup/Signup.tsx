@@ -28,10 +28,13 @@ const Signup = () => {
         });
         if (response.status !== 201) {
             const message = (await response.json()).message.toString();
+            console.log ('error : ', message)
             if (message.includes('Credentials'))
                 setUsernameError('Username already taken');
-            if (message.includes('username'))
+            if (message.includes('username should not be empty'))
                 setUsernameError('Username cannot be empty');
+            if (message.includes("must be longer") || message.includes("must be shorter"))
+				setUsernameError("Username must be between 4 and 20 characters")
             if (message.includes('password'))
                 setPasswordError('Password cannot be empty');
             return;

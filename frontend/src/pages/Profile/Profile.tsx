@@ -107,7 +107,6 @@ const Profile = () => {
         );
     };
 
-    //chgmt
     function ChangeAvatar() {
         async function HandleChangeAvatar(files: any) {
             const fileUrl = files.map((x: any) => x.fileUrl)[0];
@@ -144,8 +143,6 @@ const Profile = () => {
         );
     }
 
-    //chgmt
-
     function UserProfileForm() {
         return (
             <>
@@ -160,11 +157,13 @@ const Profile = () => {
                                     name="username"
                                 />
                             </label>
-                            <h5>
-                                {socketError?.func === 'getProfileId'
-                                    ? socketError.msg
-                                    : null}
-                            </h5>
+                            <div className='error-profile'>
+                                <span>
+                                    {socketError?.func === 'getProfileId'
+                                        ? socketError.msg
+                                        : null}
+                                </span>
+                            </div>
                         </div>
                         <button className="submit-button-new" type="submit">
                             View Profile
@@ -205,28 +204,17 @@ const Profile = () => {
         async function HandleChangeUsername(e: any) {
             e.preventDefault();
             setUsernameError(null);
-            if (
-                e.target.username.value.trim() != '' &&
-                !e.target.username.value.includes(' ')
-            )
+            if (e.target.username.value.trim() == '' ||
+                e.target.username.value.includes(' '))
+                setUsernameError('Username should not be empty or contain spaces');
+            else if (e.target.username.value.length < 4 || e.target.username.value.length > 20)
+                setUsernameError('Username must be between 4 and 20 characters');
+            else
                 socket?.emit('changeUsername', e.target.username.value.trim());
-
-            // const response = await refreshFetch('http://localhost:3333/user/username', {
-            // 	method: 'POST',
-            // 	headers: {
-            // 		'Content-Type': 'application/json',
-            // 		'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
-            // 	},
-            // 	body: JSON.stringify({newName: e.target.username.value})
-            // });
-            // if (response.status === 201)
-            // 	user && setUser({...user, username: e.target.username.value})
-            // else if (response.status !== 401)
-            // 	setUsernameError((await response.json()).message);
         }
         if (!user || !currentUser || user.id !== currentUser?.id) return;
+            
         return (
-            <>
                 <div>
                     <form onSubmit={HandleChangeUsername}>
                         <div className="div-submit-button-new">
@@ -234,10 +222,12 @@ const Profile = () => {
                                 <input
                                     type="text"
                                     name="username"
-                                    placeholder="  new username"
+                                    placeholder="new username"
                                     className="user-input-new"
                                 />
-                                <HelperText errorText={usernameError} />
+                                <div className='error-profile'>
+                                    <span>{usernameError}</span>
+                                </div>
                             </label>
                         </div>
                         <div className="submit-button-new-div">
@@ -247,7 +237,6 @@ const Profile = () => {
                         </div>
                     </form>
                 </div>
-            </>
         );
     }
 
@@ -318,10 +307,13 @@ const Profile = () => {
                                         </div>
                                         <div className="game-opponent">
                                             <h4>
-                                                {game.winner.username ===
-                                                currentUser?.username
-                                                    ? game.loser.username
-                                                    : game.winner.username}
+                                                {game.winner.username === currentUser?.username
+                                                ? game.loser.username.length > 12
+                                                ? game.loser.username.substring(0, 12) + "..."
+                                                : game.loser.username
+                                                : game.winner.username.length > 12
+                                                ? game.winner.username.substring(0, 12) + "..."
+                                                : game.winner.username}
                                             </h4>
                                         </div>
                                         <div className="game-score">

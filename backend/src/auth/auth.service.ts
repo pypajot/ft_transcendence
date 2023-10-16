@@ -217,14 +217,16 @@ export class AuthService {
     }
 
     async validateUser(username: string, password: string) {
+        console.log('received : ', username)
         const user = await this.prisma.user.findUnique({
             where: {
                 username: username,
             },
         });
-
         if (!user) throw new UnauthorizedException('User does not exist');
+        if (user?.intralogin) throw new UnauthorizedException('User is intralogin');
         const pwMatch = await argon2.verify(user.hash, password);
+        console.log('pwMatch : ', pwMatch)
         if (!pwMatch) throw new UnauthorizedException('Invalid password');
 
         return user;

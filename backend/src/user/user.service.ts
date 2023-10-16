@@ -10,6 +10,7 @@ import { WsException } from '@nestjs/websockets';
 import { v2 as cloudinary } from 'cloudinary';
 import { Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
+import { AuthDto } from 'src/dto';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUDNAME,
@@ -159,6 +160,9 @@ export class UserService {
     }
 
     async changeUsername(socketId: string, new_name: string, server: any) {
+        //check new username using auth dto
+        
+        
         if (new_name === '')
             throw new WsException('Name cannot be empty');
         let user = await this.prisma.user.findUnique({

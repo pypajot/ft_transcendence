@@ -145,6 +145,7 @@
 }
 
 .div-submit-button-new{
+	position: relative;
 	display: flex;
 	justify-content: center;
 	padding-top: 5%;
@@ -158,6 +159,7 @@
 	filter: drop-shadow(0 0 2px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
 	padding-top: 4px;
 	padding-bottom: 4px;
+	padding-left: 10px;
 }
 
 .submit-button-new-div{
@@ -262,4 +264,16 @@
 .search-profile button.submit-button-new {
 	width: 90px;
 	height: 30px;
+}
+
+.error-profile {
+    position : relative;
+	color: red;
+	font-size: 12px;
+	text-align: left;
+	font-style: italic;
+    font-weight: bold;
+	padding-left : 10px;
+	height : 20px;
+    width: 100%;
 }

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import HelperText from "../../components/HelperText";
 
 function Login() {
   const { setAccessToken } = useAuth();
@@ -32,12 +31,17 @@ function Login() {
 		});
 		if (response.status !== 201) {
 			const body = (await response.json()).message.toString();
+			console.log ('error : ', body)
 			if (body.includes("username should not be empty"))
 				setUsernameError("Username should not be empty")
 			if (body.includes("password should not be empty"))
 				setPasswordError("Password should not be empty")
-			if (body.includes("not found"))
+			if (body.includes("not exist"))
 				setUsernameError("Username not found")
+			if (body.includes("intralogin"))
+				setUsernameError("Please login with 42")
+			if (body.includes("must be longer") || body.includes("must be shorter"))
+				setUsernameError("Username must be between 4 and 20 characters")
 			if (body.includes("Invalid"))
 				setPasswordError("Invalid password")
 			if (body.includes("connected"))
