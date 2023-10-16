@@ -47,7 +47,7 @@ export const Conversation = () => {
         receiver: string;
         isUser: boolean;
     }) => {
-        const url = 'http://localhost:3333/chat/getMessageReceived';
+        const url = 'http://localhost:3333/api/chat/getMessageReceived';
 		console.log("received: ", obj);
 
         try {
@@ -85,7 +85,7 @@ export const Conversation = () => {
         receiver?: string;
         isUser: boolean;
     }) => {
-        const url = 'http://localhost:3333/chat/getMessageSent';
+        const url = 'http://localhost:3333/api/chat/getMessageSent';
 		console.log("sent: ", obj);
         // try {
 			const response = await refreshFetch(url, {

@@ -46,6 +46,8 @@ export class AuthService {
 	public background = "";
 
     async signup(dto: AuthDto, res: any) {
+		if (dto.username.indexOf(' ') !== -1)
+			throw new BadRequestException('Username cannot contain spaces')
         const hash = await argon2.hash(dto.password);
         try {
             const user = await this.prisma.user.create({
@@ -59,7 +61,7 @@ export class AuthService {
                 },
             });
             res.cookie(
-                'refresh_token',
+                'refresh_token' + user.id.toString(),
                 await this.signRefreshToken(user.id, user.username, false),
                 RefreshTokenParams
             );
@@ -107,7 +109,7 @@ export class AuthService {
             client_id: process.env.INTRA_USER,
             client_secret: process.env.INTRA_SECRET,
             code: code,
-            redirect_uri: 'http://localhost:5173/intralogin',
+            redirect_uri: `http://localhost:${process.env.REACT_APP_PORT}/intralogin`,
         };
         let time = '300s';
         const response = await firstValueFrom(
@@ -122,7 +124,7 @@ export class AuthService {
         // 	throw new ForbiddenException("User is already connected");
         if (!user.twoFactorAuthActive) {
             res.cookie(
-                'refresh_token',
+                'refresh_token' + user.id.toString(),
                 await this.signRefreshToken(user.id, user.username, false),
                 RefreshTokenParams
             );
@@ -326,9 +328,9 @@ export class AuthService {
                 secret: process.env.REFRESH_SECRET,
             });
         } catch (e) {
-            const payloadToDelete = this.jwt.decode(refresh_token);
+            const payloadToDelete = this.jwt.decode(refresh_token) as {[key: string] :any};
             await this.deleteTokenFromDb(payloadToDelete);
-            await res.clearCookie('refresh_token', RefreshTokenParams);
+            await res.clearCookie('refresh_token' + payloadToDelete.sub.toString(), RefreshTokenParams);
             throw new UnauthorizedException('Invalid refresh token');
         }
         const payload = this.jwt.decode(refresh_token) as {
@@ -352,7 +354,7 @@ export class AuthService {
             payload.username,
             payload.token_family
         );
-        res.cookie('refresh_token', newtoken, RefreshTokenParams);
+        res.cookie('refresh_token' + payload.sub.toString(), newtoken, RefreshTokenParams);
         return await this.signAccessToken(
             payload.sub,
             payload.username,
@@ -377,7 +379,7 @@ export class AuthService {
                 family: payload.token_family,
             },
         });
-        await res.clearCookie('refresh_token', RefreshTokenParams);
+        await res.clearCookie('refresh_token' + payload.sub.toString(), RefreshTokenParams);
         return 'Logout successful';
     }
 
@@ -447,7 +449,7 @@ export class AuthService {
             },
         });
 		res.cookie(
-            'refresh_token',
+            'refresh_token' + user.id.toString(),
             await this.signRefreshToken(user.id, user.username, true),
             RefreshTokenParams
         );
@@ -471,7 +473,7 @@ export class AuthService {
         });
         if (!isValid) throw new ForbiddenException('Invalid code');
         res.cookie(
-            'refresh_token',
+            'refresh_token' + user.id.toString(),
             await this.signRefreshToken(user.id, user.username, true),
             RefreshTokenParams
         );

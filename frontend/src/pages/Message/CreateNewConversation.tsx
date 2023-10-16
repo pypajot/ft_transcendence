@@ -1,18 +1,12 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
-import { ChatContext, useChatContext } from '../../context/ChatContext';
+import { useChatContext } from '../../context/ChatContext';
 import './CreateNewConversation.css';
 import './ChatPage.css';
 
-interface ConvDropDownProps {
-    setOpen: any;
-}
 
-const CreateNewConvDropdown: React.FC<ConvDropDownProps> = ({
-    setOpen,
-}: any) => {
+const CreateNewConvDropdown = () => {
     const { socket, socketError, setSocketError } = useSocketContext();
-    const chatContext = useChatContext();
 
     const channelCreation = useCallback(
         async (e: any) => {
@@ -112,8 +106,8 @@ export const CreateNewConversation = ({ open, setOpen }: any) => {
             <button className="create-conv-button" onClick={handleOpen}>
                 Create a Channel
             </button>
-            {open === 'CreateNewConversation' ? (
-                <CreateNewConvDropdown setOpen={setOpen} />
+            {open === "CreateNewConversation" ? (
+                <CreateNewConvDropdown />
             ) : null}
         </div>
     );

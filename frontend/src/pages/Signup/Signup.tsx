@@ -1,8 +1,7 @@
-import { useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
-import './Signup.css';
-import { useState } from 'react';
-import HelperText from '../../components/HelperText';
+import { useAuth } from "../../context/AuthContext";
+import { Link } from "react-router-dom";
+import "./Signup.css";
+import { useState } from "react";
 
 const Signup = () => {
     const { setAccessToken } = useAuth();
@@ -20,7 +19,7 @@ const Signup = () => {
             password: formData.get('password'),
         };
         const body = JSON.stringify(formBody);
-        const response = await fetch('http://localhost:3333/auth/signup', {
+        const response = await fetch('http://localhost:3333/api/auth/signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: body,

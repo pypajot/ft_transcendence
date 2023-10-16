@@ -1,6 +1,5 @@
 import { useState} from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
-import { LoadingIcon } from "@twilio-paste/icons/esm/LoadingIcon";
 import { useGameContext } from '../../context/GameContext';
 import './modeSelection.css';
 import Navbar from '../../components/Navbar';

@@ -34,7 +34,7 @@ refreshFetch.interceptors.response.use(
 		if ( error.response?.status !== 401 || error.response?.config.retry == true || !originalRequest )
 			return Promise.reject(error);
 
-		const response = await fetch("http://localhost:3333/auth/refresh", {
+		const response = await fetch("http://localhost:3333/api/auth/refresh", {
 			method: "GET",
 			headers: { 'Content-Type': 'application/json' },
 			credentials: 'include',

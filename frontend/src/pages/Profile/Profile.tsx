@@ -2,7 +2,7 @@ import './Profile.css';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
 import { Checkbox } from '@twilio-paste/core';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { Uploader } from 'uploader';
@@ -35,23 +35,16 @@ type AchievementType = {
 };
 
 const Profile = () => {
-    const { user, setUser, refreshFetch } = useAuth();
-    const { socket, socketError, setSocketError } = useSocketContext();
-    const { profileId, setProfileId } = useProfileContext();
-    const [imagePath, setImagePath] = useState<string | null>(null);
-    const [usernameError, setUsernameError] = useState<string | null>(null);
-    const [codeError, setCodeError] = useState<string | null>(null);
-    const [searchParams] = useSearchParams();
-    const [currentUser, setCurrentUser] = useState<{
-        id: number;
-        username: string;
-        avatar: string;
-        matchHistory: GameType[];
-        elo: number;
-        achievements: AchievementType[];
-    } | null>(null);
-    const navigate = useNavigate();
-    const run = useRef(true);
+	const { user, setUser, refreshFetch } = useAuth();
+	const { socket, socketError, setSocketError } = useSocketContext();
+	const {profileId, setProfileId} = useProfileContext();
+	const [imagePath, setImagePath] = useState<string | null>(null);
+	const [usernameError, setUsernameError] = useState<string | null>(null);
+	const [codeError, setCodeError] = useState<string | null>(null);
+	const [searchParams] = useSearchParams();
+	const [currentUser, setCurrentUser] = useState<{id: number, username: string, avatar: string, matchHistory: GameType[], elo: number, achievements: AchievementType[]} | null>(null);
+	const navigate = useNavigate();
+	// const run = useRef(true);
 
     async function GetUserProfile(e: any) {
         e.preventDefault();
@@ -60,37 +53,37 @@ const Profile = () => {
         socket?.emit('getProfileId', e.target.username.value);
     }
 
-    useEffect(() => {
-        const getCurrentUser = async (id: string | null) => {
-            const response = await refreshFetch(
-                'http://localhost:3333/user/' + id,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${sessionStorage.getItem(
-                            'access_token'
-                        )}`,
-                    },
-                }
-            );
-            if (response.status === 400) {
-                navigate('/error');
-                return;
-            }
-            setCurrentUser(await response.json());
-        };
-        if (profileId) {
-            navigate('/profile' + `?id=${profileId}`);
-            return;
-        }
-        if (!user || !run.current) return;
-        if (!searchParams.get('id')) getCurrentUser(user.id.toString());
-        else getCurrentUser(searchParams.get('id'));
-        run.current = false;
-    }, [user, searchParams.get('id'), profileId]);
-
-    // if (!currentUser || !user)
-    // 	return ;
+	useEffect(() => {
+		const getCurrentUser = async (id: string | null) => {
+			const response = await refreshFetch('http://localhost:3333/api/user/' + id, {
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
+				},
+			});
+			if (response.status === 400) {
+				navigate("/error");
+				return ;
+			}
+			setCurrentUser(await response.json());
+		}
+		console.log("test here")
+		if (profileId) {
+			navigate("/profile" + `?id=${profileId}`);
+			setProfileId(0);
+			return ;
+		}
+		if (!user)
+			return ;
+		if (!searchParams.get("id"))
+			getCurrentUser(user.id.toString());
+		else
+			getCurrentUser(searchParams.get("id"));
+		// run.current = false;
+	}, [user, searchParams.get("id"), profileId])
+	
+	// if (!currentUser || !user)
+	// 	return ;
 
     const DisplayAvatar = (props: { img: string }) => {
         return (
@@ -175,30 +168,26 @@ const Profile = () => {
     }
 
     async function HandleSubmit(e: any) {
-        e.preventDefault();
-        setCodeError(null);
-        console.log(e.target.code.value);
-        const response = await refreshFetch(
-            'http://localhost:3333/auth/2fa/confirm',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${sessionStorage.getItem(
-                        'access_token'
-                    )}`,
-                },
-                body: JSON.stringify({ code: e.target.code.value }),
-            }
-        );
-        console.log('response status: ', response.status, response.ok);
-        if (response.status == 403)
-            setCodeError((await response.json()).message);
-        if (!response.ok) return;
-        setImagePath(null);
-        sessionStorage.setItem('access_token', await response.json().token);
-        user && setUser({ ...user, twoFactorAuthActive: true });
-    }
+		e.preventDefault();
+		setCodeError(null);
+		console.log(e.target.code.value);
+		const response = await refreshFetch('http://localhost:3333/api/auth/2fa/confirm', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
+			},
+			body: JSON.stringify({code: e.target.code.value})
+		});
+		console.log("response status: ", response.status, response.ok);
+		if (response.status == 403)
+			setCodeError((await response.json()).message);
+		if (!response.ok)
+			return ;
+		setImagePath(null);
+		sessionStorage.setItem("access_token", (await response.json().token))
+		user && setUser({...user, twoFactorAuthActive: true})
+	}
 
     function ChangeUsernameForm() {
         async function HandleChangeUsername(e: any) {

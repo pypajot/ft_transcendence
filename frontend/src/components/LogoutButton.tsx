@@ -8,7 +8,7 @@ export function LogoutButton() {
 	const navigate = useNavigate()
 
 	const Logout = async () => {
-		const response = await refreshFetch.post('http://localhost:3333/auth/logout');
+		const response = await refreshFetch.post('http://localhost:3333/api/auth/logout');
 		if (response.data = "Logout successful")
 		{
 			sessionStorage.removeItem("access_token");

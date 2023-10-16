@@ -1,0 +1,32 @@
+services:
+  postgres:
+    container_name: ${PG_CONTAINER_NAME}
+    image: postgres:bookworm
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - transcendence
+    ports:
+      - "5432:5432"
+    volumes:
+      - type: volume
+        target: /mnt/nfs/homes/odessein/Project/ft_transcendence/backend/docker-compose.yml
+    restart: always
+
+  node:
+    container_name: ${NODE_CONTAINER_NAME}
+    build: ./
+    depends_on:
+      - postgres
+    networks:
+      - transcendence
+    ports:
+      - "3001:5555"
+      - "3333:3333"
+    restart: always
+
+networks:
+  transcendence:
+    driver: bridge

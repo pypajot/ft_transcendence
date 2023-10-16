@@ -11,13 +11,13 @@ async function bootstrap() {
 		process.env.REFRESH_SECRET
 	))
 	app.useGlobalPipes(new ValidationPipe());
-	app.enableCors({
-		origin: 'http://localhost:5173',
-		methods: ['GET', 'POST', 'PUT', 'DELETE'],
-		credentials: true,
-		allowedHeaders: ['Content-Type', 'Authorization'],
-	});
-
+	// app.enableCors({
+	// 	origin: 'http://localhost:3333',
+	// 	methods: ['GET', 'POST', 'PUT', 'DELETE'],
+	// 	credentials: true,
+	// 	allowedHeaders: ['Content-Type', 'Authorization'],
+	// });
+	app.setGlobalPrefix("/api")
 	app.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(app));
 	await app.listen(3333, () => {
 		console.log("Listening on port 3333..");

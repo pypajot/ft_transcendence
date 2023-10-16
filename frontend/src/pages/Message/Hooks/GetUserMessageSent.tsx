@@ -3,7 +3,7 @@ const getMessageSent = async (obj: {
   receiver: string;
   isUser: boolean;
 }) => {
-  const url = "http://localhost:3333/chat/getMessageSent";
+  const url = "http://localhost:3333/api/chat/getMessageSent";
 
   try {
     const response = await fetch(url, {
