@@ -84,7 +84,7 @@ export const AddFriends = ({
     return (
         <div className="add-friends-dropdown" ref={dropdownRef}>
             <button className="add-friends-button" onClick={handleOpen}>
-                Friend Requests
+                Add Friends
             </button>
             {open === 'addfriends' ? <AddFriendsDropdown /> : null}
         </div>
