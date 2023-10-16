@@ -49,8 +49,9 @@ export const AddFriends = ({open, setOpen, friendError, setFriendError } : any) 
 		return (
 			<>
 				<div className="chat-dropdown-menu">
-					<h4>Add friend</h4>
 					<form onSubmit={SendFriendRequest}>
+					<div className="position-relative-input-friend">
+						<h4>Add friend</h4>
 						<div>
 							<input
 							className='chat-input-field'
@@ -58,9 +59,10 @@ export const AddFriends = ({open, setOpen, friendError, setFriendError } : any) 
 							type="text"
 							placeholder="Enter a username" />
 						</div>
-						<div>
-							<h4 className="error">{friendError}</h4>
+						<div className="chat-error-add-friend ">
+							<span>{friendError}</span>
 						</div>
+					</div>
 						<div>
 							<button className='chat-submit-button'
 							type="submit">Send friend request</button>

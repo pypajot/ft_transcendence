@@ -26,3 +26,19 @@
     background-color: #775d85;
     filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
 }
+
+.position-relative-input-block{
+    position: relative;
+    padding-bottom : 30px;
+}
+
+.chat-error-block-users {
+    position : absolute;
+    bottom : 14px;
+	color: red;
+	font-size: 12px;
+	text-align: center;
+	font-style: italic;
+    font-weight: bold;
+    width: 100%;
+}
