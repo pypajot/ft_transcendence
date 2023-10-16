@@ -27,27 +27,27 @@ export class PrismaService extends PrismaClient {
 		{
 		name: 'First Blood',
 		description: 'Win your first game.',
-		icon: 'src/assets/firstBlood.png'
+		icon: 'https://i.imgur.com/xx5C3pt.png'
 		},
 		{
 		name: 'Friendly Competitor',
 		description: 'Play a game with a friend.',
-		icon: 'src/assets/friendly.png'
+		icon: 'https://i.imgur.com/U4z1R1R.png'
 		},
 		{
 			name: 'Hat Trick',
 			description: 'Win three games in a row.',
-			icon: 'src/assets/hatTrick.png'
+			icon: 'https://i.imgur.com/rZlZNa0.png'
 		},
 		{
 			name: 'Underdog victory',
 			description: 'Win a game against a player with more wins than you.',
-			icon: 'src/assets/underdog.png'
+			icon: 'https://i.imgur.com/8ZTru30.png'
 		},
 		{
 			name: 'Hardcore Veteran',
 			description: 'Win 5 games in Hardcore mode.',
-			icon: 'src/assets/veteran.png'
+			icon: 'https://i.imgur.com/icgHkzF.png'
 		}
 	];
 

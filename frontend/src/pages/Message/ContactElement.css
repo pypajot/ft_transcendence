@@ -1,4 +1,5 @@
 .contact {
+	position : relative;
 	display: flex;
 	justify-content: space-between;
 	width: 100%;
@@ -7,6 +8,7 @@
 }
 
 .contact-image {
+	position : relative;
 	width: 40px;
 	height: 40px;
 	border-radius: 30px;
@@ -14,17 +16,22 @@
 }
 
 .contact-name {
+	position : relative;
 	width: 68%;
 	text-align: left;
 	font-size: 12px;
+	padding-left: 10px;
+	text-align: center;
 }
 
 .img-container {
 	width: 16%;
+	position : relative;
 }
 
 .status-icon {
 	width: 16%;
+	position : relative;
 }
 
 .online-button{

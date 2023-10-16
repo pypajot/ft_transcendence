@@ -57,6 +57,7 @@
 
   .channel-name, .friend-name {
 	transition: 0.4s ease all ;
+	padding-left : 10px;
   }
 
   .channel-name:hover, .friend-name:hover {
