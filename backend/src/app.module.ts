@@ -21,7 +21,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     PrismaModule,
     GameModule,
 	ServeStaticModule.forRoot({
-		rootPath: '/frontend/dist',
+		rootPath: '/app/frontend/dist',
 	}),
   ],
   providers: [
