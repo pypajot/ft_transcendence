@@ -109,7 +109,7 @@ export class AuthService {
             client_id: process.env.INTRA_USER,
             client_secret: process.env.INTRA_SECRET,
             code: code,
-            redirect_uri: `http://localhost:${process.env.REACT_APP_PORT}/intralogin`,
+            redirect_uri: `http://localhost:3333/intralogin`,
         };
         let time = '300s';
         const response = await firstValueFrom(
@@ -387,11 +387,13 @@ export class AuthService {
         const payload = this.jwt.decode(
             req.headers.authorization.split(' ')[1]
         ) as JwtPaylodType;
+		console.log(" paylaod ",payload)
         const user = await this.prisma.user.findUnique({
             where: {
                 id: payload.sub,
             },
         });
+		console.log("user:", user)
         const secret = authenticator.generateSecret();
         const key = (await promisify(scrypt)(password, salt, 32)) as Buffer;
         const cipher = createCipheriv('aes-256-ctr', key, iv);
@@ -412,7 +414,9 @@ export class AuthService {
             process.env.TWOFACTOR_APP_NAME,
             secret
         );
+		console.log("otp: ",otp);
         const imagePath = await toDataURL(otp);
+		console.log("iamge: ", imagePath)
         return { path: imagePath };
     }
 

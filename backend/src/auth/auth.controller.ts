@@ -64,6 +64,7 @@ export class AuthController {
 	@Get('2fa/activate')
 	@UseGuards(JwtAuthGuard)
 	async activate2fa(@Req() req: any) {
+		console.log()
 		const response = await this.authservice.activate2fa(req)
 		return { imagePath: response };
 	}

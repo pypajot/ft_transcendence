@@ -177,7 +177,8 @@ const Profile = () => {
 				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
 			},
-			body: JSON.stringify({code: e.target.code.value})
+			body: JSON.stringify({code: e.target.code.value}),
+			credentials: "include"
 		});
 		console.log("response status: ", response.status, response.ok);
 		if (response.status == 403)
@@ -185,7 +186,7 @@ const Profile = () => {
 		if (!response.ok)
 			return ;
 		setImagePath(null);
-		sessionStorage.setItem("access_token", (await response.json().token))
+		sessionStorage.setItem("access_token", ((await response.json()).token))
 		user && setUser({...user, twoFactorAuthActive: true})
 	}
 
@@ -257,7 +258,7 @@ const Profile = () => {
     }
 
     const activate2FA = async () => {
-        await refreshFetch('http://localhost:3333/auth/2fa/activate', {
+        await refreshFetch('http://localhost:3333/api/auth/2fa/activate', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
