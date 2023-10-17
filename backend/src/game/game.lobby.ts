@@ -36,6 +36,7 @@ export class GameLobby {
     private paddleWidth: number = 0;
     private paddleHeight: number = 0;
     private paddleMoveSpeed: number = 0;
+    private lastCollision: number = 0;
 
     // Properties for the game rules
     public goalLimit: number = 0;
@@ -142,7 +143,8 @@ export class GameLobby {
             this.ballY - this.ballSize / 2 <= 0 ||
             this.ballY + this.ballSize / 2 >= this.gameHeight
         ) {
-            this.ballSpeedYDirection *= -1; // Reverse the Y-direction when the ball hits the top or bottom wall
+            this.ballSpeedYDirection *= -1; // Reverse the Y-direction
+            this.lastCollision = 3;
         }
         const collisionPaddle1 =
             this.ballX - this.ballSize / 2 + ballXVelocity <=
@@ -155,11 +157,16 @@ export class GameLobby {
             this.ballY >= this.player2.paddlePos &&
             this.ballY <= this.player2.paddlePos + this.paddleHeight;
 
-        if (collisionPaddle1 || collisionPaddle2) {
-            // console log informations about the ball, paddle and collision
+        if (collisionPaddle1 && this.lastCollision !== 1) {
             // Reverse the X-direction and increase the ball speed after hitting a paddle
             this.ballSpeedXDirection *= -1;
             this.ballSpeedX *= this.ballSpeedIncreaseFactor;
+            this.lastCollision = 1;
+        }
+        if (collisionPaddle2 && this.lastCollision !== 2) {
+            this.ballSpeedXDirection *= -1;
+            this.ballSpeedX *= this.ballSpeedIncreaseFactor;
+            this.lastCollision = 2;
         }
         // Check for scoring when the ball crosses the left or right boundary
         if (this.ballX <= 0) {
@@ -179,6 +186,7 @@ export class GameLobby {
         this.ballSpeedY = this.gameConfiguration?.ballSpeed;
         this.ballSpeedXDirection = Math.random() > 0.5 ? 1 : -1;
         this.ballSpeedYDirection = Math.random() > 0.5 ? 1 : -1;
+        this.lastCollision = 0;
     }
 }
 

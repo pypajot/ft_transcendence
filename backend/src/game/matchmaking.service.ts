@@ -7,7 +7,7 @@ import { Server } from 'socket.io';
 
 const classicGameConfig: GameConfiguration = {
   mode: GameMode.Classic,
-  ballSpeed: 3,
+  ballSpeed: 3.5,
   ballSpeedIncreaseFactor: 1.1,
   paddleWidth: 10,
   paddleHeight: 60,

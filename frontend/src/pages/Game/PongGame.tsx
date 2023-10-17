@@ -169,7 +169,8 @@ const PongGame : React.FC = () => {
                     </>
                 )}
             </div>
-            <div className={`game-board${gameMode === 'Party' ? ' party-game-board' : ''} glow-medium`}
+            <div className={`game-board${gameMode === 'Party' ? ' party-game-board' 
+                            : gameMode === 'Hardcore' ? ' hc-game-board' : ''} glow-medium`}
                 style={gameMode === 'Party' ? {backgroundImage: `url(${partyBackground})`} : {}}>
                 {countdown && <div className="countdown">{countdown}</div>}
                 {showGo && <div className="go-message">GO!</div>}

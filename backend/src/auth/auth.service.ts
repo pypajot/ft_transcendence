@@ -14,7 +14,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
-import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
+import { createCipheriv, createDecipheriv, scrypt } from 'crypto';
 import { promisify } from 'util';
 
 type JwtPaylodType = {
@@ -74,7 +74,7 @@ export class AuthService {
             };
         } catch (err) {
             if (
-                err instanceof Prisma.PrismaClientKnownRequestError &&
+                err.code instanceof Prisma.PrismaClientKnownRequestError &&
                 err.code === 'P2002'
             ) {
                 throw new ForbiddenException('Credentials taken');
