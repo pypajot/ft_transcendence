@@ -3,13 +3,26 @@ import { useChatContext } from '../../context/ChatContext';
 import './ContactElement.css';
 
 const statusIcon = {
-    online: <img src='https://i.imgur.com/4xHiH5S.png' className='online-button'></img>,
-    offline: <img src='https://i.imgur.com/MqO4Ymr.png' className='online-button'></img>,
-    ingame: <img src='https://i.imgur.com/wNqOZav.png' className='online-button'></img>,
+    online: (
+        <img
+            src="https://i.imgur.com/4xHiH5S.png"
+            className="online-button"></img>
+    ),
+    offline: (
+        <img
+            src="https://i.imgur.com/MqO4Ymr.png"
+            className="online-button"></img>
+    ),
+    ingame: (
+        <img
+            src="https://i.imgur.com/wNqOZav.png"
+            className="online-button"></img>
+    ),
 };
 
 export const ContactElement = ({ info }: { info: ConversationInformation }) => {
-    const {conversationInfo, setConversationInfo} = useChatContext();
+    const { conversationInfo, setConversationInfo, setRenderConversation } =
+        useChatContext();
 
     const User = () => {
         if (info.isChannel && info.channel)
@@ -26,7 +39,7 @@ export const ContactElement = ({ info }: { info: ConversationInformation }) => {
         return (
             <div className="contact">
                 <div className="img-container">
-                    <img className='contact-image' src={info?.user?.avatar} />
+                    <img className="contact-image" src={info?.user?.avatar} />
                 </div>
                 <h3
                     className="contact-name"
@@ -43,16 +56,17 @@ export const ContactElement = ({ info }: { info: ConversationInformation }) => {
         );
     };
     const handleClick = () => {
-		if (info?.channel?.name !== conversationInfo?.channel?.name ||
-			info?.user?.username !== conversationInfo?.user?.username) {
-			console.log("set conversation info");
-			setConversationInfo(info);
-		}
-		// if (!renderConversation)
-		// 	setRenderConversation(true);
+        if (
+            info?.channel?.name !== conversationInfo?.channel?.name ||
+            info?.user?.username !== conversationInfo?.user?.username
+        ) {
+            console.log('set conversation info');
+            setConversationInfo(info);
+            setRenderConversation(true);
+        }
+        // if (!renderConversation)
+        // 	setRenderConversation(true);
     };
 
-    return (
-			<User />
-    );
+    return <User />;
 };

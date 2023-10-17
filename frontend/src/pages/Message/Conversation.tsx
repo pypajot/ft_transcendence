@@ -30,7 +30,8 @@ export const Conversation = () => {
     const [username, setUsername] = useState<string>('');
     const convContainerRef = useRef<HTMLDivElement>(null);
 
-    const { conversationInfo, isBlocked } = useChatContext();
+    const { conversationInfo, isBlocked, renderConversation } =
+        useChatContext();
     //Make a component to get the previous messsage
     const { socket } = useSocketContext();
 
@@ -110,7 +111,7 @@ export const Conversation = () => {
         // return ();
         //   } catch (error) {
         // 	console.error("There was an error fetching the data", error);
-        //   }
+        //   http://localhost:3333/home}
     };
 
     // useEffect(() => {}, [conversationInfo, username]);
@@ -267,7 +268,7 @@ export const Conversation = () => {
     };
     return (
         <>
-            {conversationInfo && (
+            {renderConversation && conversationInfo && (
                 <div className="conversation-name">
                     <Flex>
                         <Flex grow shrink basis="1px">
@@ -281,7 +282,7 @@ export const Conversation = () => {
                     </Flex>
                 </div>
             )}
-            {conversationInfo && (
+            {renderConversation && conversationInfo && (
                 <div className="conversation-container" ref={convContainerRef}>
                     {conversationMsg &&
                         conversationMsg.map(function (message, i) {
@@ -312,7 +313,7 @@ export const Conversation = () => {
                         })}
                 </div>
             )}
-            {conversationInfo && (
+            {renderConversation && conversationInfo && (
                 <div className="conversation-input-area">
                     <form
                         onSubmit={handleFormSubmit}
