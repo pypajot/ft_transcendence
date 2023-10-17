@@ -49,7 +49,6 @@ export const Conversation = () => {
         isUser: boolean;
     }) => {
         const url = 'http://localhost:3333/api/chat/getMessageReceived';
-        console.log('received: ', obj);
 
         try {
             const response = await refreshFetch(url, {
@@ -72,7 +71,6 @@ export const Conversation = () => {
             }
 
             const text = await response.text();
-            console.log('text received: ', text);
             const json = JSON.parse(text);
             setReceivedMessage(json);
         } catch (error) {
@@ -86,7 +84,6 @@ export const Conversation = () => {
         isUser: boolean;
     }) => {
         const url = 'http://localhost:3333/api/chat/getMessageSent';
-        console.log('sent: ', obj);
         // try {
         const response = await refreshFetch(url, {
             method: 'POST',
@@ -99,13 +96,11 @@ export const Conversation = () => {
                 isUser: obj.isUser,
             }),
         });
-        console.log('response ok: ', response.ok, response.status);
         if (!response.ok) {
             return [];
         }
         // console.log(response)
         const text = await response.text();
-        console.log('text sent: ', text);
         const json = text === '[]' ? [] : JSON.parse(text);
         setSentMessage(json);
         // return ();
@@ -126,7 +121,6 @@ export const Conversation = () => {
         // } else if (info && info.isUser && info.user) {
         // 	setConvName(info.user.username);
         // }
-        console.log('username conversation: ', username);
         // if (username === '' || convName === '') {
         // 	setRenderConversation(false);
         // 	return ;

@@ -380,7 +380,6 @@ export class ChannelService {
                 },
             });
             client.leave(info.channelName);
-            console.log('channel left: ', channelLeft);
             if (
                 channelLeft &&
                 channelLeft.admins &&
@@ -388,7 +387,6 @@ export class ChannelService {
             ) {
                 this.deleteChannel(io, client, info.channelName);
             } else {
-                console.log('Here');
                 this.updateChannel(io, info.channelName);
             }
         } catch (error) {
@@ -482,7 +480,6 @@ export class ChannelService {
                     target: true,
                 },
             });
-            console.log('gogo');
             console.log(channel.members);
             channel.members.map((user) => {
                 io.to(user.socketId).emit('updateChannel', {

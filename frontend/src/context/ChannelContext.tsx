@@ -39,7 +39,6 @@ export default function ChannelContextProvider(
     React.useEffect(() => {
         const buff: Channel[] = [];
         if (channels) {
-            console.log(buff, channels);
             for (const channel of channels) {
                 buff.push(channel[1]);
             }
@@ -80,9 +79,6 @@ export default function ChannelContextProvider(
                     }
                 );
                 setArrayChannels(newArrayChannels);
-                console.log('Le Pain');
-                console.log(channelName, username);
-                console.log(channels);
             }
             chatContext.setConversationInfo(undefined);
         },
@@ -127,8 +123,6 @@ export default function ChannelContextProvider(
             });
             newArrayChannels.push(channel);
             setArrayChannels(newArrayChannels);
-            console.log('Mias ntt');
-            console.log(user, channels);
         },
         [user, channels, setChannels, arrayChannels, setArrayChannels]
     );
@@ -136,7 +130,6 @@ export default function ChannelContextProvider(
     const updateInviteChannel = React.useCallback(
         (channels: Channel[]) => {
             setInvitedList(channels);
-            console.log(channels);
         },
         [setInvitedList]
     );

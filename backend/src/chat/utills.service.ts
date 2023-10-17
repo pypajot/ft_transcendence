@@ -111,7 +111,6 @@ export class UtilsService {
                 }
             });
         }
-        console.log(`there ${res}`);
         return res;
     }
 
@@ -135,7 +134,6 @@ export class UtilsService {
                 }
             });
         }
-        console.log(`Thweree : ${res}`);
         return res;
     }
 
@@ -150,8 +148,6 @@ export class UtilsService {
                 }
             });
         });
-        console.log('cool');
-        console.log(res);
         return res;
     }
 }

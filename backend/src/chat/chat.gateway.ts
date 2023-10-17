@@ -85,13 +85,11 @@ class ChatGateway
 
     @SubscribeMessage('JoinChannel')
     async handleChannelJoining(client: any, data: joinChannelInfo): Promise<void> {
-		console.log(data);
         await this.channelService.newChannelMember(this.io, client, data);
     }
 
     @SubscribeMessage('ChannelMessage')
     handleChannelMessage(client: any, data: string[]): void {
-        console.log(`this is life ${data[0]}, ${data[1]}`);
         this.channelService.sendToChannel(this.io, data[0], data[1], client.id);
     }
     @SubscribeMessage('ChannelCreation')
@@ -166,8 +164,6 @@ class ChatGateway
 
     @SubscribeMessage('BanUser')
     handleBanRequest(client: any, data: any) {
-        console.log('salut');
-        console.log(data.targetId, data.channelName);
         this.channelService.BanUser(this.io, data.targetId, data.channelName);
     }
 
