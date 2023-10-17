@@ -84,22 +84,6 @@ export const UserList = (props: UserListProps) => {
                                     </ListItem>
                                 );
                             })}
-							{chatContext.conversationInfo?.channel?.info?.map((moderation) => {
-								if (moderation.type !== 'ban' || moderation.ChannelName !== chatContext.conversationInfo?.channel?.name)
-								 	return ;
-								return (
-									<ListItem key={moderation.targetId}>
-                                        <ListItemButton
-                                            onClick={() =>
-                                                handleListItemClick(moderation.target)
-                                            }>
-                                            <ListItemText
-                                                primary={moderation.target.username}
-                                            />
-                                        </ListItemButton>
-                                    </ListItem>
-								)
-							})}
                         </List>
                     </Dialog>
                 )}

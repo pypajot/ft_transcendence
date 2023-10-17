@@ -116,6 +116,15 @@ export default function ChannelContextProvider(
             });
             newArrayChannels.push(channel);
             setArrayChannels(newArrayChannels);
+			// if (chatContext.conversationInfo &&
+			// 	chatContext.conversationInfo.channel &&
+			// 	channel.name === chatContext.conversationInfo.channel.name) {
+			// 	chatContext.setConversationInfo({
+			// 		isUser: false,
+			// 		isChannel: true,
+			// 		channel: channel,
+			// 	})
+			// }
             // console.log(user, channels);
         },
         [user, channels, setChannels, arrayChannels, setArrayChannels]

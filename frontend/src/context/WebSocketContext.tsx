@@ -25,23 +25,23 @@ export default function SocketContextProvider(
         func: string;
         msg: string;
     } | null>(null);
-    const { user, setUser } = useAuth();
-    const [token, setToken] = useState<string | null>(null);
+    const { user, setUser, logout } = useAuth();
+    // const [token, setToken] = useState<string | null>(null);
 
-    const refresh = async () => {
-        const response = await fetch('http://localhost:3333/api/auth/refresh', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${sessionStorage.getItem(
-                    'access_token'
-                )}`,
-            },
-            credentials: 'include',
-        });
-        setToken((await response.json()).access_token);
-        token && sessionStorage.setItem('access_token', token);
-    };
+    // const refresh = async () => {
+    //     const response = await fetch('http://localhost:3333/api/auth/refresh', {
+    //         method: 'GET',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             Authorization: `Bearer ${sessionStorage.getItem(
+    //                 'access_token'
+    //             )}`,
+    //         },
+    //         credentials: 'include',
+    //     });
+    //     setToken((await response.json()).access_token);
+    //     token && sessionStorage.setItem('access_token', token);
+    // };
 
     useEffect(() => {
         if (!user) return;
@@ -52,7 +52,7 @@ export default function SocketContextProvider(
                 username: user.username,
             },
         });
-        newSocket.on('connect_error', refresh);
+        newSocket.on('connect_error', logout);
         setSocket(newSocket);
         newSocket.on('exception', (err) => {
             setSocketError(err);
@@ -89,7 +89,7 @@ export default function SocketContextProvider(
             newSocket.off('updateStatus');
             newSocket.disconnect();
         };
-    }, [user?.id, token]);
+    }, [user?.id]);
 
     const value = useMemo(
         () => ({

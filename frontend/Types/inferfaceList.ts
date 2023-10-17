@@ -3,7 +3,7 @@ export interface Moderation {
     type: string;
     targetId: number;
 	target: User;
-    ChannelName: string;
+    channelName: string;
 }
 
 export interface Channel {

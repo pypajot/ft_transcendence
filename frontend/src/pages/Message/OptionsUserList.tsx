@@ -124,12 +124,9 @@ export const OptionsUserList = (props: OptionUserListProps) => {
             // 'Block',
         ];
         const choices2: string[] = ['Play with', 'View profile'];
-        const choices3: string[] = ['Ban', 'View Profile'];
 
         if (user && channelContext.isChannelOwner(user.id)) {
             setOptions(['Promote to admin', ...choices]);
-        } else if (target && channelContext.isBan(target.id)) {
-            setOptions(choices3);
         } else if (
             target &&
             user &&
