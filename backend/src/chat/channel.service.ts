@@ -7,6 +7,7 @@ import { joinChannelInfo } from './chat.gateway';
 import { Message } from 'src/types/message.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WsException } from '@nestjs/websockets';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class ChannelService {
@@ -112,7 +113,6 @@ export class ChannelService {
                 },
             });
             io.to(user.socketId).emit('Kicked', channelName);
-            this.updateChannel(io, channelName);
         } catch (error) {
             console.log(error);
         }
@@ -380,14 +380,15 @@ export class ChannelService {
                 },
             });
             client.leave(info.channelName);
-            console.log('channel left: ', channelLeft);
             if (
                 channelLeft &&
                 channelLeft.admins &&
                 channelLeft.admins.length === 0
-            )
+            ) {
                 this.deleteChannel(io, client, info.channelName);
-            else this.updateChannel(io, info.channelName);
+            } else {
+                this.updateChannel(io, info.channelName);
+            }
         } catch (error) {
             console.log(error);
         }
@@ -432,6 +433,10 @@ export class ChannelService {
                     },
                 },
             });
+            let pass = '';
+            if (data_chan.pwd && data_chan.pwd != '') {
+                pass = await argon2.hash(data_chan.pwd);
+            }
             const newchannel = await this.prisma.channel.create({
                 data: {
                     name: data_chan.name,
@@ -440,7 +445,7 @@ export class ChannelService {
                         connect: { id: user.id },
                     },
                     public: public_chan,
-                    password: data_chan.pwd,
+                    password: pass,
                     invited: [],
                     admins: [user.id],
                     info: {
@@ -453,7 +458,6 @@ export class ChannelService {
                 },
             });
             client.join(data_chan.name);
-            console.log(newchannel);
             client.emit('successfullyJoinedChannel', newchannel);
         }
     }
@@ -476,6 +480,7 @@ export class ChannelService {
                     target: true,
                 },
             });
+            console.log(channel.members);
             channel.members.map((user) => {
                 io.to(user.socketId).emit('updateChannel', {
                     ...channel,
@@ -544,7 +549,8 @@ export class ChannelService {
             return;
         } else if (
             info.pass !== undefined &&
-            info.pass !== existingChannel.password
+            info.pass != '' &&
+            !(await argon2.verify(existingChannel.password, info.pass))
         ) {
             throw new WsException({
                 func: 'joinChannel',

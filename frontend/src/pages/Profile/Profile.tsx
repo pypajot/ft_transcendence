@@ -35,16 +35,23 @@ type AchievementType = {
 };
 
 const Profile = () => {
-	const { user, setUser, refreshFetch } = useAuth();
-	const { socket, socketError, setSocketError } = useSocketContext();
-	const {profileId, setProfileId} = useProfileContext();
-	const [imagePath, setImagePath] = useState<string | null>(null);
-	const [usernameError, setUsernameError] = useState<string | null>(null);
-	const [codeError, setCodeError] = useState<string | null>(null);
-	const [searchParams] = useSearchParams();
-	const [currentUser, setCurrentUser] = useState<{id: number, username: string, avatar: string, matchHistory: GameType[], elo: number, achievements: AchievementType[]} | null>(null);
-	const navigate = useNavigate();
-	// const run = useRef(true);
+    const { user, setUser, refreshFetch } = useAuth();
+    const { socket, socketError, setSocketError } = useSocketContext();
+    const { profileId, setProfileId } = useProfileContext();
+    const [imagePath, setImagePath] = useState<string | null>(null);
+    const [usernameError, setUsernameError] = useState<string | null>(null);
+    const [codeError, setCodeError] = useState<string | null>(null);
+    const [searchParams] = useSearchParams();
+    const [currentUser, setCurrentUser] = useState<{
+        id: number;
+        username: string;
+        avatar: string;
+        matchHistory: GameType[];
+        elo: number;
+        achievements: AchievementType[];
+    } | null>(null);
+    const navigate = useNavigate();
+    // const run = useRef(true);
 
     async function GetUserProfile(e: any) {
         e.preventDefault();
@@ -53,37 +60,38 @@ const Profile = () => {
         socket?.emit('getProfileId', e.target.username.value);
     }
 
-	useEffect(() => {
-		const getCurrentUser = async (id: string | null) => {
-			const response = await refreshFetch('http://localhost:3333/api/user/' + id, {
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
-				},
-			});
-			if (response.status === 400) {
-				navigate("/error");
-				return ;
-			}
-			setCurrentUser(await response.json());
-		}
-		console.log("test here")
-		if (profileId) {
-			navigate("/profile" + `?id=${profileId}`);
-			setProfileId(0);
-			return ;
-		}
-		if (!user)
-			return ;
-		if (!searchParams.get("id"))
-			getCurrentUser(user.id.toString());
-		else
-			getCurrentUser(searchParams.get("id"));
-		// run.current = false;
-	}, [user, searchParams.get("id"), profileId])
-	
-	// if (!currentUser || !user)
-	// 	return ;
+    useEffect(() => {
+        const getCurrentUser = async (id: string | null) => {
+            const response = await refreshFetch(
+                'http://localhost:3333/api/user/' + id,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${sessionStorage.getItem(
+                            'access_token'
+                        )}`,
+                    },
+                }
+            );
+            if (response.status === 400) {
+                navigate('/error');
+                return;
+            }
+            setCurrentUser(await response.json());
+        };
+        if (profileId) {
+            navigate('/profile' + `?id=${profileId}`);
+            setProfileId(0);
+            return;
+        }
+        if (!user) return;
+        if (!searchParams.get('id')) getCurrentUser(user.id.toString());
+        else getCurrentUser(searchParams.get('id'));
+        // run.current = false;
+    }, [user, searchParams.get('id'), profileId]);
+
+    // if (!currentUser || !user)
+    // 	return ;
 
     const DisplayAvatar = (props: { img: string }) => {
         return (
@@ -150,7 +158,7 @@ const Profile = () => {
                                     name="username"
                                 />
                             </label>
-                            <div className='error-profile'>
+                            <div className="error-profile">
                                 <span>
                                     {socketError?.func === 'getProfileId'
                                         ? socketError.msg
@@ -168,65 +176,77 @@ const Profile = () => {
     }
 
     async function HandleSubmit(e: any) {
-		e.preventDefault();
-		setCodeError(null);
-		console.log(e.target.code.value);
-		const response = await refreshFetch('http://localhost:3333/api/auth/2fa/confirm', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${sessionStorage.getItem("access_token")}`
-			},
-			body: JSON.stringify({code: e.target.code.value}),
-			credentials: "include"
-		});
-		console.log("response status: ", response.status, response.ok);
-		if (response.status == 403)
-			setCodeError((await response.json()).message);
-		if (!response.ok)
-			return ;
-		setImagePath(null);
-		sessionStorage.setItem("access_token", ((await response.json()).token))
-		user && setUser({...user, twoFactorAuthActive: true})
-	}
+        e.preventDefault();
+        setCodeError(null);
+        console.log(e.target.code.value);
+        const response = await refreshFetch(
+            'http://localhost:3333/api/auth/2fa/confirm',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${sessionStorage.getItem(
+                        'access_token'
+                    )}`,
+                },
+                body: JSON.stringify({ code: e.target.code.value }),
+                credentials: 'include',
+            }
+        );
+        console.log('response status: ', response.status, response.ok);
+        if (response.status == 403)
+            setCodeError((await response.json()).message);
+        if (!response.ok) return;
+        setImagePath(null);
+        sessionStorage.setItem('access_token', (await response.json()).token);
+        user && setUser({ ...user, twoFactorAuthActive: true });
+    }
 
     function ChangeUsernameForm() {
         async function HandleChangeUsername(e: any) {
             e.preventDefault();
             setUsernameError(null);
-            if (e.target.username.value.trim() == '' ||
-                e.target.username.value.includes(' '))
-                setUsernameError('Username should not be empty or contain spaces');
-            else if (e.target.username.value.length < 4 || e.target.username.value.length > 20)
-                setUsernameError('Username must be between 4 and 20 characters');
-            else
-                socket?.emit('changeUsername', e.target.username.value.trim());
+            if (
+                e.target.username.value.trim() == '' ||
+                e.target.username.value.includes(' ')
+            )
+                setUsernameError(
+                    'Username should not be empty or contain spaces'
+                );
+            else if (
+                e.target.username.value.length < 4 ||
+                e.target.username.value.length > 20
+            )
+                setUsernameError(
+                    'Username must be between 4 and 20 characters'
+                );
+            else socket?.emit('changeUsername', e.target.username.value.trim());
         }
         if (!user || !currentUser || user.id !== currentUser?.id) return;
-            
+
         return (
-                <div>
-                    <form onSubmit={HandleChangeUsername}>
-                        <div className="div-submit-button-new">
-                            <label>
-                                <input
-                                    type="text"
-                                    name="username"
-                                    placeholder="new username"
-                                    className="user-input-new"
-                                />
-                                <div className='error-profile'>
-                                    <span>{usernameError}</span>
-                                </div>
-                            </label>
-                        </div>
-                        <div className="submit-button-new-div">
-                            <button type="submit" className="submit-button-new">
-                                Submit
-                            </button>
-                        </div>
-                    </form>
-                </div>
+            <div>
+                <form onSubmit={HandleChangeUsername}>
+                    <div className="div-submit-button-new">
+                        <label>
+                            <input
+                                type="text"
+                                name="username"
+                                placeholder="new username"
+                                className="user-input-new"
+                            />
+                            <div className="error-profile">
+                                <span>{usernameError}</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div className="submit-button-new-div">
+                        <button type="submit" className="submit-button-new">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
         );
     }
 
@@ -297,13 +317,22 @@ const Profile = () => {
                                         </div>
                                         <div className="game-opponent">
                                             <h4>
-                                                {game.winner.username === currentUser?.username
-                                                ? game.loser.username.length > 12
-                                                ? game.loser.username.substring(0, 12) + "..."
-                                                : game.loser.username
-                                                : game.winner.username.length > 12
-                                                ? game.winner.username.substring(0, 12) + "..."
-                                                : game.winner.username}
+                                                {game.winner.username ===
+                                                currentUser?.username
+                                                    ? game.loser.username
+                                                          .length > 12
+                                                        ? game.loser.username.substring(
+                                                              0,
+                                                              12
+                                                          ) + '...'
+                                                        : game.loser.username
+                                                    : game.winner.username
+                                                          .length > 12
+                                                    ? game.winner.username.substring(
+                                                          0,
+                                                          12
+                                                      ) + '...'
+                                                    : game.winner.username}
                                             </h4>
                                         </div>
                                         <div className="game-score">

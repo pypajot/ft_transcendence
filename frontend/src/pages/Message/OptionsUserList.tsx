@@ -56,6 +56,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     };
 
     const handleProfile = () => {
+        console.log(target?.id);
         navigate(`/profile?id=${target?.id}`);
     };
 
@@ -69,7 +70,6 @@ export const OptionsUserList = (props: OptionUserListProps) => {
     };
 
     const handleOptionClick = (choice: string) => {
-        console.log(`dude : ${choice}`);
         switch (choice) {
             case 'Mute':
                 handleMute();
@@ -123,7 +123,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
             'View Profile',
             // 'Block',
         ];
-        const choices2: string[] = ['Play with', 'View profile'];
+        const choices2: string[] = ['Play with', 'View Profile'];
         const choices3: string[] = ['Ban', 'View Profile'];
 
         if (user && channelContext.isChannelOwner(user.id)) {
@@ -134,7 +134,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
             target &&
             user &&
             channelContext.isAdmin() &&
-            !channelContext.isChannelOwner(user.id)
+            !channelContext.isChannelOwner(target.id)
         ) {
             setOptions(choices);
         } else {

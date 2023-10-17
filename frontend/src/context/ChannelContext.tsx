@@ -39,7 +39,6 @@ export default function ChannelContextProvider(
     React.useEffect(() => {
         const buff: Channel[] = [];
         if (channels) {
-            console.log(buff, channels);
             for (const channel of channels) {
                 buff.push(channel[1]);
             }
@@ -63,15 +62,23 @@ export default function ChannelContextProvider(
 
     const leaveChannel = React.useCallback(
         (channelName: string, username: string) => {
-            const buffChannel = new Map(channels);
             socket?.emit('userLeavingChannel', {
                 channelName: channelName,
                 user: username,
             });
-            if (buffChannel) {
-                buffChannel.delete(channelName);
-                setChannels(buffChannel);
+            if (channels) {
+                channels.delete(channelName);
+                setChannels(channels);
                 chatContext.setRenderConversation(false);
+                const newArrayChannels = arrayChannels.filter(
+                    (channelInArr) => {
+                        if (channelName == channelInArr.name) {
+                            return false;
+                        }
+                        return true;
+                    }
+                );
+                setArrayChannels(newArrayChannels);
             }
             chatContext.setConversationInfo(undefined);
         },
@@ -116,7 +123,6 @@ export default function ChannelContextProvider(
             });
             newArrayChannels.push(channel);
             setArrayChannels(newArrayChannels);
-            // console.log(user, channels);
         },
         [user, channels, setChannels, arrayChannels, setArrayChannels]
     );
@@ -124,7 +130,6 @@ export default function ChannelContextProvider(
     const updateInviteChannel = React.useCallback(
         (channels: Channel[]) => {
             setInvitedList(channels);
-            console.log(channels);
         },
         [setInvitedList]
     );
@@ -176,6 +181,7 @@ export default function ChannelContextProvider(
             socket?.off('Kicked', handleGettingKicked);
             socket?.off('updateChannel', updateChannel);
             socket?.off('deleteChannel', deleteChannel);
+            socket?.off('updateInvited', updateInviteChannel);
         };
     }, [
         socket,
@@ -189,7 +195,11 @@ export default function ChannelContextProvider(
     const isBan = React.useCallback(
         (userId: number) => {
             let res = false;
-            if (chatContext.conversationInfo?.channel && channels) {
+            if (
+                chatContext.conversationInfo?.channel &&
+                channels &&
+                channels.get(chatContext.conversationInfo.channel.name)?.info
+            ) {
                 channels
                     .get(chatContext.conversationInfo.channel.name)
                     ?.info.map((moderation) => {

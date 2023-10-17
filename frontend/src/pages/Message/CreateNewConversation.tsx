@@ -4,7 +4,6 @@ import { useChatContext } from '../../context/ChatContext';
 import './CreateNewConversation.css';
 import './ChatPage.css';
 
-
 const CreateNewConvDropdown = () => {
     const { socket, socketError, setSocketError } = useSocketContext();
 
@@ -33,7 +32,7 @@ const CreateNewConvDropdown = () => {
     return (
         <div className={'create-conv-dropdown-menu'}>
             <form onSubmit={channelCreation}>
-                <div className='position-relative-input'>
+                <div className="position-relative-input">
                     <h4>Create new Channel</h4>
                     <input
                         className="chat-input-field"
@@ -41,9 +40,11 @@ const CreateNewConvDropdown = () => {
                         id="channelInputId"
                         placeholder="Enter Channel Name"
                     />
-                    <div className='chat-error-create-chan'>
-                    {socketError && socketError.func === "channelCreation" ? (
-                            <span>{socketError.msg}</span>) : null}
+                    <div className="chat-error-create-chan">
+                        {socketError &&
+                        socketError.func === 'channelCreation' ? (
+                            <span>{socketError.msg}</span>
+                        ) : null}
                     </div>
                 </div>
                 <div>
@@ -97,6 +98,7 @@ export const CreateNewConversation = ({ open, setOpen }: any) => {
         if (open === 'CreateNewConversation') {
             setOpen(null);
         } else {
+            chatContext.setRenderConversation(true);
             setOpen('CreateNewConversation');
         }
     };
@@ -106,7 +108,7 @@ export const CreateNewConversation = ({ open, setOpen }: any) => {
             <button className="create-conv-button" onClick={handleOpen}>
                 Create a Channel
             </button>
-            {open === "CreateNewConversation" ? (
+            {open === 'CreateNewConversation' ? (
                 <CreateNewConvDropdown />
             ) : null}
         </div>

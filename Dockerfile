@@ -1,5 +1,6 @@
 FROM node:bookworm
 
+WORKDIR app/
 COPY backend backend
 COPY frontend frontend
 COPY .env backend
