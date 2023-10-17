@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { Uploader } from 'uploader';
 import { UploadButton } from 'react-uploader';
-import HelperText from '../../components/HelperText';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useProfileContext } from '../../context/ProfileContext';
 
@@ -261,9 +260,14 @@ const Profile = () => {
                     <form onSubmit={HandleSubmit}>
                         <div>
                             <label>
-                                Authenticator code:{' '}
-                                <input type="text" name="code" />
-                                <HelperText errorText={codeError} />
+                                <input 
+                                    className='user-input-new'
+                                    type="text"
+                                    name="code"
+                                    placeholder='Enter Authenticator code' />
+                                <div className="error-2fa">
+                                    <span>{codeError}</span>
+                                </div>
                             </label>
                         </div>
                         <div>
