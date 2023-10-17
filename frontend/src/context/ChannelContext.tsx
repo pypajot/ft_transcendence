@@ -63,15 +63,26 @@ export default function ChannelContextProvider(
 
     const leaveChannel = React.useCallback(
         (channelName: string, username: string) => {
-            const buffChannel = new Map(channels);
             socket?.emit('userLeavingChannel', {
                 channelName: channelName,
                 user: username,
             });
-            if (buffChannel) {
-                buffChannel.delete(channelName);
-                setChannels(buffChannel);
+            if (channels) {
+                channels.delete(channelName);
+                setChannels(channels);
                 chatContext.setRenderConversation(false);
+                const newArrayChannels = arrayChannels.filter(
+                    (channelInArr) => {
+                        if (channelName == channelInArr.name) {
+                            return false;
+                        }
+                        return true;
+                    }
+                );
+                setArrayChannels(newArrayChannels);
+                console.log('Le Pain');
+                console.log(channelName, username);
+                console.log(channels);
             }
             chatContext.setConversationInfo(undefined);
         },
@@ -116,7 +127,8 @@ export default function ChannelContextProvider(
             });
             newArrayChannels.push(channel);
             setArrayChannels(newArrayChannels);
-            // console.log(user, channels);
+            console.log('Mias ntt');
+            console.log(user, channels);
         },
         [user, channels, setChannels, arrayChannels, setArrayChannels]
     );
@@ -176,6 +188,7 @@ export default function ChannelContextProvider(
             socket?.off('Kicked', handleGettingKicked);
             socket?.off('updateChannel', updateChannel);
             socket?.off('deleteChannel', deleteChannel);
+            socket?.off('updateInvited', updateInviteChannel);
         };
     }, [
         socket,

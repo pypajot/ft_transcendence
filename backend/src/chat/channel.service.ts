@@ -113,7 +113,6 @@ export class ChannelService {
                 },
             });
             io.to(user.socketId).emit('Kicked', channelName);
-            this.updateChannel(io, channelName);
         } catch (error) {
             console.log(error);
         }
@@ -386,9 +385,12 @@ export class ChannelService {
                 channelLeft &&
                 channelLeft.admins &&
                 channelLeft.admins.length === 0
-            )
+            ) {
                 this.deleteChannel(io, client, info.channelName);
-            else this.updateChannel(io, info.channelName);
+            } else {
+                console.log('Here');
+                this.updateChannel(io, info.channelName);
+            }
         } catch (error) {
             console.log(error);
         }
@@ -480,6 +482,8 @@ export class ChannelService {
                     target: true,
                 },
             });
+            console.log('gogo');
+            console.log(channel.members);
             channel.members.map((user) => {
                 io.to(user.socketId).emit('updateChannel', {
                     ...channel,

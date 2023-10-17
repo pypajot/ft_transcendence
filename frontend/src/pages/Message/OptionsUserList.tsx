@@ -134,7 +134,7 @@ export const OptionsUserList = (props: OptionUserListProps) => {
             target &&
             user &&
             channelContext.isAdmin() &&
-            !channelContext.isChannelOwner(user.id)
+            !channelContext.isChannelOwner(target.id)
         ) {
             setOptions(choices);
         } else {
