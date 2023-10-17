@@ -9,7 +9,7 @@ function JoinChannelDropdown({ joinChannel, friendError }: any) {
     return (
         <div className="chat-dropdown-joinmenu">
             <form onSubmit={joinChannel}>
-                <div className='position-relative-input-join'>
+                <div className="position-relative-input-join">
                     <h4> Join Channel Form </h4>
                     <input
                         className="chat-input-field"
@@ -17,20 +17,20 @@ function JoinChannelDropdown({ joinChannel, friendError }: any) {
                         type="text"
                         placeholder="Enter a Channel"
                     />
-                    <div className='chat-error-join'>
-                    {friendError !== 'Invalid password' && (
-                        <span>{friendError}</span>
-                    )}
+                    <div className="chat-error-join">
+                        {friendError !== 'Invalid password' && (
+                            <span>{friendError}</span>
+                        )}
                     </div>
                 </div>
-                <div className='position-relative-input-join'>
-                        <input
-                            className="chat-input-field"
-                            type="password"
-                            name="password"
-                            placeholder="Enter a Password"
-                        />
-                    <div className='chat-error-join'>
+                <div className="position-relative-input-join">
+                    <input
+                        className="chat-input-field"
+                        type="password"
+                        name="password"
+                        placeholder="Enter a Password"
+                    />
+                    <div className="chat-error-join">
                         {friendError === 'Invalid password' && (
                             <span>{friendError}</span>
                         )}
@@ -51,7 +51,7 @@ export const JoinChannel = ({
     setFriendError,
 }: any) => {
     const { socket, setSocketError } = useSocketContext();
-    const { setConversationInfo } = useChatContext();
+    const { setConversationInfo, setRenderConversation } = useChatContext();
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const handleClickOutside = (event: any) => {
@@ -96,6 +96,7 @@ export const JoinChannel = ({
             channel: arg,
         };
         setConversationInfo(convInfo);
+        setRenderConversation(true);
     };
 
     useEffect(() => {

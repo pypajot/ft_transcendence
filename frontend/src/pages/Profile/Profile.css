@@ -276,3 +276,14 @@
 	height : 20px;
     width: 100%;
 }
+
+.error-2fa {
+    position : relative;
+	color: red;
+	font-size: 12px;
+	text-align: center;
+	font-style: italic;
+    font-weight: bold;
+	height : 20px;
+    width: 100%;
+}

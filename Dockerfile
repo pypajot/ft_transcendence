@@ -1,5 +1,6 @@
 FROM node:bookworm
 
+WORKDIR app/
 COPY backend backend
 COPY frontend frontend
 COPY .env backend
@@ -9,8 +10,8 @@ COPY docker-entrypoint.sh /bin/docker-entrypoint.sh
 RUN apt update -y
 RUN apt install vim iputils-ping -y
 
-RUN npm install --prefix backend
-RUN npm install --prefix frontend
+RUN npm update --prefix backend
+RUN npm update --prefix frontend
 RUN npx prisma generate
 
 RUN npm run build --prefix backend

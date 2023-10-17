@@ -28,9 +28,10 @@ export const Conversation = () => {
     const [receivedMessage, setReceivedMessage] = useState<Message[]>();
     const [conversationMsg, setConversationMsg] = useState<Message[]>([]);
     const [username, setUsername] = useState<string>('');
-    const convContainerRef = useRef<HTMLDivElement>(null); 
+    const convContainerRef = useRef<HTMLDivElement>(null);
 
-    const {conversationInfo, isBlocked} = useChatContext();
+    const { conversationInfo, isBlocked, renderConversation } =
+        useChatContext();
     //Make a component to get the previous messsage
     const { socket } = useSocketContext();
 
@@ -48,7 +49,6 @@ export const Conversation = () => {
         isUser: boolean;
     }) => {
         const url = 'http://localhost:3333/api/chat/getMessageReceived';
-		console.log("received: ", obj);
 
         try {
             const response = await refreshFetch(url, {
@@ -69,49 +69,44 @@ export const Conversation = () => {
             if (!response.ok) {
                 return [];
             }
-			
 
             const text = await response.text();
-			console.log("text received: ", text)
-			const json = JSON.parse(text);
-			setReceivedMessage(json);
+            const json = JSON.parse(text);
+            setReceivedMessage(json);
         } catch (error) {
             console.error('There was an error fetching the data', error);
         }
     };
 
-	const getMessageSent = async (obj: {
+    const getMessageSent = async (obj: {
         sender: string;
         receiver?: string;
         isUser: boolean;
     }) => {
         const url = 'http://localhost:3333/api/chat/getMessageSent';
-		console.log("sent: ", obj);
         // try {
-			const response = await refreshFetch(url, {
-			  method: "POST",
-			  headers: {
-				"Content-Type": "application/json",
-			  },
-			  body: JSON.stringify({
-				sender: obj.sender,
-				receiver: obj.receiver,
-				isUser: obj.isUser,
-			  }),
-			});
-			console.log("response ok: ", response.ok, response.status)
-			if (!response.ok) {
-			  return [];
-			}
-			// console.log(response)
-			const text = await response.text();
-			console.log("text sent: ", text)
-			const json = (text === "[]") ? [] : JSON.parse(text);
-			setSentMessage(json);
-			// return ();
-		//   } catch (error) {
-		// 	console.error("There was an error fetching the data", error);
-		//   }
+        const response = await refreshFetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sender: obj.sender,
+                receiver: obj.receiver,
+                isUser: obj.isUser,
+            }),
+        });
+        if (!response.ok) {
+            return [];
+        }
+        // console.log(response)
+        const text = await response.text();
+        const json = text === '[]' ? [] : JSON.parse(text);
+        setSentMessage(json);
+        // return ();
+        //   } catch (error) {
+        // 	console.error("There was an error fetching the data", error);
+        //   http://localhost:3333/home}
     };
 
     // useEffect(() => {}, [conversationInfo, username]);
@@ -119,30 +114,28 @@ export const Conversation = () => {
     useEffect(() => {
         const info = conversationInfo;
         if (!info) {
-			return;
+            return;
         }
         // if (info && info.isChannel && info.channel) {
-		// 	setConvName(info.channel.name);
+        // 	setConvName(info.channel.name);
         // } else if (info && info.isUser && info.user) {
-		// 	setConvName(info.user.username);
+        // 	setConvName(info.user.username);
         // }
-		console.log('username conversation: ', username)
-		// if (username === '' || convName === '') {
-			// 	setRenderConversation(false);
-			// 	return ;
-			// }
-		if (!username)
-			return ;
-		getMessageSent({
-			sender: username,
-			receiver: info.isUser ? info.user?.username : info.channel?.name,
-			isUser: info.isUser,
-		});
-		getMessageReceived({
-			sender: info.isUser ? info.user?.username : info.channel?.name,
-			receiver: username,
-			isUser: info.isUser,
-		});
+        // if (username === '' || convName === '') {
+        // 	setRenderConversation(false);
+        // 	return ;
+        // }
+        if (!username) return;
+        getMessageSent({
+            sender: username,
+            receiver: info.isUser ? info.user?.username : info.channel?.name,
+            isUser: info.isUser,
+        });
+        getMessageReceived({
+            sender: info.isUser ? info.user?.username : info.channel?.name,
+            receiver: username,
+            isUser: info.isUser,
+        });
     }, [
         conversationInfo,
         // renderConversation,
@@ -154,6 +147,8 @@ export const Conversation = () => {
         // setRenderConversation(false);
         // return;
         // }
+        const info = conversationInfo;
+        if (!info) return;
         if (receivedMessage && user) {
             receivedMessage.forEach(function (obj) {
                 obj.sent = false;
@@ -188,8 +183,7 @@ export const Conversation = () => {
             }
             if (
                 message.channel &&
-                message.channel.name ==
-                    conversationInfo?.channel?.name
+                message.channel.name == conversationInfo?.channel?.name
             )
                 setConversationMsg([...conversationMsg, message]);
             // console.log(conversationMsg);
@@ -213,7 +207,9 @@ export const Conversation = () => {
         if (content && content != '' && conversationInfo) {
             const message_content: MessageInfo = {
                 content: content,
-                target: conversationInfo.user ? conversationInfo.user.username : conversationInfo.channel?.name,
+                target: conversationInfo.user
+                    ? conversationInfo.user.username
+                    : conversationInfo.channel?.name,
                 ToUser: conversationInfo.isUser,
             };
             socket?.emit('message', message_content);
@@ -232,95 +228,115 @@ export const Conversation = () => {
         };
     }, [messageListener, socket, channelMessage]);
 
-    const handleFormSubmit = (e : any) => {
-        e.preventDefault();  // Prevents default form submission behavior
+    const handleFormSubmit = (e: any) => {
+        e.preventDefault(); // Prevents default form submission behavior
         sendMessage();
     };
 
-    const handleInputChange = (e : any) => {
+    const handleInputChange = (e: any) => {
         setContent(e.target.value);
     };
 
     useEffect(() => {
         const container = convContainerRef.current;
         if (container)
-            container.scrollTop = container.scrollHeight - container.clientHeight;
+            container.scrollTop =
+                container.scrollHeight - container.clientHeight;
     }, [conversationMsg]);
 
     const renderName = () => {
-        if (conversationInfo && conversationInfo.isUser && conversationInfo.user) {
+        if (
+            conversationInfo &&
+            conversationInfo.isUser &&
+            conversationInfo.user
+        ) {
             return conversationInfo.user.username;
-        } else if (conversationInfo && conversationInfo.isChannel && conversationInfo.channel) {
+        } else if (
+            conversationInfo &&
+            conversationInfo.isChannel &&
+            conversationInfo.channel
+        ) {
             return conversationInfo.channel.name;
         }
         return '';
-    }
+    };
     return (
         <>
-            {conversationInfo && (
-                <div className='conversation-name'>
-                <Flex>
-                    <Flex grow shrink basis="1px">
-                        <Flex>{renderName().length > 20 
-                            ? renderName().substring(20, 0) + '...'
-                            : renderName()}</Flex>
+            {renderConversation && conversationInfo && (
+                <div className="conversation-name">
+                    <Flex>
+                        <Flex grow shrink basis="1px">
+                            <Flex>
+                                {renderName().length > 20
+                                    ? renderName().substring(20, 0) + '...'
+                                    : renderName()}
+                            </Flex>
+                        </Flex>
+                        <OptionMenu />
                     </Flex>
-                    <OptionMenu />
-                </Flex>
                 </div>
             )}
-            {conversationInfo && (
-            <div className="conversation-container" ref={convContainerRef}>
-                {conversationMsg &&
-                    conversationMsg.map(function (message, i) {
-                        if (
-                            message.targetId &&
-                            conversationInfo?.isChannel
-                        ) {
-                            return;
-                        }
-                        if (message.sent) {
-                            return (
-                                <div key={i}>
-                                    <BasicOutMessage
-                                        message={message}></BasicOutMessage>
-                                </div>
-                            );
-                        } else {
-                            if (isBlocked(message.authorId)) {
+            {renderConversation && conversationInfo && (
+                <div className="conversation-container" ref={convContainerRef}>
+                    {conversationMsg &&
+                        conversationMsg.map(function (message, i) {
+                            if (
+                                message.targetId &&
+                                conversationInfo?.isChannel
+                            ) {
                                 return;
                             }
-                            return (
-                                <div key={i}>
-                                    <BasicInMessage
-                                        message={message}></BasicInMessage>
-                                </div>
-                            );
-                        }
-                    })}
-            </div>
+                            if (message.sent) {
+                                return (
+                                    <div key={i}>
+                                        <BasicOutMessage
+                                            message={message}></BasicOutMessage>
+                                    </div>
+                                );
+                            } else {
+                                if (isBlocked(message.authorId)) {
+                                    return;
+                                }
+                                return (
+                                    <div key={i}>
+                                        <BasicInMessage
+                                            message={message}></BasicInMessage>
+                                    </div>
+                                );
+                            }
+                        })}
+                </div>
             )}
-            {conversationInfo && (
-                <div className='conversation-input-area'>
-                <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
-                    <input
-                        className='conversation-input-field'
-                        type="text"
-                        placeholder="Type here..."
-                        value={content}
-                        onChange={handleInputChange}
-                        style={{ flex: 1 }}
-                    />
-                    <button
-                        className='conversation-button'
-                        type="submit"
-                        name="send"
-                        disabled={!content}
-                    >
-                        <img src={sendIcon} alt="Send" className="conversation-button-icon" />
-                    </button>
-                </form>
-            </div>
+            {renderConversation && conversationInfo && (
+                <div className="conversation-input-area">
+                    <form
+                        onSubmit={handleFormSubmit}
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            flex: 1,
+                        }}>
+                        <input
+                            className="conversation-input-field"
+                            type="text"
+                            placeholder="Type here..."
+                            value={content}
+                            onChange={handleInputChange}
+                            style={{ flex: 1 }}
+                        />
+                        <button
+                            className="conversation-button"
+                            type="submit"
+                            name="send"
+                            disabled={!content}>
+                            <img
+                                src={sendIcon}
+                                alt="Send"
+                                className="conversation-button-icon"
+                            />
+                        </button>
+                    </form>
+                </div>
             )}
         </>
     );

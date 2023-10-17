@@ -52,7 +52,6 @@ export class ChatGatewayService {
             }
             if (user.friends) {
                 friendsList = user.friends.filter((id) => {
-                    console.log(id, target.id);
                     if (id == target.id) {
                         return false;
                     }
@@ -101,7 +100,6 @@ export class ChatGatewayService {
                     socketId: { not: socket_id },
                 },
             });
-            console.log(await userList);
             io.emit('ResponseGetFriendsList', await userList);
         } catch (error) {
             console.log(error);
@@ -149,7 +147,6 @@ export class ChatGatewayService {
                 const userId = (
                     await this.utilsService.findIdFromSocketId(socket_id)
                 )[0];
-                console.log(userId);
                 const channel = await this.prisma.channel.findUnique({
                     where: {
                         name: info.target,
@@ -159,7 +156,6 @@ export class ChatGatewayService {
                     },
                 });
                 if (this.utilsService.isMute(userId, channel)) {
-                    console.log('Muteed message creation fail');
                     return null;
                 }
                 const msg = await this.prisma.message.create({
@@ -219,7 +215,6 @@ export class ChatGatewayService {
 
     async sendToUser(io: Server, message: any, socket_id: string) {
         try {
-            console.log(`test : ${message.content}`);
             const sender = await this.prisma.user.findUnique({
                 where: {
                     id: (
@@ -237,9 +232,6 @@ export class ChatGatewayService {
             io.to(
                 await this.utilsService.getSocketIdFromId(message.targetId)
             ).emit('messageRcv', msgRes);
-            console.log(
-                await this.utilsService.getSocketIdFromId(message.targetId)
-            );
             this.logger.log(`Sent ${message.content}`);
         } catch (error) {
             console.log(error);

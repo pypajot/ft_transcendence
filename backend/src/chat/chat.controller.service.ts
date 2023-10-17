@@ -10,7 +10,6 @@ export class ChatControllerService {
         private prisma: PrismaService) {}
 
     async getFriendsList(user_name: string) {
-        console.log(user_name);
         try {
             const user = await this.prisma.user.findUnique({
                 where: {
@@ -150,7 +149,6 @@ export class ChatControllerService {
 				}
 			}
 			// console.log(`msgSent from : ${user_name} :`);
-			console.log(res);
 			return JSON.stringify(res);
         // } catch (error) {
         //     console.log(error);
@@ -181,7 +179,6 @@ export class ChatControllerService {
                 };
                 res.push(msg);
             }
-			console.log(res);
             return JSON.stringify(res);
         // } catch (error) {
         //     console.log(error);

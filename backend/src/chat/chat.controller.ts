@@ -16,7 +16,6 @@ export class ChatController {
 
     @Post('getMessageSent')
     async getLogsSender(@Body() dto: PrivMsgLogsDto): Promise<string> {
-        console.log("message sent dto: ", dto);
         if (dto.isUser) {
             return await this.chatService.getLogsUserToUser(dto.sender, dto.receiver);
         } else {
@@ -34,7 +33,6 @@ export class ChatController {
     }
     @Post('getMessageReceived')
     async getLogsReceiver(@Body() dto: PrivMsgLogsDto): Promise<string> {
-        console.log("message received dto: ", dto);
         if (dto.isUser) {
             return await this.chatService.getLogsUserToUser(dto.sender, dto.receiver);
         } else {
@@ -46,7 +44,6 @@ export class ChatController {
     }
     @Get('getFriendsList')
     getFriends(@Query('username') username: any) {
-        console.log('username: ', username);
         return this.chatService.getFriendsList(username);
     }
 }
