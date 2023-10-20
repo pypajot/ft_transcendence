@@ -1,8 +1,8 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { useSocketContext } from '../../context/WebSocketContext';
-import { useChatContext } from '../../context/ChatContext';
-import './CreateNewConversation.css';
-import './ChatPage.css';
+import { useSocketContext } from '../../../context/WebSocketContext';
+import { useChatContext } from '../../../context/ChatContext';
+import '../../../CSS/CreateNewConversation.css';
+import '../../../CSS/ChatPage.css';
 
 const CreateNewConvDropdown = () => {
     const { socket, socketError, setSocketError } = useSocketContext();

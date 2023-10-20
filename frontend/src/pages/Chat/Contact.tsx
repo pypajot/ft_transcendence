@@ -4,12 +4,12 @@ import { useAuth } from '../../context/AuthContext';
 import { useChatContext } from '../../context/ChatContext';
 import { Channel } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
-import './Contact.css';
-import { CreateNewConversation } from './CreateNewConversation';
-import { JoinChannel } from './JoinChannel';
-import { AddFriends } from './AddFriends';
+import '../../CSS/Contact.css';
+import { CreateNewConversation } from './Channel/CreateNewConversation';
+import { JoinChannel } from './Channel/JoinChannel';
+import { AddFriends } from '../Friends/AddFriends';
 import { useSocketContext } from '../../context/WebSocketContext';
-import BlockUser from './BlockUser';
+import BlockUser from '../Friends/BlockUser';
 
 export const Contact = () => {
     const [username, setUsername] = useState<string>('');

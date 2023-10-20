@@ -5,7 +5,7 @@ import {
     ChatMessageMeta,
     ChatMessageMetaItem,
 } from '@twilio-paste/core';
-import { Message } from '../../../Types/message.entity';
+import { Message } from '../../../../Types/message.entity';
 
 export const BasicOutMessage = ({ message }: { message: Message }) => {
     return (

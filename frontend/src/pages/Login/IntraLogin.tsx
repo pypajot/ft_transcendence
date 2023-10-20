@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import './Login.css';
+import '../../CSS/Login.css';
 import { useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 // import { useRef } from 'react';

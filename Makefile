@@ -8,3 +8,10 @@ fclean:
 	docker volume rm $$(docker volume ls -q);
 	docker network rm $$(docker network ls -q);
 	docker system prune -a -f;
+
+dev:
+	cd backend && docker compose up -d
+	sleep 3
+	cd frontend && (npm run start&)
+	cd backend && npx prisma migrate dev --name init && npm run start:dev
+	

@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState, useRef } from 'react';
 import { Flex } from '@twilio-paste/core';
 import { Message } from '../../../Types/message.entity';
 import { MessageInfo } from '../../../Types/messageInfo.entity';
-import { BasicInMessage, BasicOutMessage } from './BasicMessage';
+import { BasicInMessage, BasicOutMessage } from './Message/BasicMessage';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useAuth } from '../../context/AuthContext';
 import { useChatContext } from '../../context/ChatContext';
 import { OptionMenu } from './OptionMenu';
 import sendIcon from '../../assets/send.png';
-import './Conversation.css';
+import '../../CSS/Conversation.css';
 
 const sortByDate = () => {
     return function (a: any, b: any) {

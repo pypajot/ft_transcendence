@@ -1,4 +1,4 @@
-import './Profile.css';
+import '../../CSS/Profile.css';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
 import { Checkbox } from '@twilio-paste/core';

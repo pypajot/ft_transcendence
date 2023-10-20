@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import './Notifications.css';
+import '../CSS/Notifications.css';
 import { useSocketContext } from "../context/WebSocketContext";
 import { useAuth } from "../context/AuthContext";
 

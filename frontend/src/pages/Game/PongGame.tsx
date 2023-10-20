@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSocketContext } from '../../context/WebSocketContext.tsx';
 import { GameState } from '../../../../backend/src/game/game.lobby.ts';
-import './PongGame.css';
+import '../../CSS/PongGame.css';
 import { Link } from 'react-router-dom';
 import { useGameContext } from '../../context/GameContext.tsx';
 

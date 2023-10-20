@@ -1,5 +1,5 @@
 import { ReactEventHandler } from 'react'
-import './SendButton.css'
+import '../../CSS/SendButton.css'
 
 interface SendButtonProps {
     onClick: ReactEventHandler;

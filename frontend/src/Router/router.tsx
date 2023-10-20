@@ -8,7 +8,7 @@ import Profile from '../pages/Profile/Profile';
 import Game from '../pages/Game/Game';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import ChatComponent from '../pages/Message/ChatPage';
+import ChatComponent from '../pages/Chat/ChatPage';
 import Login2fa from '../pages/Login/Login2fa';
 import Friends from '../pages/Friends/Friends';
 import NotFound from '../pages/NotFound/NotFound';

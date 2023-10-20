@@ -1,6 +1,6 @@
 import { ConversationInformation } from '../../../Types/conversationInformation.entity';
 import { useChatContext } from '../../context/ChatContext';
-import './ContactElement.css';
+import '../../CSS/ContactElement.css';
 
 const statusIcon = {
     online: (

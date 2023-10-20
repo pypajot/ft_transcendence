@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { useSocketContext } from '../../context/WebSocketContext';
-import { ConversationInformation } from '../../../Types/conversationInformation.entity';
-import { useChatContext } from '../../context/ChatContext';
-import './JoinChannel.css';
-import './ChatPage.css';
+import { useSocketContext } from '../../../context/WebSocketContext';
+import { ConversationInformation } from '../../../../Types/conversationInformation.entity';
+import { useChatContext } from '../../../context/ChatContext';
+import '../../../CSS/JoinChannel.css';
+import '../../../CSS/ChatPage.css';
 
 function JoinChannelDropdown({ joinChannel, friendError }: any) {
     return (

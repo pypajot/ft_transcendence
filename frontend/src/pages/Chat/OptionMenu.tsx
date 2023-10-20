@@ -7,16 +7,16 @@ import {
 } from '@twilio-paste/core';
 import { MoreIcon } from '@twilio-paste/icons/esm/MoreIcon';
 import { useState, useEffect, useCallback } from 'react';
-import { InviteToChannel } from './InviteToChannel';
+import { InviteToChannel } from './Channel/InviteToChannel';
 import { useAuth } from '../../context/AuthContext';
 import { UserList } from './UserList';
-import { OptionsUserList } from './OptionsUserList';
+import { OptionsUserList } from './Channel/OptionsUserList';
 import { User } from '../../../Types/inferfaceList';
 import { useChannelContext } from '../../context/ChannelContext';
 import { useNavigate } from 'react-router-dom';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useChatContext } from '../../context/ChatContext';
-import { InvitePending } from './InvitePending';
+import { InvitePending } from '../Game/InvitePending';
 
 export const OptionMenu = () => {
     const menu = useMenuState();

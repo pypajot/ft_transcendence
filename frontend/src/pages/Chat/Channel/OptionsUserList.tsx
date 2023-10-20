@@ -1,12 +1,12 @@
 import { Dialog, DialogTitle, ListItem, ListItemText } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
-import { useSocketContext } from '../../context/WebSocketContext';
-import { useChatContext } from '../../context/ChatContext';
+import { useSocketContext } from '../../../context/WebSocketContext';
+import { useChatContext } from '../../../context/ChatContext';
 import { useEffect, useState } from 'react';
 import List from '@mui/material/List';
-import { User } from '../../../Types/inferfaceList';
-import { useChannelContext } from '../../context/ChannelContext';
-import { useAuth } from '../../context/AuthContext';
+import { User } from '../../../../Types/inferfaceList';
+import { useChannelContext } from '../../../context/ChannelContext';
+import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 interface OptionUserListProps {

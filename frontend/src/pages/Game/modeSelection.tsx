@@ -1,7 +1,7 @@
 import { useState} from 'react';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useGameContext } from '../../context/GameContext';
-import './modeSelection.css';
+import '../../CSS/modeSelection.css';
 import Navbar from '../../components/Navbar';
 
 const ModeSelection = () => {

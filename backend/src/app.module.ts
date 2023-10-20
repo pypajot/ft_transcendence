@@ -8,26 +8,41 @@ import { UserModule } from './user/user.module';
 import { MatchHistoryModule } from './match_history/match-history.module';
 import { GameModule } from './game/game.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { DynamicModule } from '@nestjs/common';
 
-@Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    ChatModule,
-    UserModule,
-    MatchHistoryModule,
-    AuthModule,
-    PrismaModule,
-    GameModule,
-	ServeStaticModule.forRoot({
-		rootPath: '/app/frontend/dist',
-	}),
-  ],
-  providers: [
-    PrismaService,
-  ],
-})
+function createAppModule() {
+  const commonModule = {
+    imports: [
+      ConfigModule.forRoot({
+        isGlobal: true,
+      }),
+      ChatModule,
+      UserModule,
+      AuthModule,
+      PrismaModule,
+      
+    ],
+    providers: [
+      PrismaService
+    ],
+  };
+
+  if (process.env.DEV === '1') {
+    return commonModule
+  } else {
+    return {
+      ...commonModule,
+      imports: [
+        // Additional production-specific imports can be added here.
+ServeStaticModule.forRoot({
+        rootPath: '/app/frontend/dist',
+      }),
+      ],
+    };
+  }
+}
+
+@Module(createAppModule())
 export class AppModule implements OnApplicationBootstrap {
 	constructor(private prisma: PrismaService) {}
   
@@ -38,5 +53,5 @@ export class AppModule implements OnApplicationBootstrap {
 		}
 	  });
   } catch (e) {}
-	}
   }
+}

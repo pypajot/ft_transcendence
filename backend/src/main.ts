@@ -11,13 +11,15 @@ async function bootstrap() {
 		process.env.REFRESH_SECRET
 	))
 	app.useGlobalPipes(new ValidationPipe());
-	// app.enableCors({
-	// 	origin: 'http://localhost:3333',
-	// 	methods: ['GET', 'POST', 'PUT', 'DELETE'],
-	// 	credentials: true,
-	// 	allowedHeaders: ['Content-Type', 'Authorization'],
-	// });
 	app.setGlobalPrefix("/api")
+	if (process.env.DEV == '1'){
+	 app.enableCors({
+	 	origin: 'http://localhost:5173',
+	 	methods: ['GET', 'POST', 'PUT', 'DELETE'],
+	 	credentials: true,
+	 	allowedHeaders: ['Content-Type', 'Authorization'],
+	 });
+	}
 	app.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(app));
 	await app.listen(3333, () => {});
 }

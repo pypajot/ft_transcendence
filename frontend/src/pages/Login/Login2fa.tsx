@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import "./Login.css"
+import "../../CSS/Login.css"
 
 function Login2fa() {
   const { setAccessToken } = useAuth();

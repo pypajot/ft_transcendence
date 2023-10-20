@@ -7,10 +7,10 @@ import ListItemText from '@mui/material/ListItemText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import { blue } from '@mui/material/colors';
-import { useChatContext } from '../../context/ChatContext';
-import { useSocketContext } from '../../context/WebSocketContext';
-import { User } from '../../../Types/inferfaceList';
-import { useAuth } from '../../context/AuthContext';
+import { useChatContext } from '../../../context/ChatContext';
+import { useSocketContext } from '../../../context/WebSocketContext';
+import { User } from '../../../../Types/inferfaceList';
+import { useAuth } from '../../../context/AuthContext';
 
 export interface SimpleDialogProps {
     open: boolean;

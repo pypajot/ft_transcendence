@@ -7,7 +7,7 @@ import {
   MenuSeparator,
 } from "@twilio-paste/paste-reakit-fork";
 import { MoreIcon } from "@twilio-paste/icons/esm/MoreIcon";
-import { InviteToChannel } from "./InviteToChannel";
+import { InviteToChannel } from "./Channel/InviteToChannel";
 import { useState } from "react";
 
 export const HeaderConversation = () => {

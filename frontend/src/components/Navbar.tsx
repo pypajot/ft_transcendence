@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import './Navbar.css';
+import '../CSS/Navbar.css';
 import First from './Notifications';
-import { PopUpInvite } from '../pages/Message/PopUpInvite';
+import { PopUpInvite } from './PopUpInvite';
 import { useGameContext } from '../context/GameContext';
 
 const Navbar = () => {

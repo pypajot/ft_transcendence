@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
-import './BlockUser.css';
-import './ChatPage.css';
+import '../../CSS/BlockUser.css';
+import '../../CSS/ChatPage.css';
 import { useAuth } from '../../context/AuthContext';
 import { useSocketContext } from '../../context/WebSocketContext';
 import { useChatContext } from '../../context/ChatContext';

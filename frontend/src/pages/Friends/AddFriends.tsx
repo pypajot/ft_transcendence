@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
-import './AddFriends.css';
-import './ChatPage.css';
+import '../../CSS/AddFriends.css';
+import '../../CSS/ChatPage.css';
 import { useAuth } from '../../context/AuthContext';
 import { useSocketContext } from '../../context/WebSocketContext';
 

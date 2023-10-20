@@ -3,9 +3,9 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, ModalFooterActions, ModalHe
 import { Button } from '@twilio-paste/button';
 import { useUID } from '@twilio-paste/core/uid-library';
 import { Paragraph } from '@twilio-paste/paragraph';
-import { useSocketContext } from '../../context/WebSocketContext';
+import { useSocketContext } from '../context/WebSocketContext';
 import { useNavigate } from 'react-router-dom';
-import { useGameContext } from '../../context/GameContext';
+import { useGameContext } from '../context/GameContext';
 
 interface PopUpProps {
 	key: number;
