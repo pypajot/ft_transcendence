@@ -1,0 +1,76 @@
+.conversation-container {
+    width: 100%;
+    height: 400px;
+    overflow-y: scroll;
+    border: 0.2rem solid #994dc2;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.conversation-input-area {
+    border: 0.2rem solid #994dc2;
+    border-radius: 1rem;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-top : 0.2rem;
+}
+
+.conversation-input-area form {
+    align-items: center;
+}
+
+.conversation-input-field {
+    border-color: #994dc2;
+    border-radius: 1rem;
+    display: relative;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding : 8px ;
+
+}
+
+.conversation-input-field:focus {
+    border-color: #d386fd;
+    outline: none;
+}
+
+.conversation-button {
+    width: 30px;
+    height: 25px; 
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.conversation-button-icon {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+}
+
+.conversation-name {
+    font-size: 1.2rem;
+    color: #994dc2;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    border-radius: 1rem;
+    padding: 0.5rem;
+}
+
+.css-1g68540 {
+    padding: 0.2rem 0.8rem !important;
+}
+
+.css-5luojk, .css-6d3ztg {
+    max-width: 80% !important;
+    text-align: left !important;
+}
+
+.css-1eqh6ij {
+    max-width: 70% !important;
+}

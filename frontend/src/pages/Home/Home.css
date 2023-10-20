@@ -1,0 +1,40 @@
+.logo-home{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 90%;
+    padding-top: 3%;
+}
+
+.game-home{
+    display: flex;
+    justify-content: center;
+}
+
+.game-pong-home{
+    width: 580px;
+}
+
+.play-button{
+    display: flex;
+    justify-content: center;
+    padding-top: 5%;
+}
+
+.play-button-home{
+    font-size: 21px;
+    color: white;
+    border: 3px solid #775d85;
+    border-radius:30px;
+    padding: 5px 20px;
+    cursor: pointer;
+    filter: drop-shadow(0 0 15px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
+    transition: .5s;
+    background: transparent;
+}
+
+.play-button-home:hover{
+    color: white;
+    background-color: #775d85;
+    filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
+}

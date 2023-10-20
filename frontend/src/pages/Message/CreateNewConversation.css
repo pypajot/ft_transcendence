@@ -1,0 +1,65 @@
+.create-conv {
+    position: relative;
+}
+
+.create-conv-show {
+    display: flex;
+}
+
+.create-conv-button {
+    font-size: 0.8rem;
+    color: white;
+    border: 3px solid #775d85;
+    border-radius:30px;
+    padding: 0.5rem 0.7rem;
+    cursor: pointer;
+    filter: drop-shadow(0 0 15px #775d85) drop-shadow(0 0 50px #775d85) contrast(2) brightness(2);
+    transition: .5s;
+    background: transparent;
+	margin-bottom: 1rem;
+    width: 100%;
+    position: relative;
+}
+
+.create-conv-button:hover {
+    color: white;
+    background-color: #775d85;
+    filter: drop-shadow(0 0 20px #775d85) contrast(2) brightness(2);
+}
+
+.create-conv-select {
+    position: relative;
+    background-color: #510779;
+    border: 3px solid #c56ff3;
+    border-radius: 1rem;
+    margin-bottom: 10px;
+    height: 25px;
+    justify-content: center;
+    align-items: center;
+}
+
+.create-conv-dropdown-menu {
+    position: absolute;
+    background-color: #510779;
+    border: 0.2rem solid #994dc2;
+    border-radius: 1rem;
+    width: 15rem;
+    height: 22rem;
+    z-index: 999;
+}
+
+.position-relative-input {
+    position: relative;
+    padding-bottom : 30px;
+}
+
+.chat-error-create-chan {
+    position : absolute;
+    bottom : 14px;
+	color: red;
+	font-size: 12px;
+	text-align: center;
+	font-style: italic;
+    font-weight: bold;
+    width: 100%;
+}

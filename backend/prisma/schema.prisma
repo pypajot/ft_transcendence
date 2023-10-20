@@ -1,0 +1,130 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  username        String    @unique
+  id              Int       @id @default(autoincrement())
+  hash            String?
+  intralogin      String?   @unique
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  avatar          String    @default("https://i.imgur.com/WxNkK7J.png")
+  status          String    @default("offline")
+  friends         Int[]     
+  friendsRequest  Int[]     
+  blocked         Int[]     
+  socketId        String?   @unique
+  channels        Channel[] @relation("Memberships")
+  messagesSent    Message[] @relation("Author")
+  messageReceived Message[] @relation("Target")
+  gamesWon        Game[]    @relation("Winner")
+  gamesLost       Game[]    @relation("Loser")
+  gamesPlayed     Game[]    @relation("Players")
+  wins            Int       @default(0)
+  losses          Int       @default(0)
+  achievements    UserAchievement[]
+  gameInvite      Boolean   @default(false)
+
+  tokens UserToken[]
+
+  twoFactorAuthActive Boolean @default(false)
+  twoFactorAuthSecret Bytes?
+  ManagementChannel   ManagementChannel[]
+
+  @@map("users")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  author    User     @relation("Author", fields: [authorId], references: [id])
+  target    User?    @relation("Target", fields: [targetId], references: [id])
+  createdAt DateTime @default(now())
+  targetId  Int?
+  authorId  Int
+  Channel   Channel? @relation(fields: [channelId], references: [id])
+  channelId Int?
+}
+
+model ManagementChannel {
+  id        Int      @id @default(autoincrement())
+  type      String
+  target    User     @relation(fields: [targetId], references: [id])
+  targetId  Int
+  createdAt DateTime @default(now())
+  channel   Channel? @relation(fields: [channelName], references: [name])
+  channelName String?
+}
+
+model Channel {
+  id       Int                 @id @default(autoincrement())
+  name     String
+  public   Boolean
+  password String?
+  messages Message[]
+  members  User[]              @relation("Memberships")
+  owner    Int
+  admins   Int[]
+  invited  Int[]
+  info     ManagementChannel[]
+
+  @@unique([name])
+  @@unique([id])
+}
+
+model UserToken {
+  id String @id @default(uuid())
+
+  user   User @relation(fields: [UserId], references: [id], onDelete: Cascade)
+  UserId Int
+
+  refreshToken String
+  family       String   @unique
+  createdAt    DateTime @default(now())
+
+  @@map("usertokens")
+}
+
+model Game {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  mode        String
+  players     User[]   @relation("Players")
+  winner      User?    @relation("Winner", fields: [winnerId], references: [id])
+  loser       User?    @relation("Loser", fields: [loserId], references: [id])
+  winnerId    Int?
+  loserId     Int?
+  winnerScore Int?
+  loserScore  Int?
+}
+
+model Achievement {
+  id       Int              @id @default(autoincrement())
+  name     String           @unique  
+  description String        
+  icon     String          // URL of an icon for the achievement
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  achievementId Int
+  createdAt     DateTime  @default(now())
+  user          User      @relation(fields: [userId], references: [id])
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])  // ensure a user can only earn each achievement once
+}
+
+model Background {
+	id		Int		@id @default(autoincrement())
+	picture	String
+}

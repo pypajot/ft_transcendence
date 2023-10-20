@@ -1,0 +1,85 @@
+*
+  .wrapper {
+	/* max-width: 50rem; */
+	background: #000000;
+	width: 30%;
+	margin: 0 auto;
+	padding-right : 32px;
+  }
+  .tabs {
+	height: 3.5rem;
+	
+  }
+
+  .active-tab {
+	cursor: pointer;
+	border-color:#663880;
+	border-width: 0.2rem;
+	border-style: solid;
+	border-bottom-style: hidden;
+	border-radius: 1rem 1rem 0 0;
+  }
+
+  .inactive-tab {
+	cursor: pointer;
+	border-color:#663880;
+	border-width: 0.2rem;
+	border-style: hidden;
+	border-bottom-style: solid;
+	border-radius: 1rem 1rem 0 0;
+  }
+
+  .tabs > div {
+	float: left;
+	position: relative;
+	width: 50%;
+	height: 100%;
+	
+  }
+  
+  .tab-content {
+	/* height: 12rem; */
+	width: 100%;
+	position: relative;
+	z-index: 1;
+	padding: 1.618rem;
+	transition: all 0.35s;
+	border-color:#663880;
+	border-width: 0.2rem;
+	border-style: solid;
+	border-top-style: hidden;
+	border-radius: 0 0 1rem 1rem;
+  }
+
+  .css-hv74hu {
+	background-color:rgba(0, 0, 0, 0) !important;
+  }
+
+  .channel-name, .friend-name {
+	transition: 0.4s ease all ;
+	padding-left : 10px;
+  }
+
+  .channel-name:hover, .friend-name:hover {
+	cursor: pointer !important;
+	transition: 0.4s ease all ;
+	color: #994dc2;
+  }
+
+::-webkit-scrollbar {
+	width: 12px;
+	border-radius: 10px;
+	background-color: rgb(49, 46, 46);
+}
+
+::-webkit-scrollbar-track {
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background:rgb(66, 68, 70); 
+}
